@@ -15,6 +15,8 @@ import string
 import datetime
 import urllib
 import sys
+import buggalo
+import scinema
 
 
 class KODISCLib(xbmcprovider.XBMCMultiResolverContentProvider):
@@ -136,3 +138,5 @@ class KODISCLib(xbmcprovider.XBMCMultiResolverContentProvider):
         while not xbmc.abortRequested and sleep_time > 0:
             sleep_time -= 1
             xbmc.sleep(1)
+
+buggalo.SUBMIT_URL = scinema.submiturl

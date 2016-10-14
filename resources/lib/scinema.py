@@ -27,6 +27,7 @@ import cookielib
 import xml.etree.ElementTree as ET
 import sys
 import json
+import buggalo
 import string
 import util
 import resolver
@@ -44,6 +45,7 @@ MOVIES_A_TO_Z_TYPE = "movies-a-z"
 #util.info('--------------------------------------------------------')
 #util.info(resolver.resolve('https://openload.co/embed/DeZ-s187KYg/33-720p-2744411.mp4'))
 #util.info('--------------------------------------------------------')
+submiturl = 'http://stream-cinema.online/plugin/submit/'
 
 class StreamCinemaContentProvider(ContentProvider):
     par = None
@@ -58,6 +60,7 @@ class StreamCinemaContentProvider(ContentProvider):
     def capabilities(self):
         return ['resolve', 'categories', '!download']
 
+    @buggalo.buggalo_try_except({'method': 'scinema.categories'})
     def categories(self):
         result = []
         for title, url in [
@@ -75,6 +78,7 @@ class StreamCinemaContentProvider(ContentProvider):
             result.append(item)
         return result
 
+    @buggalo.buggalo_try_except({'method': 'scinema.a_to_z'})
     def a_to_z(self, url_type):
         result = []
         for letter in ['0-9', 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'e', 'h', 'i', 'j', 'k', 'l', 'm',
@@ -84,6 +88,7 @@ class StreamCinemaContentProvider(ContentProvider):
             result.append(item)
         return result
 
+    @buggalo.buggalo_try_except({'method': 'scinema.list'})
     def list(self, url):
         xbmcplugin.setContent(int(sys.argv[1]), 'movies')
         
@@ -97,6 +102,7 @@ class StreamCinemaContentProvider(ContentProvider):
         
         return [self.dir_item(title="I failed", url="fail")]
 
+    @buggalo.buggalo_try_except({'method': 'scinema.list_by_params'})
     def list_by_params(self, url):
         data = json.loads(self.get_data_cached(url))
         result = []
@@ -112,6 +118,7 @@ class StreamCinemaContentProvider(ContentProvider):
         #xbmc.executebuiltin("Container.SetViewMode(515)")
         return result
         
+    @buggalo.buggalo_try_except({'method': 'scinema._video_item'})
     def _video_item(self, m):
         item = self.video_item(url=MOVIES_BASE_URL + '/play/' + m['id'], img=m['poster'])
         for k in m.keys():
@@ -144,9 +151,11 @@ class StreamCinemaContentProvider(ContentProvider):
         item['art'] = art
         return item
     
+    @buggalo.buggalo_try_except({'method': 'scinema.get_data_cached'})
     def get_data_cached(self, url):
         return util.request(url)
 
+    @buggalo.buggalo_try_except({'method': 'scinema.list_by_letter'})
     def list_by_letter(self, url):
         result = []
         util.debug("Ideme na pismeno!")
@@ -158,6 +167,7 @@ class StreamCinemaContentProvider(ContentProvider):
         util.debug(result)
         return result
 
+    @buggalo.buggalo_try_except({'method': 'scinema.resolve'})
     def resolve(self, item, captcha_cb=None, select_cb=None):
         data = json.loads(self.get_data_cached(item['url']))
         util.debug(select_cb)
@@ -168,3 +178,4 @@ class StreamCinemaContentProvider(ContentProvider):
         elif len(data) > 1 and select_cb:
             return select_cb(data)
 
+buggalo.SUBMIT_URL = submiturl
