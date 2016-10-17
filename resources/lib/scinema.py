@@ -65,6 +65,7 @@ class StreamCinemaContentProvider(ContentProvider):
         result = []
         for title, url in [
                 ("Movies", MOVIES_BASE_URL + '/movies-a-z'), 
+                ("Movies by country", MOVIES_BASE_URL + '/list/country'),
                 ("Movies by quality", MOVIES_BASE_URL + '/list/quality'),
                 ("Movies by genre", MOVIES_BASE_URL + '/list/genre'),
                 ("Movies by people", MOVIES_BASE_URL + '/list/people'),
