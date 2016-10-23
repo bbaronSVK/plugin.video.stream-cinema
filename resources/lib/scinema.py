@@ -73,9 +73,6 @@ class StreamCinemaContentProvider(ContentProvider):
                 ("Movies latest", MOVIES_BASE_URL + '/list/latest'),
                 ]:
             item = self.dir_item(title=title, url=url)
-            if title == 'Movies' or title == 'TV Shows' or title == 'Movies - Recently added':
-                item['menu'] = {"[B][COLOR red]Add all to library[/COLOR][/B]": {
-                    'action': 'add-all-to-library', 'title': title}}
             result.append(item)
         return result
 
