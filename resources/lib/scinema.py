@@ -56,9 +56,9 @@ class StreamCinemaContentProvider(ContentProvider):
         opener = urllib2.build_opener(urllib2.HTTPCookieProcessor(cookielib.LWPCookieJar()))
         urllib2.install_opener(opener)
         self.reverse_eps = reverse_eps
-
+        
     def capabilities(self):
-        return ['resolve', 'categories', '!download']
+        return ['resolve', 'categories', '!download', 'search']
 
     @buggalo.buggalo_try_except({'method': 'scinema.categories'})
     def categories(self):
@@ -116,7 +116,6 @@ class StreamCinemaContentProvider(ContentProvider):
                 item = self._video_item(m)
                 
             self._filter(result, item)
-        #xbmc.executebuiltin("Container.SetViewMode(515)")
         return result
         
     @buggalo.buggalo_try_except({'method': 'scinema._video_item'})
@@ -167,6 +166,11 @@ class StreamCinemaContentProvider(ContentProvider):
             self._filter(result, item)
         util.debug(result)
         return result
+
+    @buggalo.buggalo_try_except({'method': 'scinema.search'})
+    def search(self, keyword):
+        sq = {'search': keyword}
+        return self.list_by_params(MOVIES_BASE_URL + '/list/search?' + urllib.urlencode(sq))
 
     @buggalo.buggalo_try_except({'method': 'scinema.resolve'})
     def resolve(self, item, captcha_cb=None, select_cb=None):
