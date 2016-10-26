@@ -16,6 +16,7 @@ import datetime
 import urllib
 import sys
 import buggalo
+import json
 import scinema
 
 
@@ -28,12 +29,34 @@ class KODISCLib(xbmcprovider.XBMCMultiResolverContentProvider):
         xbmcprovider.XBMCMultiResolverContentProvider.__init__(self, provider, settings, addon)
         provider.parent = self
         self.dialog = xbmcgui.DialogProgress()
+        self._settings()
         try:
             import StorageServer
             self.cache = StorageServer.StorageServer("Downloader")
         except:
             import storageserverdummy as StorageServer
             self.cache = StorageServer.StorageServer("Downloader")
+
+    def _parse_settings(self, itm):
+        util.info('--------------------------------------------------------')
+        for (a, b) in itm:
+            util.info("A: " + a + " " + json.dumps(b))
+            if "name" in b:
+                self.sett += "<" + b.name
+                if "data" in b and "params" in b.data:
+                    for (pn, pv) in b.data:
+                        self.sett += ' %s="%s"' % (pn, pv)
+            if 'items' in b:
+                self._parse_settings(b['items'])
+        util.info('--------------------------------------------------------')
+        
+    def _settings(self):
+        return
+        sp = os.path.join(self.addon_dir(), 'resources', 'settings.xml')
+        itm = json.loads(util.request(scinema.BASE_URL + '/json/settings'))
+        self.sett = "";
+        self._parse_settings(itm['items'])
+        util.info('SET: ' + self.sett);
 
     def _extract_infolabels(self,item):
         infoLabels = {}
