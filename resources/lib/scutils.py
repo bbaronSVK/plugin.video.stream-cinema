@@ -62,10 +62,75 @@ class KODISCLib(xbmcprovider.XBMCMultiResolverContentProvider):
         infoLabels = {}
         for label in ['title','plot','year','genre','rating','director','votes','cast','trailer','tvshowtitle','season','episode','mpaa','studio','code','trailer']:
             if label in item.keys():
-                infoLabels[label] = util.decode_html(item[label])
-#        util.debug("_extract_infolabels")
-#        util.debug(infoLabels)
+                if label == 'cast':
+                    if hasattr(item['cast'], 'lower'):
+                        item['cast'] = item['cast'].split(', ')
+                    infoLabels[label] = item[label]
+                else:
+                    infoLabels[label] = util.decode_html(item[label])
         return infoLabels
+
+    def render_dir(self,item):
+        params = self.params()
+        params.update({'list':item['url']})
+        title = item['title']
+        img = None
+        if 'img' in item.keys():
+            img = item['img']
+        if title.find('$') == 0:
+            try:
+                title = self.addon.getLocalizedString(int(title[1:]))
+            except:
+                pass
+        menuItems = {}
+        if 'menu' in item.keys():
+            for ctxtitle, value in item['menu'].iteritems():
+                if ctxtitle.find('$') == 0:
+                    try:
+                        ctxtitle = self.addon.getLocalizedString(int(ctxtitle[1:]))
+                    except:
+                        pass
+                menuItems[ctxtitle] = value
+        self.add_dir(title,params,img,infoLabels=item,menuItems=menuItems)
+
+    def add_dir(self, name, params, logo='', infoLabels={}, menuItems={}):
+        name = util.decode_html(name)
+        if not 'title' in infoLabels:
+            infoLabels['title'] = ''
+        if logo == None:
+            logo = ''
+        liz = xbmcgui.ListItem(name, iconImage='DefaultFolder.png', thumbnailImage=logo)
+        
+        if 'art' in infoLabels.keys():
+            liz.setArt(infoLabels['art'])
+
+        try:
+            liz.setInfo(type='Video', infoLabels=self._extract_infolabels(infoLabels))
+        except:
+            sys.exc_info()
+            util.debug("CHYBA")
+            util.debug(infoLabels)
+        items = []
+        for mi in menuItems.keys():
+            action = menuItems[mi]
+            if not type(action) == type({}):
+                items.append((mi, action))
+            else:
+                if 'action-type' in action:
+                    action_type = action['action-type']
+                    del action['action-type']
+                    if action_type == 'list':
+                        items.append((mi, 'Container.Update(%s)' % xbmcutil._create_plugin_url(action)))
+                    elif action_type == 'play':
+                        items.append((mi, 'PlayMedia(%s)' % xbmcutil._create_plugin_url(action)))
+                    else:
+                        items.append((mi, 'RunPlugin(%s)' % xbmcutil._create_plugin_url(action)))
+                else:
+                    items.append((mi, 'RunPlugin(%s)' % xbmcutil._create_plugin_url(action)))
+        if len(items) > 0:
+            liz.addContextMenuItems(items)
+        return xbmcplugin.addDirectoryItem(handle=int(sys.argv[1]), url=xbmcutil._create_plugin_url(params),
+                                           listitem=liz, isFolder=True)
 
     def render_video(self,item):
 #        util.debug("_render_video")

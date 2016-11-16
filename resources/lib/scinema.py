@@ -131,7 +131,7 @@ class StreamCinemaContentProvider(ContentProvider):
                 item = self._video_item(m)
             if m['typ'] == 'latest':
                 xbmcplugin.setContent(int(sys.argv[1]), 'tvshows')
-                item = self.dir_item(title=m['name'], url=SERIES_BASE_URL + '/get/' + m['url'])
+                item = self._dir_item(m)
                 if m['poster'] != '':
                     item['img'] = m['poster']
             else:
@@ -139,6 +139,31 @@ class StreamCinemaContentProvider(ContentProvider):
                 
             self._filter(result, item)
         return result
+    
+    @buggalo.buggalo_try_except({'method': 'scinema._dir_item'})
+    def _dir_item(self, m):
+        item = self.dir_item(title=m['name'], url=SERIES_BASE_URL + '/get/' + m['url'])
+        for k in m.keys():
+            if k != 'url':
+                item[k] = m[k]
+        year = m['release']
+        item['plot'] = m['description']
+        item['originaltitle'] = m['name_orig']
+        item['sorttitle'] = m['name_seo']
+        item['studio'] = m['studio']
+        
+        art = {}
+        if m['fanart'] != '':
+            art['fanart'] = m['fanart']
+        if 'banner' in m:
+            art['banner'] = m['banner']
+        item['art'] = art
+
+        if int(year[:4]) > 0:
+            item['title'] = m['name'] + ' (' + year[:4] + ')'
+        else:
+            item['title'] = m['name']
+        return item
         
     @buggalo.buggalo_try_except({'method': 'scinema._video_item'})
     def _video_item(self, m):
