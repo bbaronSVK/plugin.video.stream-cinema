@@ -133,7 +133,7 @@ class StreamCinemaContentProvider(ContentProvider):
                 xbmcplugin.setContent(int(sys.argv[1]), 'tvshows')
                 item = self.dir_item(title=m['name'], url=SERIES_BASE_URL + '/get/' + m['url'])
                 if m['poster'] != '':
-                    item['img'] = "%s%s" % (BASE_URL, m['poster'])
+                    item['img'] = m['poster']
             else:
                 item = self._video_item(m)
                 
