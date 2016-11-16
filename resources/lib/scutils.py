@@ -29,7 +29,7 @@ class KODISCLib(xbmcprovider.XBMCMultiResolverContentProvider):
         xbmcprovider.XBMCMultiResolverContentProvider.__init__(self, provider, settings, addon)
         provider.parent = self
         self.dialog = xbmcgui.DialogProgress()
-        self._settings()
+        #self._settings()
         try:
             import StorageServer
             self.cache = StorageServer.StorageServer("Downloader")
@@ -60,7 +60,7 @@ class KODISCLib(xbmcprovider.XBMCMultiResolverContentProvider):
 
     def _extract_infolabels(self,item):
         infoLabels = {}
-        for label in ['title','plot','year','genre','rating','director','votes','cast','trailer','tvshowtitle','season','episode','mpaa','studio','code','trailer']:
+        for label in ['genre', 'year', 'episode', 'season', 'top250', 'tracknumber', 'rating', 'watched', 'playcount', 'overlay', 'cast', 'castandrole', 'director', 'mpaa', 'plot', 'plotoutline', 'title', 'originaltitle', 'sorttitle', 'duration', 'studio', 'tagline', 'writer', 'tvshowtitle', 'premiered', 'status', 'code', 'aired', 'credits', 'lastplayed', 'album', 'artist', 'votes', 'trailer', 'dateadded', 'count', 'date']:
             if label in item.keys():
                 if label == 'cast':
                     if hasattr(item['cast'], 'lower'):

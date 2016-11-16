@@ -151,6 +151,8 @@ class StreamCinemaContentProvider(ContentProvider):
         item['originaltitle'] = m['name_orig']
         item['sorttitle'] = m['name_seo']
         item['studio'] = m['studio']
+        item['genre'] = m['genres']
+        item['year'] = year[:4]
         
         art = {}
         if m['fanart'] != '':
