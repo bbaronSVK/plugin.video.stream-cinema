@@ -40,6 +40,8 @@ sys.setdefaultencoding('utf-8')
 
 BASE_URL="http://stream-cinema.online"
 MOVIES_BASE_URL = BASE_URL + "/json"
+SERIES_BASE_URL = BASE_URL + "/json/series"
+
 MOVIES_A_TO_Z_TYPE = "movies-a-z"
 
 #util.info('--------------------------------------------------------')
@@ -71,6 +73,7 @@ class StreamCinemaContentProvider(ContentProvider):
                 ("Movies by people", MOVIES_BASE_URL + '/list/people'),
                 ("Movies by year", MOVIES_BASE_URL + '/list/year'),
                 ("Movies latest", MOVIES_BASE_URL + '/list/latest'),
+                ("Series latest", SERIES_BASE_URL + '/list/latest'),
                 ]:
             item = self.dir_item(title=title, url=url)
             result.append(item)
@@ -95,6 +98,9 @@ class StreamCinemaContentProvider(ContentProvider):
             return self.a_to_z(MOVIES_A_TO_Z_TYPE)
         if "/letter/" in url:
             return self.list_by_letter(url)
+        if "/series/" in url:
+            self.base_url = SERIES_BASE_URL
+            return self.list_series(url)
         if "/list/" in url:
             return self.list_by_params(url)
         
@@ -115,9 +121,31 @@ class StreamCinemaContentProvider(ContentProvider):
             self._filter(result, item)
         return result
         
+    @buggalo.buggalo_try_except({'method': 'scinema.list_series'})
+    def list_series(self, url):
+        data = json.loads(self.get_data_cached(url))
+        result = []
+        for m in data:
+            if m['typ'] == 'get':
+                xbmcplugin.setContent(int(sys.argv[1]), 'episodes')
+                item = self._video_item(m)
+            if m['typ'] == 'latest':
+                xbmcplugin.setContent(int(sys.argv[1]), 'tvshows')
+                item = self.dir_item(title=m['name'], url=SERIES_BASE_URL + '/get/' + m['url'])
+                if m['poster'] != '':
+                    item['img'] = "%s%s" % (BASE_URL, m['poster'])
+            else:
+                item = self._video_item(m)
+                
+            self._filter(result, item)
+        return result
+        
     @buggalo.buggalo_try_except({'method': 'scinema._video_item'})
     def _video_item(self, m):
-        item = self.video_item(url=MOVIES_BASE_URL + '/play/' + m['id'], img=m['poster'])
+        if '/json/series' in self.base_url:
+            item = self.video_item(url=self.base_url + '/play/%s/%s/%s' % (m['id'], m['season'], m['episode']), img=m['poster'])
+        else:
+            item = self.video_item(url=self.base_url + '/play/' + m['id'], img=m['poster'])
         for k in m.keys():
             if k != 'url':
                 item[k] = m[k]
@@ -145,7 +173,10 @@ class StreamCinemaContentProvider(ContentProvider):
         art = {}
         if m['fanart'] != '':
             art['fanart'] = m['fanart']
+        if 'banner' in m:
+            art['banner'] = m['banner']
         item['art'] = art
+        
         return item
     
     @buggalo.buggalo_try_except({'method': 'scinema.get_data_cached'})
