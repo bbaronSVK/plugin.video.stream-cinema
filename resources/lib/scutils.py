@@ -173,6 +173,12 @@ class KODISCLib(xbmcprovider.XBMCMultiResolverContentProvider):
         url = xbmcutil._create_plugin_url(params)
         li = xbmcgui.ListItem(name, path=url, iconImage='DefaultVideo.png', thumbnailImage=logo)
         li.setInfo(type='Video', infoLabels=_infoLabels)
+        if 'mvideo' in infoLabels.keys():
+            li.addStreamInfo('video', infoLabels['mvideo'])
+        if 'maudio' in infoLabels.keys():
+            li.addStreamInfo('audio', infoLabels['maudio'])
+        if 'msubtitle' in infoLabels.keys():
+            li.addStreamInfo('subtitle', infoLabels['msubtitle'])
         if 'art' in infoLabels.keys():
             li.setArt(infoLabels['art'])
         li.setProperty('IsPlayable', 'true')
