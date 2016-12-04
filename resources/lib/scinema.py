@@ -24,14 +24,11 @@ import re
 import urllib
 import urllib2
 import cookielib
-import xml.etree.ElementTree as ET
 import sys
 import json
 import buggalo
-import string
 import util
-import resolver
-import xbmcplugin,xbmc,xbmcgui,util
+import xbmcplugin,xbmc,xbmcgui
 from provider import ContentProvider, cached, ResolveException
 
 reload(sys)
@@ -44,9 +41,6 @@ SERIES_BASE_URL = BASE_URL + "/json/series"
 
 MOVIES_A_TO_Z_TYPE = "movies-a-z"
 
-#util.info('--------------------------------------------------------')
-#util.info(resolver.resolve('https://openload.co/embed/DeZ-s187KYg/33-720p-2744411.mp4'))
-#util.info('--------------------------------------------------------')
 submiturl = 'http://stream-cinema.online/plugin/submit/'
 
 class StreamCinemaContentProvider(ContentProvider):
@@ -110,6 +104,12 @@ class StreamCinemaContentProvider(ContentProvider):
     def list_by_params(self, url):
         data = json.loads(self.get_data_cached(url))
         result = []
+        xbmcplugin.addSortMethod(int(sys.argv[1]), xbmcplugin.SORT_METHOD_UNSORTED)
+        xbmcplugin.addSortMethod(int(sys.argv[1]), xbmcplugin.SORT_METHOD_VIDEO_RATING)
+        xbmcplugin.addSortMethod(int(sys.argv[1]), xbmcplugin.SORT_METHOD_MPAA_RATING)
+        xbmcplugin.addSortMethod(int(sys.argv[1]), xbmcplugin.SORT_METHOD_VIDEO_SORT_TITLE)
+        xbmcplugin.addSortMethod(int(sys.argv[1]), xbmcplugin.SORT_METHOD_VIDEO_YEAR)
+        xbmcplugin.addSortMethod(int(sys.argv[1]), xbmcplugin.SORT_METHOD_DATEADDED)
         for m in data:
             if m['typ'] != 'latest':
                 item = self.dir_item(title=m['title'], url=url + '/' + m['url'])
@@ -123,6 +123,11 @@ class StreamCinemaContentProvider(ContentProvider):
         
     @buggalo.buggalo_try_except({'method': 'scinema.list_series'})
     def list_series(self, url):
+        xbmcplugin.addSortMethod(int(sys.argv[1]), xbmcplugin.SORT_METHOD_UNSORTED)
+        xbmcplugin.addSortMethod(int(sys.argv[1]), xbmcplugin.SORT_METHOD_VIDEO_RATING)
+        xbmcplugin.addSortMethod(int(sys.argv[1]), xbmcplugin.SORT_METHOD_VIDEO_SORT_TITLE)
+        xbmcplugin.addSortMethod(int(sys.argv[1]), xbmcplugin.SORT_METHOD_VIDEO_YEAR)
+        xbmcplugin.addSortMethod(int(sys.argv[1]), xbmcplugin.SORT_METHOD_DATEADDED)
         data = json.loads(self.get_data_cached(url))
         result = []
         for m in data:
