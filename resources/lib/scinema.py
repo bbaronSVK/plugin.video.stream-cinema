@@ -49,8 +49,10 @@ class StreamCinemaContentProvider(ContentProvider):
     def __init__(self, username=None, password=None, filter=None, reverse_eps=False):
         ContentProvider.__init__(self, name='czsklib', base_url=MOVIES_BASE_URL, username=username,
                                  password=password, filter=filter)
-        opener = urllib2.build_opener(urllib2.HTTPCookieProcessor(cookielib.LWPCookieJar()))
-        urllib2.install_opener(opener)
+        util.init_urllib(self.cache)
+        cookies = self.cache.get('cookies')
+        if not cookies or len(cookies) == 0:
+            util.request(self.base_url)
         self.reverse_eps = reverse_eps
         
     def capabilities(self):
@@ -67,7 +69,9 @@ class StreamCinemaContentProvider(ContentProvider):
                 ("Movies by people", MOVIES_BASE_URL + '/list/people'),
                 ("Movies by year", MOVIES_BASE_URL + '/list/year'),
                 ("Movies latest", MOVIES_BASE_URL + '/list/latest'),
+                ("Movies popular", MOVIES_BASE_URL + '/list/popular'),
                 ("Series latest", SERIES_BASE_URL + '/list/latest'),
+                ("Series popular", SERIES_BASE_URL + '/list/popular'),
                 ]:
             item = self.dir_item(title=title, url=url)
             result.append(item)
@@ -235,8 +239,9 @@ class StreamCinemaContentProvider(ContentProvider):
 
     @buggalo.buggalo_try_except({'method': 'scinema.resolve'})
     def resolve(self, item, captcha_cb=None, select_cb=None):
+        util.info('RESOLVE: %s' % (item['url']))
         data = json.loads(self.get_data_cached(item['url']))
-        util.debug(select_cb)
+        util.debug(str(select_cb))
         if len(data) < 1:
             raise ResolveException('Video is not available.')
         if len(data) == 1:

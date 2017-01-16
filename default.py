@@ -34,5 +34,5 @@ __set__ = __addon__.getSetting
 settings = {'quality': __set__('quality')}
 
 params = util.params()
-
+util.info('[sc] PARAMS: ' + str(params))
 KODISCLib(StreamCinemaContentProvider(), settings, __addon__).run(params)
