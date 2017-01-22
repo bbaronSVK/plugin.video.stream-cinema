@@ -1,3 +1,6 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes"?>
 <strings>
+	<string id="30010">webshare.cz</string>
+	<string id="30101">Login</string>
+	<string id="30102">Heslo</string>
 </strings>

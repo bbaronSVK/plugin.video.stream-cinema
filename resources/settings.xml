@@ -1,3 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <settings>
+	<category label="30010">
+		<setting label="30101" id="wsuser" type="text" default="" />
+		<setting label="30102" id="wspass" type="text" default="" option="hidden" />
+	</category>
 </settings>

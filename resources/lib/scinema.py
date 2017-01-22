@@ -54,6 +54,7 @@ class StreamCinemaContentProvider(ContentProvider):
         if not cookies or len(cookies) == 0:
             util.request(self.base_url)
         self.reverse_eps = reverse_eps
+        self.ws = None
         
     def capabilities(self):
         return ['resolve', 'categories', '!download', 'search']
@@ -237,16 +238,27 @@ class StreamCinemaContentProvider(ContentProvider):
         sq = {'search': keyword}
         return self.list_by_params(MOVIES_BASE_URL + '/list/search?' + urllib.urlencode(sq))
 
+    @buggalo.buggalo_try_except({'method': 'scinema._resolve'})
+    def _resolve(self, itm):
+        if itm.get('provider') == 'plugin.video.online-files' and itm.get('params').get('cp') == 'webshare.cz':
+            if self.parent.getSetting('wsuser') is not None:
+                try:
+                    if self.ws == None:
+                        from myprovider.webshare import Webshare as wx
+                        self.ws = wx(self.parent.getSetting('wsuser'), self.parent.getSetting('wspass'))
+                    itm['url'] = self.ws.resolve(itm.get('params').get('play').get('ident'))
+                except:
+                    pass
+        return itm
+    
     @buggalo.buggalo_try_except({'method': 'scinema.resolve'})
     def resolve(self, item, captcha_cb=None, select_cb=None):
-        util.info('RESOLVE: %s' % (item['url']))
         data = json.loads(self.get_data_cached(item['url']))
-        util.debug(str(select_cb))
         if len(data) < 1:
             raise ResolveException('Video is not available.')
         if len(data) == 1:
-            return data[0]
+            return self._resolve(data[0])
         elif len(data) > 1 and select_cb:
-            return select_cb(data)
+            return self._resolve(select_cb(data))
 
 buggalo.SUBMIT_URL = submiturl

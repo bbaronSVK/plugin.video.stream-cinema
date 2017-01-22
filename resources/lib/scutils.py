@@ -29,6 +29,7 @@ class KODISCLib(xbmcprovider.XBMCMultiResolverContentProvider):
         xbmcprovider.XBMCMultiResolverContentProvider.__init__(self, provider, settings, addon)
         provider.parent = self
         self.dialog = xbmcgui.DialogProgress()
+        self.noImage = os.path.join(self.addon_dir(), 'resources', 'img', 'no-image.png')
         #self._settings()
         try:
             import StorageServer
@@ -171,6 +172,8 @@ class KODISCLib(xbmcprovider.XBMCMultiResolverContentProvider):
         if not 'Title' in _infoLabels:
             _infoLabels['Title'] = name
         url = xbmcutil._create_plugin_url(params)
+        if logo == '' or logo == None:
+            logo = self.noImage
         li = xbmcgui.ListItem(name, path=url, iconImage='DefaultVideo.png', thumbnailImage=logo)
         li.setInfo(type='Video', infoLabels=_infoLabels)
         if 'mvideo' in infoLabels.keys():
