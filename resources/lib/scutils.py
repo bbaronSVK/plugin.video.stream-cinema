@@ -50,6 +50,23 @@ class KODISCLib(xbmcprovider.XBMCMultiResolverContentProvider):
             if 'items' in b:
                 self._parse_settings(b['items'])
         util.info('--------------------------------------------------------')
+
+    def play(self, item):
+        stream = self.resolve(item['url'])
+        if stream:
+            if 'headers' in stream.keys():
+                headerStr = '|' + urllib.urlencode(stream['headers'])
+                if len(headerStr) > 1:
+                    stream['url'] += headerStr
+            util.debug('Sending %s to player' % stream['url'])
+            li = xbmcgui.ListItem(path=stream['url'], iconImage='DefaulVideo.png')
+            util.debug("PLAY::LI::" + str(li))
+            il = self._extract_infolabels(item['info'])
+            if len(il) > 0:  # only set when something was extracted
+                li.setInfo('video', il)
+                util.debug("PLAY::IL:: " + str(il))
+            li.setSubtitles([stream['subs']])
+            xbmcplugin.setResolvedUrl(int(sys.argv[1]), True, li)
         
     def _settings(self):
         return
@@ -138,6 +155,8 @@ class KODISCLib(xbmcprovider.XBMCMultiResolverContentProvider):
         
         params = self.params()
         params.update({'play':item['url']})
+#        for k,v in item.iteritems():
+#            params.update({k: str(v)})
         downparams = self.params()
         downparams.update({'title':item['title'],'down':item['url']})
         def_item = self.provider.video_item()

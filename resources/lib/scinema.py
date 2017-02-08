@@ -28,8 +28,10 @@ import sys
 import json
 import buggalo
 import util
+#import urlresolver
 import xbmcplugin,xbmc,xbmcgui
 from provider import ContentProvider, cached, ResolveException
+import resolver
 
 reload(sys)
 sys.setrecursionlimit(10000)
@@ -240,6 +242,8 @@ class StreamCinemaContentProvider(ContentProvider):
 
     @buggalo.buggalo_try_except({'method': 'scinema._resolve'})
     def _resolve(self, itm):
+        if itm == None:
+            return None;
         if itm.get('provider') == 'plugin.video.online-files' and itm.get('params').get('cp') == 'webshare.cz':
             if self.parent.getSetting('wsuser') != "":
                 try:
@@ -249,10 +253,22 @@ class StreamCinemaContentProvider(ContentProvider):
                     itm['url'] = self.ws.resolve(itm.get('params').get('play').get('ident'))
                 except:
                     pass
+        else:
+            try:
+                hmf = urlresolver.HostedMediaFile(url=itm['url'], include_disabled=False,
+                                                  include_universal=False)
+                if hmf.valid_url() is True:
+                    try:
+                        itm['url'] = hmf.resolve()
+                    except:
+                        pass
+            except:
+                pass
         return itm
     
     @buggalo.buggalo_try_except({'method': 'scinema.resolve'})
     def resolve(self, item, captcha_cb=None, select_cb=None):
+        util.debug("ITEM RESOLVE: " + str(item))
         data = json.loads(self.get_data_cached(item['url']))
         if len(data) < 1:
             raise ResolveException('Video is not available.')
