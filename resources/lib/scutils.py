@@ -1,24 +1,25 @@
 # -*- coding: utf-8 -*-
-import util
-import xbmcprovider
-import xbmcplugin
-import xbmcutil
-import resolver
-import xbmcvfs
-import xbmcgui
-import xbmc
-import unicodedata
+import base64
+import buggalo
+import codecs
+import json
 import os
 import re
-import time
-import string
-import datetime
-import urllib
-import sys
-import buggalo
-import json
+import resolver
 import scinema
-
+import sys
+import unicodedata
+import urllib
+import util
+import xbmc
+import xbmcaddon
+import xbmcgui
+import xbmcplugin
+import xbmcprovider
+import xbmcutil
+import xbmcvfs
+import xmlrpclib
+import zlib
 
 class KODISCLib(xbmcprovider.XBMCMultiResolverContentProvider):
     last_run = 0
@@ -62,10 +63,20 @@ class KODISCLib(xbmcprovider.XBMCMultiResolverContentProvider):
             li = xbmcgui.ListItem(path=stream['url'], iconImage='DefaulVideo.png')
             util.debug("PLAY::LI::" + str(li))
             il = self._extract_infolabels(item['info'])
+            
             if len(il) > 0:  # only set when something was extracted
                 li.setInfo('video', il)
-                util.debug("PLAY::IL:: " + str(il))
-            li.setSubtitles([stream['subs']])
+            
+            util.debug("jazyk: " + stream['lang'])
+            if (stream['subs'] == '' or stream['subs'] == None) and (stream['lang'] != 'CZ' and stream['lang'] != 'SK'):
+                util.debug(stream)
+                stream['subs'] = self.findSubtitles(stream)
+            elif stream['subs'] == 'internal' or stream['subs'] == 'disabled':
+                stream['subs'] = ''
+                
+            if stream['subs'] != '' and stream['subs'] != None:
+                util.debug("Seturnm titulky: " + str(stream['subs']))
+                li.setSubtitles([stream['subs']])
             xbmcplugin.setResolvedUrl(int(sys.argv[1]), True, li)
         
     def _settings(self):
@@ -255,4 +266,80 @@ class KODISCLib(xbmcprovider.XBMCMultiResolverContentProvider):
             sleep_time -= 1
             xbmc.sleep(1)
 
+    def findSubtitles(self, stream):
+        try:
+            if not self.getSetting('subtitles') == 'true': 
+                raise Exception()
+            name = stream['title']
+            imdb = stream['imdb']
+            season = stream['season']
+            episode = stream['episode']
+
+            util.debug("Hladam titulky")
+            langDict = {'Afrikaans': 'afr', 'Albanian': 'alb', 'Arabic': 'ara', 'Armenian': 'arm', 'Basque': 'baq', 'Bengali': 'ben', 'Bosnian': 'bos', 'Breton': 'bre', 'Bulgarian': 'bul', 'Burmese': 'bur', 'Catalan': 'cat', 'Chinese': 'chi', 'Croatian': 'hrv', 'Czech': 'cze', 'Danish': 'dan', 'Dutch': 'dut', 'English': 'eng', 'Esperanto': 'epo', 'Estonian': 'est', 'Finnish': 'fin', 'French': 'fre', 'Galician': 'glg', 'Georgian': 'geo', 'German': 'ger', 'Greek': 'ell', 'Hebrew': 'heb', 'Hindi': 'hin', 'Hungarian': 'hun', 'Icelandic': 'ice', 'Indonesian': 'ind', 'Italian': 'ita', 'Japanese': 'jpn', 'Kazakh': 'kaz', 'Khmer': 'khm', 'Korean': 'kor', 'Latvian': 'lav', 'Lithuanian': 'lit', 'Luxembourgish': 'ltz', 'Macedonian': 'mac', 'Malay': 'may', 'Malayalam': 'mal', 'Manipuri': 'mni', 'Mongolian': 'mon', 'Montenegrin': 'mne', 'Norwegian': 'nor', 'Occitan': 'oci', 'Persian': 'per', 'Polish': 'pol', 'Portuguese': 'por,pob', 'Portuguese(Brazil)': 'pob,por', 'Romanian': 'rum', 'Russian': 'rus', 'Serbian': 'scc', 'Sinhalese': 'sin', 'Slovak': 'slo', 'Slovenian': 'slv', 'Spanish': 'spa', 'Swahili': 'swa', 'Swedish': 'swe', 'Syriac': 'syr', 'Tagalog': 'tgl', 'Tamil': 'tam', 'Telugu': 'tel', 'Thai': 'tha', 'Turkish': 'tur', 'Ukrainian': 'ukr', 'Urdu': 'urd'}
+
+            codePageDict = {'ara': 'cp1256', 'ar': 'cp1256', 'ell': 'cp1253', 'el': 'cp1253', 'heb': 'cp1255', 'he': 'cp1255', 'tur': 'cp1254', 'tr': 'cp1254', 'rus': 'cp1251', 'ru': 'cp1251'}
+
+            quality = ['bluray', 'hdrip', 'brrip', 'bdrip', 'dvdrip', 'webrip', 'hdtv']
+
+            langs = []
+            try:
+                try: langs = langDict[self.getSetting('subtitles.lang.1')].split(',')
+                except: langs.append(langDict[self.getSetting('subtitles.lang.1')])
+            except: pass
+            try:
+                try: langs = langs + langDict[self.getSetting('subtitles.lang.2')].split(',')
+                except: langs.append(langDict[self.getSetting('subtitles.lang.2')])
+            except: pass
+
+            server = xmlrpclib.Server('http://api.opensubtitles.org/xml-rpc', verbose=0)
+            token = server.LogIn('', '', 'en', 'XBMC_Subtitles_v1')['token']
+
+            sublanguageid = ','.join(langs) ; imdbid = re.sub('[^0-9]', '', imdb)
+
+            if not (season == None or episode == None):
+                result = server.SearchSubtitles(token, [{'sublanguageid': sublanguageid, 'imdbid': imdbid, 'season': season, 'episode': episode}])['data']
+                fmt = ['hdtv']
+            else:
+                result = server.SearchSubtitles(token, [{'sublanguageid': sublanguageid, 'imdbid': imdbid}])['data']
+                try: vidPath = stream['url']
+                except: vidPath = ''
+                fmt = re.split('\.|\(|\)|\[|\]|\s|\-', vidPath)
+                fmt = [i.lower() for i in fmt]
+                fmt = [i for i in fmt if i in quality]
+
+            filter = []
+            result = [i for i in result if i['SubSumCD'] == '1']
+
+            for lang in langs:
+                filter += [i for i in result if i['SubLanguageID'] == lang and any(x in i['MovieReleaseName'].lower() for x in fmt)]
+                filter += [i for i in result if i['SubLanguageID'] == lang and any(x in i['MovieReleaseName'].lower() for x in quality)]
+                filter += [i for i in result if i['SubLanguageID'] == lang]
+
+            try: lang = xbmc.convertLanguage(filter[0]['SubLanguageID'], xbmc.ISO_639_1)
+            except: lang = filter[0]['SubLanguageID']
+
+            content = [filter[0]['IDSubtitleFile'],]
+            content = server.DownloadSubtitles(token, content)
+            content = base64.b64decode(content['data'][0]['data'])
+            content = str(zlib.decompressobj(16+zlib.MAX_WBITS).decompress(content))
+
+            subtitle = xbmc.translatePath('special://temp/')
+            subtitle = os.path.join(subtitle, 'AutomatickeTitulky.%s.srt' % lang)
+
+            codepage = codePageDict.get(lang, '')
+            if codepage and self.getSetting('subtitles.utf') == 'true':
+                try:
+                    content_encoded = codecs.decode(content, codepage)
+                    content = codecs.encode(content_encoded, 'utf-8')
+                except:
+                    pass
+
+            file = xbmcvfs.File(subtitle, 'w')
+            file.write(str(content))
+            file.close()
+            util.debug("Vysledne titulky: %s" % (subtitle))
+            return subtitle
+        except:
+            pass
 buggalo.SUBMIT_URL = scinema.submiturl

@@ -3,4 +3,7 @@
 	<string id="30010">webshare.cz</string>
 	<string id="30101">Username</string>
 	<string id="30102">Password</string>
+    <string id="30201">Subtitles</string>
+    <string id="30202">Lang 1</string>
+    <string id="30203">Lang 2</string>
 </strings>
