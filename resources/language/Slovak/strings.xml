@@ -3,7 +3,11 @@
 	<string id="30010">webshare.cz</string>
 	<string id="30101">Login</string>
 	<string id="30102">Heslo</string>
-    <string id="30201">Titulky</string>
-    <string id="30202">Jazyk 1</string>
-    <string id="30203">Jazyk 2</string>
+    <string id="30020">Titulky</string>
+    <string id="30201">Povolit titulky</string>
+    <string id="30202">Konvertovat titulky do UTF-8</string>
+    <string id="30203">Primarny jazyk</string>
+    <string id="30204">Sekundarny jazyk</string>
+    <string id="39001">Titulky nemusia byt dostupne alebo nesynchronne.</string>
+    <string id="39002">V tom pripade pouzite svoje vlastne titulky.</string>
 </strings>

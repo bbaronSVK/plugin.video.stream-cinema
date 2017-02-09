@@ -67,8 +67,8 @@ class KODISCLib(xbmcprovider.XBMCMultiResolverContentProvider):
             if len(il) > 0:  # only set when something was extracted
                 li.setInfo('video', il)
             
-            util.debug("jazyk: " + stream['lang'])
-            if (stream['subs'] == '' or stream['subs'] == None) and (stream['lang'] != 'CZ' and stream['lang'] != 'SK'):
+            util.debug("jazyk: [%s]" % (str(stream['lang'].strip())))
+            if (stream['subs'] == '' or stream['subs'] == None) and stream['lang'].strip() not in ['CZ', 'SK']:
                 util.debug(stream)
                 stream['subs'] = self.findSubtitles(stream)
             elif stream['subs'] == 'internal' or stream['subs'] == 'disabled':
