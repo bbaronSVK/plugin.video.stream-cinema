@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes"?>
 <strings>
-	<string id="30010">webshare.cz</string>
-	<string id="30101">Username</string>
-	<string id="30102">Password</string>
+    <string id="30010">webshare.cz</string>
+    <string id="30101">Username</string>
+    <string id="30102">Password</string>
     <string id="30020">Subtitles</string>
     <string id="30201">Enable subtitles</string>
     <string id="30202">Convert subtitles to UTF-8</string>
@@ -10,4 +10,11 @@
     <string id="30204">Secondary Language</string>
     <string id="39001">Subtitles could be unavailable or out of sync.</string>
     <string id="39002">In that case use your own subtitles.</string>
+    <string id="30030">Stahovanie</string>
+    <string id="30301">Priečinok pre sťahovanie</string>
+    <string id="30302">Zobrazovať stav sťahovania</string>
+    <string id="30303"> - zobraziť stav každých</string>
+    <string id="30311">10%</string>
+    <string id="30312">5%</string>
+    <string id="30313">1%</string>
 </strings>

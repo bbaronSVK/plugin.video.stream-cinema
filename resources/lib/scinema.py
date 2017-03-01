@@ -20,18 +20,20 @@
 # *
 # */
 
-import re
-import urllib
-import urllib2
-import cookielib
-import sys
-import json
 import buggalo
-import util
-#import urlresolver
-import xbmcplugin,xbmc,xbmcgui
-from provider import ContentProvider, cached, ResolveException
+import json
+import os
+from provider import ContentProvider
+from provider import ResolveException
+from provider import cached
 import resolver
+import sys
+import urllib
+import util
+import xbmcplugin
+
+sys.path.append(os.path.join(os.path.dirname(resolver.__file__), 'usage'))
+import tracker
 
 reload(sys)
 sys.setrecursionlimit(10000)
@@ -48,35 +50,29 @@ submiturl = 'http://stream-cinema.online/plugin/submit/'
 class StreamCinemaContentProvider(ContentProvider):
     par = None
 
-    def __init__(self, username=None, password=None, filter=None, reverse_eps=False):
+    def __init__(self, username=None, password=None, filter=None, uid=None):
         ContentProvider.__init__(self, name='czsklib', base_url=MOVIES_BASE_URL, username=username,
                                  password=password, filter=filter)
+        
+        self.tr = tracker.TrackerInfo().getSystemInfo()
+        self.uid = uid
+        util.UA = self.tr['useragent']
+        
         util.init_urllib(self.cache)
         cookies = self.cache.get('cookies')
         if not cookies or len(cookies) == 0:
             util.request(self.base_url)
-        self.reverse_eps = reverse_eps
         self.ws = None
         
     def capabilities(self):
-        return ['resolve', 'categories', '!download', 'search']
+        return ['resolve', 'categories', 'search']
 
     @buggalo.buggalo_try_except({'method': 'scinema.categories'})
     def categories(self):
         result = []
-        for title, url in [
-                ("Movies", MOVIES_BASE_URL + '/movies-a-z'), 
-                ("Movies by country", MOVIES_BASE_URL + '/list/country'),
-                ("Movies by quality", MOVIES_BASE_URL + '/list/quality'),
-                ("Movies by genre", MOVIES_BASE_URL + '/list/genre'),
-                ("Movies by people", MOVIES_BASE_URL + '/list/people'),
-                ("Movies by year", MOVIES_BASE_URL + '/list/year'),
-                ("Movies latest", MOVIES_BASE_URL + '/list/latest'),
-                ("Movies popular", MOVIES_BASE_URL + '/list/popular'),
-                ("Series latest", SERIES_BASE_URL + '/list/latest'),
-                ("Series popular", SERIES_BASE_URL + '/list/popular'),
-                ]:
-            item = self.dir_item(title=title, url=url)
+        data = json.loads(self.get_data_cached(MOVIES_BASE_URL + '/list/hp'))
+        for m in data:
+            item = self.dir_item(title=m['title'], url=MOVIES_BASE_URL + str(m['url']))
             result.append(item)
         return result
 
@@ -119,7 +115,11 @@ class StreamCinemaContentProvider(ContentProvider):
         xbmcplugin.addSortMethod(int(sys.argv[1]), xbmcplugin.SORT_METHOD_DATEADDED)
         xbmcplugin.addSortMethod(int(sys.argv[1]), xbmcplugin.SORT_METHOD_VIDEO_RUNTIME)
         for m in data:
-            if m['typ'] != 'latest':
+            if m['typ'] == 'dir':
+                item = self.dir_item(title=m['title'], url= MOVIES_BASE_URL + m['url'])
+                if m['pic'] != '':
+                    item['img'] = "%s%s" % (BASE_URL, m['pic'])
+            elif m['typ'] != 'latest':
                 item = self.dir_item(title=m['title'], url=url + '/' + m['url'])
                 if m['pic'] != '':
                     item['img'] = "%s%s" % (BASE_URL, m['pic'])
@@ -220,8 +220,9 @@ class StreamCinemaContentProvider(ContentProvider):
         return item
     
     @buggalo.buggalo_try_except({'method': 'scinema.get_data_cached'})
+    @cached(ttl=1)
     def get_data_cached(self, url):
-        return util.request(url)
+        return util.request(url,{'X-UID':self.uid})
 
     @buggalo.buggalo_try_except({'method': 'scinema.list_by_letter'})
     def list_by_letter(self, url):

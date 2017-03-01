@@ -1,6 +1,6 @@
 # -*- coding: UTF-8 -*-
 # /*
-#  *      Copyright (C) 2013 Libor Zoubek + jondas
+#  *      Copyright (C) 2013 bbaron
 #  *
 #  *
 #  *  This Program is free software; you can redistribute it and/or modify
@@ -20,7 +20,7 @@
 #  *
 #  */
 
-import xbmcaddon
+import xbmcaddon, xbmc, uuid
 import util
 from resources.lib.scinema import StreamCinemaContentProvider
 from resources.lib.scutils import KODISCLib
@@ -31,8 +31,12 @@ __addon__ = xbmcaddon.Addon(id=__scriptid__)
 __language__ = __addon__.getLocalizedString
 __set__ = __addon__.getSetting
 
-settings = {'quality': __set__('quality')}
+settings = {'quality': __set__('quality'), 'downloads': xbmc.translatePath(__set__('downloads'))}
+uid = __set__('uid')
+if uid == '':
+    uid = str(uuid.uuid4())
+    __addon__.setSetting('uid', uid)
 
 params = util.params()
 util.info('[sc] PARAMS: ' + str(params))
-KODISCLib(StreamCinemaContentProvider(), settings, __addon__).run(params)
+KODISCLib(StreamCinemaContentProvider(username=__set__('wsuser'),password=__set__('wspass'),uid=uid), settings, __addon__).run(params)

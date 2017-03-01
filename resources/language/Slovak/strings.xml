@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes"?>
 <strings>
-	<string id="30010">webshare.cz</string>
-	<string id="30101">Login</string>
-	<string id="30102">Heslo</string>
+    <string id="30010">webshare.cz</string>
+    <string id="30101">Login</string>
+    <string id="30102">Heslo</string>
     <string id="30020">Titulky</string>
     <string id="30201">Povolit titulky</string>
     <string id="30202">Konvertovat titulky do UTF-8</string>
@@ -10,4 +10,11 @@
     <string id="30204">Sekundarny jazyk</string>
     <string id="39001">Titulky nemusia byt dostupne alebo nesynchronne.</string>
     <string id="39002">V tom pripade pouzite svoje vlastne titulky.</string>
+    <string id="30030">Stahovanie</string>
+    <string id="30301">Priečinok pre sťahovanie</string>
+    <string id="30302">Zobrazovať stav sťahovania</string>
+    <string id="30303"> - zobraziť stav každých</string>
+    <string id="30311">10%</string>
+    <string id="30312">5%</string>
+    <string id="30313">1%</string>
 </strings>

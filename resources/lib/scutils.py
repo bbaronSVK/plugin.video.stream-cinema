@@ -5,14 +5,12 @@ import codecs
 import json
 import os
 import re
-import resolver
 import scinema
 import sys
 import unicodedata
 import urllib
 import util
 import xbmc
-import xbmcaddon
 import xbmcgui
 import xbmcplugin
 import xbmcprovider
@@ -29,7 +27,6 @@ class KODISCLib(xbmcprovider.XBMCMultiResolverContentProvider):
     def __init__(self, provider, settings, addon):
         xbmcprovider.XBMCMultiResolverContentProvider.__init__(self, provider, settings, addon)
         provider.parent = self
-        self.dialog = xbmcgui.DialogProgress()
         self.noImage = os.path.join(self.addon_dir(), 'resources', 'img', 'no-image.png')
         #self._settings()
         try:
@@ -67,14 +64,14 @@ class KODISCLib(xbmcprovider.XBMCMultiResolverContentProvider):
             if len(il) > 0:  # only set when something was extracted
                 li.setInfo('video', il)
             
-            util.debug("jazyk: [%s]" % (str(stream['lang'].strip())))
             if (stream['subs'] == '' or stream['subs'] == None) and stream['lang'].strip() not in ['CZ', 'SK']:
                 util.debug(stream)
                 stream['subs'] = self.findSubtitles(stream)
-            elif stream['subs'] == 'internal' or stream['subs'] == 'disabled':
-                stream['subs'] = ''
                 
-            if stream['subs'] != '' and stream['subs'] != None:
+            if stream['subs'] == '' or stream['subs'] == 'internal' or stream['subs'] == 'disabled':
+                stream.remove('subs')
+                
+            if 'subs' in stream and stream['subs'] != '' and stream['subs'] != None:
                 util.debug("Seturnm titulky: " + str(stream['subs']))
                 li.setSubtitles([stream['subs']])
             xbmcplugin.setResolvedUrl(int(sys.argv[1]), True, li)
@@ -270,7 +267,6 @@ class KODISCLib(xbmcprovider.XBMCMultiResolverContentProvider):
         try:
             if not self.getSetting('subtitles') == 'true': 
                 raise Exception()
-            name = stream['title']
             imdb = stream['imdb']
             season = stream['season']
             episode = stream['episode']
@@ -293,7 +289,10 @@ class KODISCLib(xbmcprovider.XBMCMultiResolverContentProvider):
             except: pass
 
             server = xmlrpclib.Server('http://api.opensubtitles.org/xml-rpc', verbose=0)
-            token = server.LogIn('', '', 'en', 'XBMC_Subtitles_v1')['token']
+            token = self.cache.get('os.org:token')
+            if not token:
+                token = server.LogIn('', '', 'en', 'XBMC_Subtitles_v1')['token']
+                self.cache.set('os.org:token', token)
 
             sublanguageid = ','.join(langs) ; imdbid = re.sub('[^0-9]', '', imdb)
 
@@ -338,7 +337,6 @@ class KODISCLib(xbmcprovider.XBMCMultiResolverContentProvider):
             file = xbmcvfs.File(subtitle, 'w')
             file.write(str(content))
             file.close()
-            util.debug("Vysledne titulky: %s" % (subtitle))
             return subtitle
         except:
             pass
