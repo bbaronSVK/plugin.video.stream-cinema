@@ -16,7 +16,7 @@
         <setting type="lsep" label="39002" />
     </category>
     <category label="30030">
-        <setting label="30301" id="downloads" type="folder" default="special://home" />
+        <setting label="30301" id="downloads" type="folder" default="" />
         <setting label="30302" id="download-notify" type="bool" default="true" />
         <setting label="30303" id="download-notify-every" type="enum" lvalues="30311|30312|30313" default="0" visible="eq(-1,true)" />
     </category>
