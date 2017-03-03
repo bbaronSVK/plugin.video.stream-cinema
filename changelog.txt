@@ -1,3 +1,9 @@
+[B]1.0.6:[/B]
+fix s nazvom suboru pre stahovanie + posielanie spravnej pripony
+
+[B]1.0.5:[/B]
+default adresar pre stahovanie
+
 [B]1.0.4:[/B]
 automaticke stahovanie titulkov z opensubtitles ak stream nieje CZ/SK
 
