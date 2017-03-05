@@ -55,7 +55,7 @@ class Webshare():
         headers = {'X-Requested-With':'XMLHttpRequest','Accept':'text/xml; charset=UTF-8','Referer':self.base_url}
         req = base.copy()
         for key in req:
-            if args.has_key(key):
+            if key in args:
                 req[key] = args[key]
         return headers,req
 

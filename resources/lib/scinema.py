@@ -243,12 +243,12 @@ class StreamCinemaContentProvider(ContentProvider):
 
     @buggalo.buggalo_try_except({'method': 'scinema._resolve'})
     def _resolve(self, itm):
-        if itm == None:
+        if itm is None:
             return None;
         if itm.get('provider') == 'plugin.video.online-files' and itm.get('params').get('cp') == 'webshare.cz':
             if self.parent.getSetting('wsuser') != "":
                 try:
-                    if self.ws == None:
+                    if self.ws is None:
                         from myprovider.webshare import Webshare as wx
                         self.ws = wx(self.parent.getSetting('wsuser'), self.parent.getSetting('wspass'))
                     itm['url'] = self.ws.resolve(itm.get('params').get('play').get('ident'))

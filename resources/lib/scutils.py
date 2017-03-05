@@ -64,14 +64,14 @@ class KODISCLib(xbmcprovider.XBMCMultiResolverContentProvider):
             if len(il) > 0:  # only set when something was extracted
                 li.setInfo('video', il)
             
-            if (stream['subs'] == '' or stream['subs'] == None) and stream['lang'].strip() not in ['CZ', 'SK']:
+            if (stream['subs'] == '' or stream['subs'] is None) and stream['lang'].strip() not in ['CZ', 'SK']:
                 util.debug(stream)
                 stream['subs'] = self.findSubtitles(stream)
                 
             if stream['subs'] == '' or stream['subs'] == 'internal' or stream['subs'] == 'disabled':
                 stream.remove('subs')
                 
-            if 'subs' in stream and stream['subs'] != '' and stream['subs'] != None:
+            if 'subs' in stream and stream['subs'] != '' and stream['subs'] is not None:
                 util.debug("Seturnm titulky: " + str(stream['subs']))
                 li.setSubtitles([stream['subs']])
             xbmcplugin.setResolvedUrl(int(sys.argv[1]), True, li)
@@ -86,7 +86,9 @@ class KODISCLib(xbmcprovider.XBMCMultiResolverContentProvider):
 
     def _extract_infolabels(self,item):
         infoLabels = {}
-        for label in ['genre', 'year', 'episode', 'season', 'top250', 'tracknumber', 'rating', 'watched', 'playcount', 'overlay', 'cast', 'castandrole', 'director', 'mpaa', 'plot', 'plotoutline', 'title', 'originaltitle', 'sorttitle', 'duration', 'studio', 'tagline', 'writer', 'tvshowtitle', 'premiered', 'status', 'code', 'aired', 'credits', 'lastplayed', 'album', 'artist', 'votes', 'trailer', 'dateadded', 'count', 'date']:
+        for label in ['genre', 'year', 'episode', 'season', 'top250', 'tracknumber', 'rating', 'watched', 'playcount', 'overlay', 'cast', 'castandrole', 
+            'director', 'mpaa', 'plot', 'plotoutline', 'title', 'originaltitle', 'sorttitle', 'duration', 'studio', 'tagline', 'writer', 'tvshowtitle', 
+            'premiered', 'status', 'code', 'aired', 'credits', 'lastplayed', 'album', 'artist', 'votes', 'trailer', 'dateadded', 'count', 'date']:
             if label in item.keys():
                 if label == 'cast':
                     if hasattr(item['cast'], 'lower'):
@@ -121,9 +123,9 @@ class KODISCLib(xbmcprovider.XBMCMultiResolverContentProvider):
 
     def add_dir(self, name, params, logo='', infoLabels={}, menuItems={}):
         name = util.decode_html(name)
-        if not 'title' in infoLabels:
+        if 'title' not in infoLabels:
             infoLabels['title'] = ''
-        if logo == None:
+        if logo is None:
             logo = ''
         liz = xbmcgui.ListItem(name, iconImage='DefaultFolder.png', thumbnailImage=logo)
         
@@ -159,12 +161,12 @@ class KODISCLib(xbmcprovider.XBMCMultiResolverContentProvider):
                                            listitem=liz, isFolder=True)
 
     def render_video(self,item):
-#        util.debug("_render_video")
+        #util.debug("_render_video")
         
         params = self.params()
         params.update({'play':item['url']})
-#        for k,v in item.iteritems():
-#            params.update({k: str(v)})
+        #for k,v in item.iteritems():
+        #    params.update({k: str(v)})
         downparams = self.params()
         downparams.update({'title':"%s%s" % (item['name_seo'], item['extension']), 'down':item['url']})
         def_item = self.provider.video_item()
@@ -192,14 +194,14 @@ class KODISCLib(xbmcprovider.XBMCMultiResolverContentProvider):
         
 
     def add_video(self, name, params={}, logo='', infoLabels={}, menuItems={}):
-#        util.debug("_add_video")
-#        util.debug(infoLabels)
+        #util.debug("_add_video")
+        #util.debug(infoLabels)
         _infoLabels=self._extract_infolabels(infoLabels)
         name = util.decode_html(name)
-        if not 'Title' in _infoLabels:
+        if 'Title' not in _infoLabels:
             _infoLabels['Title'] = name
         url = xbmcutil._create_plugin_url(params)
-        if logo == '' or logo == None:
+        if logo == '' or logo is None:
             logo = self.noImage
         li = xbmcgui.ListItem(name, path=url, iconImage='DefaultVideo.png', thumbnailImage=logo)
         li.setInfo(type='Video', infoLabels=_infoLabels)
@@ -282,21 +284,22 @@ class KODISCLib(xbmcprovider.XBMCMultiResolverContentProvider):
             try:
                 try: langs = langDict[self.getSetting('subtitles.lang.1')].split(',')
                 except: langs.append(langDict[self.getSetting('subtitles.lang.1')])
-            except: pass
+            except: 
+                pass
+            
             try:
                 try: langs = langs + langDict[self.getSetting('subtitles.lang.2')].split(',')
                 except: langs.append(langDict[self.getSetting('subtitles.lang.2')])
-            except: pass
+            except: 
+                pass
 
             server = xmlrpclib.Server('http://api.opensubtitles.org/xml-rpc', verbose=0)
-            token = self.cache.get('os.org:token')
-            if not token:
-                token = server.LogIn('', '', 'en', 'XBMC_Subtitles_v1')['token']
-                self.cache.set('os.org:token', token)
+            token = server.LogIn('', '', 'en', 'XBMC_Subtitles_v1')['token']
+            util.debug("TOKEN: %s" % token)
 
             sublanguageid = ','.join(langs) ; imdbid = re.sub('[^0-9]', '', imdb)
 
-            if not (season == None or episode == None):
+            if season is not None and episode is not None:
                 result = server.SearchSubtitles(token, [{'sublanguageid': sublanguageid, 'imdbid': imdbid, 'season': season, 'episode': episode}])['data']
                 fmt = ['hdtv']
             else:
@@ -315,8 +318,10 @@ class KODISCLib(xbmcprovider.XBMCMultiResolverContentProvider):
                 filter += [i for i in result if i['SubLanguageID'] == lang and any(x in i['MovieReleaseName'].lower() for x in quality)]
                 filter += [i for i in result if i['SubLanguageID'] == lang]
 
-            try: lang = xbmc.convertLanguage(filter[0]['SubLanguageID'], xbmc.ISO_639_1)
-            except: lang = filter[0]['SubLanguageID']
+            try: 
+                lang = xbmc.convertLanguage(filter[0]['SubLanguageID'], xbmc.ISO_639_1)
+            except: 
+                lang = filter[0]['SubLanguageID']
 
             content = [filter[0]['IDSubtitleFile'],]
             content = server.DownloadSubtitles(token, content)
