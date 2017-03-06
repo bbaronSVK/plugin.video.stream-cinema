@@ -169,7 +169,6 @@ class KODISCLib(xbmcprovider.XBMCMultiResolverContentProvider):
         #    params.update({k: str(v)})
         downparams = self.params()
         downparams.update({'title':"%s%s" % (item['name_seo'], item['extension']), 'down':item['url']})
-        def_item = self.provider.video_item()
         title = item['title'] #'%s%s' % (item['title'],item['size'])
         menuItems = {}
         if "!download" not in self.provider.capabilities():
