@@ -77,7 +77,7 @@ class StreamCinemaContentProvider(ContentProvider):
         return result
 
     @buggalo.buggalo_try_except({'method': 'scinema.a_to_z'})
-    def a_to_z(self, url_type):
+    def a_to_z(self):
         result = []
         for letter in ['0-9', 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'e', 'h', 'i', 'j', 'k', 'l', 'm',
                        'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z']:
@@ -92,7 +92,7 @@ class StreamCinemaContentProvider(ContentProvider):
         
         util.debug("URL: %s" % (url))
         if MOVIES_A_TO_Z_TYPE in url:
-            return self.a_to_z(MOVIES_A_TO_Z_TYPE)
+            return self.a_to_z()
         if "/letter/" in url:
             return self.list_by_letter(url)
         if "/series/" in url:
