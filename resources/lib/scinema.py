@@ -170,22 +170,22 @@ class StreamCinemaContentProvider(ContentProvider):
     
     def ctx(self, item, data):
         menu = {}
-        util.debug("CTX ITM: %s" % str(item))
-        util.debug("CTX DAT: %s" % str(data))
+        #util.debug("CTX ITM: %s" % str(item))
+        #util.debug("CTX DAT: %s" % str(data))
         #if 'dir' in data and data['dir'] == 'tvshows':
             
         if 'id' in data and 'season' not in data:
             menu.update({"$30918": {"action": "add-to-lib", "id": data['id'], "title": data['title']}})
-            util.debug("[SC] MAME menu!")
+            #util.debug("[SC] MAME menu!")
             
         if 'season' in data:
             util.debug("[SC] mame SERIAL")
             if data['id'] in self.subs.keys():
                 item['title'] = "[COLOR red]*[/COLOR] %s" % item['title']
-                util.debug("[SC] Serial je v odoberani: %s" % data['title'])
+                #util.debug("[SC] Serial je v odoberani: %s" % data['title'])
                 menu.update({"$30924": {"action": "remove-from-sub", "id": data['id'], "title": data['title']}})
             else:
-                util.debug("[SC] Serial neodoberam: %s" % data['title'])
+                #util.debug("[SC] Serial neodoberam: %s" % data['title'])
                 menu.update({"$30918": {"action": "add-to-lib", "id": data['id'], "title": data['title']}})
                 menu.update({"$30923": {"action": "add-to-lib-sub", "id": data['id'], "title": data['title']}})
         menu.update({"$30922": {"cmd":'Addon.OpenSettings("%s")' % top.__scriptid__}})
