@@ -23,11 +23,18 @@ from crypto.md5crypt import md5crypt
 import elementtree.ElementTree as ET
 import hashlib
 from provider import ResolveException
+import random
+import re
+import sys
+import traceback
+import urllib
+import urllib2
+import urlparse
 import util
 
 class Webshare():
 
-    def __init__(self,username=None,password=None):
+    def __init__(self,username=None,password=None,cache=None):
         self.username = username
         self.password = password
         self.base_url = 'http://webshare.cz/'

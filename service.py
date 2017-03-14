@@ -1,6 +1,6 @@
 # -*- coding: UTF-8 -*-
 # /*
-#  *      Copyright (C) 2013 bbaron
+#  *      Copyright (C) 2015 BBaronSVK
 #  *
 #  *
 #  *  This Program is free software; you can redistribute it and/or modify
@@ -20,7 +20,8 @@
 #  *
 #  */
 
-import xbmcaddon, xbmc, uuid
+import xbmcaddon
+import xbmc
 import util
 from resources.lib.scinema import StreamCinemaContentProvider
 from resources.lib.scutils import KODISCLib
@@ -38,6 +39,4 @@ if uid == '':
     uid = str(uuid.uuid4())
     __addon__.setSetting('uid', uid)
 
-params = util.params()
-util.info('[sc] PARAMS: ' + str(params))
-KODISCLib(StreamCinemaContentProvider(username=__set__('wsuser'),password=__set__('wspass'),uid=uid), settings, __addon__).run(params)
+KODISCLib(StreamCinemaContentProvider(username=__set__('wsuser'),password=__set__('wspass'),uid=uid), settings, __addon__).service()
