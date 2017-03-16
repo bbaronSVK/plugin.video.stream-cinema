@@ -124,6 +124,7 @@ class MyPlayer(xbmc.Player):
                     util.debug("[SC] onPlayBackStarted() - Exception trying to get playing filename, player suddenly stopped.")
                     return
                 util.debug("[SC] Zacalo sa prehravat: SCID: [%s] imdb: %s dur: %s est: %s fi: [%s] | %sx%s - title: %s (year: %s) showtitle: %s" % (str(self.scid), str(imdb), self.itemDuration, self.estimateFinishTime, _filename, str(season), str(episode), str(title), str(year), str(showtitle)))
+                data = {'scid': self.scid, 'action': 'start'}
                 self.action(data)
                 if 'item' in res and 'id' not in res['item']:
                     util.debug("[SC] prehravanie mimo kniznice")
@@ -133,11 +134,15 @@ class MyPlayer(xbmc.Player):
 
     def onPlayBackEnded(self):
         self.log("[SC] Skoncilo sa prehravat")
+        data = {'scid': self.scid, 'action': 'end'}
+        self.action(data)
         return
         self.setWatched()
 
     def onPlayBackStopped(self):
         self.log("[SC] Stoplo sa prehravanie")
+        data = {'scid': self.scid, 'action': 'stop'}
+        self.action(data)
         return
         try:
             # Player.TimeRemaining  - už zde nemá hodnotu
@@ -163,10 +168,12 @@ class MyPlayer(xbmc.Player):
                                        'self.realFinishTime: ': self.realFinishTime,
                                        'timeDifference: ': timeDifference,
                                        'timeRatio: ': timeRatio, })
-
+        
     def waitForChange(self):
-        scutils.KODISCLib.sleep(2000)
+        scutils.KODISCLib.sleep(200)
         while True:
+            if xbmc.abortRequested or not self.isPlayingVideo():
+                return
             pom = xbmc.getInfoLabel('Player.FinishTime(hh:mm:ss)')
             if pom != self.estimateFinishTime:
                 self.estimateFinishTime = pom
@@ -175,25 +182,35 @@ class MyPlayer(xbmc.Player):
 
     def onPlayBackResumed(self):
         self.log("[SC] Znova sa prehrava")
-        return;
         self.waitForChange()
+        data = {'scid': self.scid, 'action': 'resume'}
+        self.action(data)
+        return;
 
     def onPlayBackSpeedChanged(self, speed):
         self.log("[SC] Zmennila sa rychlost prehravania %s" % speed)
-        return
         self.waitForChange()
+        data = {'scid': self.scid, 'action': 'speed', 'speed': speed}
+        self.action(data)
+        return
 
     def onPlayBackSeek(self, time, seekOffset):
         self.log("[SC] Seekujem %s %s" % (time, seekOffset))
-        return
         self.waitForChange()
+        data = {'scid': self.scid, 'action': 'seek', 'time': time, 'seekOffset': seekOffset}
+        self.action(data)
+        return
     
     def onPlayBackPaused(self):
         self.log("[SC] Pauza")
+        self.waitForChange()
+        data = {'scid': self.scid, 'action': 'pause'}
+        self.action(data)
         return
     
     def action(self, data):
         self.log("[SC] action: %s" % str(data))
         url = "%s/Stats" % (top.BASE_URL)
-        util.post_json(url, data)
+        data.update({'est': self.estimateFinishTime})
+        util.post_json(url, data, {'X-UID': top.uid})
         

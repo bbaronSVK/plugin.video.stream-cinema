@@ -34,6 +34,7 @@ class KODISCLib(xbmcprovider.XBMCMultiResolverContentProvider):
     def __init__(self, provider, settings, addon):
         xbmcprovider.XBMCMultiResolverContentProvider.__init__(self, provider, settings, addon)
         provider.parent = self
+        top.uid = provider.uid
         self.provider = provider
         self.win = xbmcgui.Window(10000)
         self.noImage = os.path.join(self.addon_dir(), 'resources', 'img', 'no-image.png')
