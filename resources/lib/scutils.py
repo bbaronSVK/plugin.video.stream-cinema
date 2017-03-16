@@ -124,7 +124,7 @@ class KODISCLib(xbmcprovider.XBMCMultiResolverContentProvider):
                     util.debug("I: %s" % str(params))
                     param.update({'id': str(i['id']), 'notify': 1})
                     
-                    if params['id'] == 'movie':
+                    if params['id'] == 'movies':
                         (err, new) = self.add_item(param, addToSubscription, i)
                     else:
                         (err, new) = self.add_item(param, addToSubscription)
@@ -147,14 +147,16 @@ class KODISCLib(xbmcprovider.XBMCMultiResolverContentProvider):
             self.showNotification('Failed, Please check kodi logs', 'Linking')
         
     def movienfo(self, data):
-        out = "<movie>\n"
-        for k,v in data.items():
-            out += "\t<%s>%s</%s>\n" % (k, str(v), k) 
-        out += "\n</movie>"
-        if 'imdb' in data:
-            out += "\nhttp://www.imdb.com/title/tt%s/" % data['imdb']
-        if 'csfd' in data:
-            out += "\nhttp://www.csfd.cz/film/%s-" % data['csfd']
+        out = ''
+        if 'imdb' in data and int(data['imdb']) > 0:
+            out += "http://www.imdb.com/title/tt%08d/\n" % int(data['imdb'])
+        if 'tmdb' in data and int(data['tmdb']) > 0:
+            out += "https://www.themoviedb.org/movie/%d/\n" % int(data['tmdb'])
+        if 'csfd' in data and int(data['csfd']) > 0:
+            out += "http://www.csfd.cz/film/%d-\n" % int(data['csfd'])
+        if 'tvdb' in data and int(data['tvdb']) > 0:
+            out += "http://thetvdb.com/index.php?tab=series&id=%d\n" % int(data['tvdb'])
+            
         util.debug("XML: %s" % out)
         return str(out)
         
@@ -192,14 +194,10 @@ class KODISCLib(xbmcprovider.XBMCMultiResolverContentProvider):
             if not xbmcvfs.exists(os.path.join(item_dir, 
                             self.normalize_filename(data['title']),
                             'tvshow.nfo')):
-                if 'tvdb' in data:
-                    tvid = data['tvdb']
-                else:
-                    tvid = self.getTVDB(data)
-                if tvid:
-                    self.add_item_to_library(os.path.join(item_dir, self.normalize_filename(
-                        data['title']), 'tvshow.nfo'),
-                        'http://thetvdb.com/index.php?tab=series&id=%s' % str(tvid))
+                if 'tvdb' not in data:
+                    data['tvdb'] = self.getTVDB(data)
+                self.add_item_to_library(os.path.join(item_dir, self.normalize_filename(
+                        data['title']), 'tvshow.nfo'), self.movienfo(data))
 
             for itm in data['ep']:
                 item_path = os.path.join(
@@ -207,7 +205,7 @@ class KODISCLib(xbmcprovider.XBMCMultiResolverContentProvider):
                     'Season ' + itm['season'],
                     "S" + itm['season'] +
                     "E" + itm['episode'] + '.strm')
-                (err, new) = self.add_item_to_library(item_path, self._link(data))
+                (err, new) = self.add_item_to_library(item_path, self._link(itm))
                 error |= err
                 if new is True and not err:
                     new_items = True
@@ -363,22 +361,22 @@ class KODISCLib(xbmcprovider.XBMCMultiResolverContentProvider):
     def render_dir(self,item):
         params = self.params()
         if item['url'].startswith('cmd://'):
-            util.debug('command!!!')
+            #util.debug('command!!!')
             params.update({'cmd':item['url'][6:]})
         else:
             params.update({'list':item['url']})
         title = str(item['title'])
         try:
             title.index('$')
-            util.debug("[SC] mame prelozit %s" % title)
+            #util.debug("[SC] mame prelozit %s" % title)
             try:
                 for i in list(re.finditer('\$([0-9]+)', title, re.IGNORECASE | re.DOTALL)):
                     try:
                         t = self.getString(int(i.group(1)))
-                        util.debug('[SC] prelozene: %s' % t)
+                        #util.debug('[SC] prelozene: %s' % t)
                         title = title.replace('$%s' % i.group(1), t)
                     except Exception:
-                        util.debug('[SC] Neprelozene %s' % title[1:])
+                        #util.debug('[SC] Neprelozene %s' % title[1:])
                         pass
             except Exception:
                 pass
@@ -456,7 +454,6 @@ class KODISCLib(xbmcprovider.XBMCMultiResolverContentProvider):
             downparams.update({'title':"%s%s" % (item['name_seo'], item['extension']), 'down':item['url']})
         else:
             downparams.update({'title':"%s%s" % (item['title'], 'mp4'), 'down':item['url']})
-        def_item = self.provider.video_item()
         title = item['title'] #'%s%s' % (item['title'],item['size'])
         menuItems = {}
         if "!download" not in self.provider.capabilities():
@@ -465,7 +462,6 @@ class KODISCLib(xbmcprovider.XBMCMultiResolverContentProvider):
             trailerparams = {'action-type': 'trailer', 'url': item['trailer']}
             menuItems['Trailer'] = trailerparams
         if 'menu' in item.keys():
-            util.debug("[SC] -=-=-=-=-=---------------------------------")
             for ctxtitle, value in item['menu'].iteritems():
                 if ctxtitle.find('$') == 0:
                     try:
@@ -473,7 +469,7 @@ class KODISCLib(xbmcprovider.XBMCMultiResolverContentProvider):
                     except:
                         pass
                 menuItems[ctxtitle] = value
-        util.debug("menuItems: %s" % str(menuItems))
+        #util.debug("menuItems: %s" % str(menuItems))
         self.add_video(title,
                 params,
                 item['img'],

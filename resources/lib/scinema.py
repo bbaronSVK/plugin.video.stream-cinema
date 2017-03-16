@@ -51,7 +51,7 @@ class StreamCinemaContentProvider(ContentProvider):
         self.tr = tracker.TrackerInfo().getSystemInfo()
         self.uid = uid
         util.UA = self.tr['useragent']
-        util.debug("[SC] tr: %s" % str(self.tr))
+        #util.debug("[SC] tr: %s" % str(self.tr))
         
         util.init_urllib(self.cache)
         cookies = self.cache.get('cookies')
@@ -101,11 +101,11 @@ class StreamCinemaContentProvider(ContentProvider):
                 except Exception:
                     pass
             if 'system' in data:
-                util.debug("SYSTEM!!!!")
+                #util.debug("SYSTEM!!!!")
                 self.system(data["system"])
         else:
             result = [{'title': 'i failed', 'url':'failed'}]
-        util.debug('--------------------- DONE -----------------')
+        #util.debug('--------------------- DONE -----------------')
         return result
 
     @buggalo.buggalo_try_except({'method': 'scinema.system'})
@@ -173,13 +173,20 @@ class StreamCinemaContentProvider(ContentProvider):
         #util.debug("CTX ITM: %s" % str(item))
         #util.debug("CTX DAT: %s" % str(data))
         #if 'dir' in data and data['dir'] == 'tvshows':
+        
+        if 'id' in data and data['type'] != 'dir':
+            try:
+                id = int(data['id'])
+                menu.update({"report stream": {"action": "report", "id": data['id'], "title": data['title']}})
+            except Exception:
+                pass
             
         if 'id' in data and 'season' not in data:
             menu.update({"$30918": {"action": "add-to-lib", "id": data['id'], "title": data['title']}})
             #util.debug("[SC] MAME menu!")
             
         if 'season' in data:
-            util.debug("[SC] mame SERIAL")
+            #util.debug("[SC] mame SERIAL")
             if data['id'] in self.subs.keys():
                 item['title'] = "[COLOR red]*[/COLOR] %s" % item['title']
                 #util.debug("[SC] Serial je v odoberani: %s" % data['title'])
@@ -225,7 +232,7 @@ class StreamCinemaContentProvider(ContentProvider):
     
     @buggalo.buggalo_try_except({'method': 'scinema.resolve'})
     def resolve(self, item, captcha_cb=None, select_cb=None):
-        util.debug("ITEM RESOLVE: " + str(item))
+        #util.debug("ITEM RESOLVE: " + str(item))
         data = json.loads(self.get_data_cached(item['url']))
         if len(data) < 1:
             raise ResolveException('Video is not available.')
