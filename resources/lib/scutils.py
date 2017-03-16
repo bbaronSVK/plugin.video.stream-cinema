@@ -323,7 +323,7 @@ class KODISCLib(xbmcprovider.XBMCMultiResolverContentProvider):
                 li.setInfo('video', il)
                 util.debug("IL: %s" % str(il))
             
-            if (stream['subs'] == '' or stream['subs'] is None) and stream['lang'].strip() not in ['CZ', 'SK']:
+            if (stream['subs'] == '' or stream['subs'] is None) and stream['lang'].strip()[:2] not in ['CZ', 'SK']:
                 #util.debug(stream)
                 stream['subs'] = self.findSubtitles(stream)
                 
