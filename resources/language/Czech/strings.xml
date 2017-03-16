@@ -38,15 +38,17 @@
     <string id="30909">Rok</string>
     <string id="30910">TV</string>
     
-    <string id="30918">Pridat do knihovny</string>
+    <string id="30918">Přidat do knihovny</string>
     <string id="30919">Série</string>
     
-    <string id="30920">Poslední pridané části</string>
-    <string id="30921">Poslední pridané seriály</string>
+    <string id="30920">Poslední přidané části</string>
+    <string id="30921">Poslední přidané seriály</string>
     
     <string id="30922">Nastavení</string>
-    <string id="30923">Pridat do knihovny s odběrem</string>
+    <string id="30923">Přidat do knihovny s odběrem</string>
     <string id="30924">Zrušit odběr</string>
+    <string id="30925">Knihovna</string>
+    <string id="30926">Přidat do knihovny (vše)</string>
     
     <!-- dni v tyzdni -->
     <string id="30911">Pondělí</string>

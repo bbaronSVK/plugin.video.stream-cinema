@@ -94,6 +94,7 @@ class KODISCLib(xbmcprovider.XBMCMultiResolverContentProvider):
     
     def add_multi_item(self, params, addToSubscription=False):
         error = False
+        new = False
         new_items = False
         
         dialog = xbmcgui.DialogProgress()
@@ -105,6 +106,7 @@ class KODISCLib(xbmcprovider.XBMCMultiResolverContentProvider):
             dialog.update(0)
             total = float(len(data['list']))
             num = 0
+            new_in_page = False
 
             for i in data['list']:
                 num += 1
@@ -125,16 +127,22 @@ class KODISCLib(xbmcprovider.XBMCMultiResolverContentProvider):
                     param.update({'id': str(i['id']), 'notify': 1})
                     
                     if params['id'] == 'movies':
-                        (err, new) = self.add_item(param, addToSubscription, i)
+                        (e, n) = self.add_item(param, addToSubscription, i)
                     else:
-                        (err, new) = self.add_item(param, addToSubscription)
+                        (e, n) = self.add_item(param, addToSubscription)
                         
-                    error |= err
-                    if new is True and not err:
+                    error |= e
+                    new |= n
+                    new_in_page |= n
+                    if new is True and not error:
                         new_items = True
             page += 1
             if params['id'] == 'movies':
-                data = self.provider._json("%s/Lib/%s/?p=%s" % (top.BASE_URL, params['id'], str(page)))
+                if 'force' not in params and page > 2 and new_in_page == False:
+                    util.debug("[SC] Dalej nepridavam, nemame nic dalsie na pridanie ...")
+                    data = None
+                else:
+                    data = self.provider._json("%s/Lib/%s/?p=%s" % (top.BASE_URL, params['id'], str(page)))
             else:
                 data = None;
                 
@@ -285,6 +293,7 @@ class KODISCLib(xbmcprovider.XBMCMultiResolverContentProvider):
         util.debug("PLAY ITEM: %s" % str(item))
         stream = self.resolve(item['url'])
         if stream:
+            self.win.setProperty('scid', stream['id'])
             if 'headers' in stream.keys():
                 headerStr = '|' + urllib.urlencode(stream['headers'])
                 if len(headerStr) > 1:

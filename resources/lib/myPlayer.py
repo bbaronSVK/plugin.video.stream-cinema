@@ -21,6 +21,7 @@ class MyPlayer(xbmc.Player):
             self.realFinishTime = '00:00:00'
             self.itemDuration = '00:00:00'
             self.win = xbmcgui.Window(10000)
+            self.scid = None
         except Exception:
             self.log("SC Chyba MyPlayer: %s" % str(traceback.format_exc()))
 
@@ -83,9 +84,11 @@ class MyPlayer(xbmc.Player):
         mojPlugin = self.win.getProperty(top.__scriptid__)
         if top.__scriptid__ not in mojPlugin:
             util.debug("[SC] Nieje to moj plugin ... ")
-            #return;
+            return;
         util.debug("[SC] JE to moj plugin ... %s" % str(mojPlugin))
+        self.scid = self.win.getProperty('scid')
         self.win.clearProperty(top.__scriptid__)
+        self.win.clearProperty('scid')
         try:
             if not self.isPlayingVideo():
                 return
@@ -120,7 +123,8 @@ class MyPlayer(xbmc.Player):
                 except:
                     util.debug("[SC] onPlayBackStarted() - Exception trying to get playing filename, player suddenly stopped.")
                     return
-                util.debug("[SC] Zacalo sa prehravat: imdb: %s dur: %s est: %s fi: [%s] | %sx%s - title: %s (year: %s) showtitle: %s" % (str(imdb), self.itemDuration, self.estimateFinishTime, _filename, str(season), str(episode), str(title), str(year), str(showtitle)))
+                util.debug("[SC] Zacalo sa prehravat: SCID: [%s] imdb: %s dur: %s est: %s fi: [%s] | %sx%s - title: %s (year: %s) showtitle: %s" % (str(self.scid), str(imdb), self.itemDuration, self.estimateFinishTime, _filename, str(season), str(episode), str(title), str(year), str(showtitle)))
+                self.action(data)
                 if 'item' in res and 'id' not in res['item']:
                     util.debug("[SC] prehravanie mimo kniznice")
         except Exception:
@@ -187,4 +191,9 @@ class MyPlayer(xbmc.Player):
     def onPlayBackPaused(self):
         self.log("[SC] Pauza")
         return
+    
+    def action(self, data):
+        self.log("[SC] action: %s" % str(data))
+        url = "%s/Stats" % (top.BASE_URL)
+        util.post_json(url, data)
         
