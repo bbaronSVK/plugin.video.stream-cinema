@@ -26,6 +26,7 @@
     <string id="30402">Subscription service sleep on start</string>
     <string id="30403">Default show check time (days)</string>
 
+    <!-- texty v menu -->
     <string id="30901">Movies</string>
     <string id="30902">Series</string>
     <string id="30903">A-Z</string>
@@ -37,39 +38,27 @@
     <string id="30909">Year</string>
     <string id="30910">TV</string>
     
-    <!-- texty v menu -->
-    <string id="30901">Filmy</string>
-    <string id="30902">Seriály</string>
-    <string id="30903">A-Z</string>
-    <string id="30904">Najnovšie</string>
-    <string id="30905">Populárne</string>
-    <string id="30906">Krajina</string>
-    <string id="30907">Kvalita</string>
-    <string id="30908">Žáner</string>
-    <string id="30909">Rok</string>
-    <string id="30910">TV</string>
-    
     <string id="30918">Add to library</string>
     <string id="30919">Series</string>
 
-    <string id="30920">Posledné pridané časti</string>
-    <string id="30921">Posledné pridané seriály</string>
+    <string id="30920">Latest episodes</string>
+    <string id="30921">Latest series</string>
     
-    <string id="30922">Nastavenia</string>
-    <string id="30923">Pridať do knižnice s odberom</string>
-    <string id="30924">Zrušiť odber</string>
+    <string id="30922">Settings</string>
+    <string id="30923">Add to library with sunscription</string>
+    <string id="30924">Cancel subscription</string>
     <string id="30925">Library</string>
     <string id="30926">Add to library (all)</string>
-    <string id="30927">Naposledy sledované</string>
+    <string id="30927">Last seen</string>
     
     <!-- dni v tyzdni -->
-    <string id="30911">Pondelok</string>
-    <string id="30912">Utorok</string>    
-    <string id="30913">Streda</string>    
-    <string id="30914">Štvrtok</string>    
-    <string id="30915">Piatok</string>    
-    <string id="30916">Sobota</string>    
-    <string id="30917">Nedeľa</string>    
+    <string id="30911">Monday</string>
+    <string id="30912">Tuesday</string>    
+    <string id="30913">Wednesday</string>    
+    <string id="30914">Thursday</string>    
+    <string id="30915">Friday</string>    
+    <string id="30916">Saturday</string>    
+    <string id="30917">Sunday</string>    
     
     <!-- zanre -->
     <string id="31001">Akční</string>

@@ -140,7 +140,7 @@ class StreamCinemaContentProvider(ContentProvider):
         return self.items(url)
     
     @buggalo.buggalo_try_except({'method': 'scinema.get_data_cached'})
-    #@cached(ttl=1)
+    @cached(ttl=1)
     def get_data_cached(self, url):
         headers = {
             'X-UID': self.uid,
