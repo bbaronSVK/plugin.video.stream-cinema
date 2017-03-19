@@ -1,6 +1,6 @@
 # -*- coding: UTF-8 -*-
 # /*
-# *      Copyright (C) 2015 bbaron
+# *      Copyright (C) 2017 bbaron
 # *
 # *
 # *  This Program is free software; you can redistribute it and/or modify
@@ -20,43 +20,38 @@
 # *
 # */
 
+import resolver
+import os
+import sys
+sys.path.append(os.path.join(os.path.dirname(resolver.__file__), 'usage'))
+sys.path.append(os.path.join(os.path.dirname(resolver.__file__), 'contentprovider'))
 import buggalo
 import json
-import os
 from provider import ContentProvider
 from provider import ResolveException
 from provider import cached
-import resolver
-import sys
 import urllib
 import util
 import xbmcplugin
-
-sys.path.append(os.path.join(os.path.dirname(resolver.__file__), 'usage'))
+import top
 import tracker
 
 reload(sys)
 sys.setrecursionlimit(10000)
 sys.setdefaultencoding('utf-8')
 
-BASE_URL="http://stream-cinema.online"
-MOVIES_BASE_URL = BASE_URL + "/json"
-SERIES_BASE_URL = BASE_URL + "/json/series"
-
-MOVIES_A_TO_Z_TYPE = "movies-a-z"
-
-submiturl = 'http://stream-cinema.online/plugin/submit/'
-
 class StreamCinemaContentProvider(ContentProvider):
     par = None
+    subs = None
 
     def __init__(self, username=None, password=None, filter=None, uid=None):
-        ContentProvider.__init__(self, name='czsklib', base_url=MOVIES_BASE_URL, username=username,
+        ContentProvider.__init__(self, name='czsklib', base_url=top.BASE_URL, username=username,
                                  password=password, filter=filter)
         
         self.tr = tracker.TrackerInfo().getSystemInfo()
         self.uid = uid
         util.UA = self.tr['useragent']
+        #util.debug("[SC] tr: %s" % str(self.tr))
         
         util.init_urllib(self.cache)
         cookies = self.cache.get('cookies')
@@ -64,182 +59,163 @@ class StreamCinemaContentProvider(ContentProvider):
             util.request(self.base_url)
         self.ws = None
         
+        
     def capabilities(self):
         return ['resolve', 'categories', 'search']
+    
+    def getSubs(self):
+        return self.parent.getSubs()
+    
+    @buggalo.buggalo_try_except({'method': 'scinema._url'})
+    def _url(self, url):
+        
+        if url.startswith('http'):
+            return url
+        
+        if url.startswith('plugin://'):
+            return url
+        if url.startswith('cmd://'):
+            if '__self__' in url:
+                url.replace('__self__', top.__scriptid__)
+            return url
+        
+        if url.startswith('/'):
+            return top.BASE_URL + url
+        
+        return self.base_url.rstrip('/') + '/' + url.lstrip('./')
+    
+    @buggalo.buggalo_try_except({'method': 'scinema._json'})
+    def _json(self, url):
+        return json.loads(self.get_data_cached(url))
+    
+    @buggalo.buggalo_try_except({'method': 'scinema.items'})
+    def items(self, url):
+        self.subs = self.getSubs()
+        data = self._json(url)
+        result = []
+        if data.get("menu"):
+            for m in data["menu"]:
+                try:
+                    #util.debug("MENU: %s" % str(m))
+                    if m['type'] == 'dir':
+                        item = self._dir_item(m)
+                    else:
+                        item = self._video_item(m)
+                    result.append(item)
+                except Exception:
+                    pass
+            if 'system' in data:
+                #util.debug("SYSTEM!!!!")
+                self.system(data["system"])
+        else:
+            result = [{'title': 'i failed', 'url':'failed'}]
+        #util.debug('--------------------- DONE -----------------')
+        return result
+
+    @buggalo.buggalo_try_except({'method': 'scinema.system'})
+    def system(self, data):
+        if "setContent" in data:
+            xbmcplugin.setContent(int(sys.argv[1]), data["setContent"])
+        
+        if "setPluginCategory" in data:
+            xbmcplugin.setPluginCategory(int(sys.argv[1]), data["setPluginCategory"])
+        
+        if "addSortMethod" in data:
+            xbmcplugin.addSortMethod(int(sys.argv[1]), top.sortmethod[int(data["addSortMethod"])])
+
+        if data.get('addSortMethods'):
+            for m in data.get("addSortMethods"):
+                xbmcplugin.addSortMethod(int(sys.argv[1]), top.sortmethod[int(m)])
+        
+        if "setPluginFanart" in data:
+            xbmcplugin.setPluginFanart(int(sys.argv[1]), data["setPluginFanart"])
 
     @buggalo.buggalo_try_except({'method': 'scinema.categories'})
     def categories(self):
-        result = []
-        data = json.loads(self.get_data_cached(MOVIES_BASE_URL + '/list/hp'))
-        for m in data:
-            item = self.dir_item(title=m['title'], url=MOVIES_BASE_URL + str(m['url']))
-            result.append(item)
-        return result
-
-    @buggalo.buggalo_try_except({'method': 'scinema.a_to_z'})
-    def a_to_z(self):
-        result = []
-        for letter in ['0-9', 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'e', 'h', 'i', 'j', 'k', 'l', 'm',
-                       'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z']:
-            item = self.dir_item(title=letter.upper())
-            item['url'] = self.base_url + "/movie/letter/" + letter
-            result.append(item)
-        return result
-
+        return self.list(self._url(''))
+    
     @buggalo.buggalo_try_except({'method': 'scinema.list'})
     def list(self, url):
-        xbmcplugin.setContent(int(sys.argv[1]), 'movies')
-        
-        util.debug("URL: %s" % (url))
-        if MOVIES_A_TO_Z_TYPE in url:
-            return self.a_to_z()
-        if "/letter/" in url:
-            return self.list_by_letter(url)
-        if "/series/" in url:
-            self.base_url = SERIES_BASE_URL
-            return self.list_series(url)
-        if "/list/" in url:
-            return self.list_by_params(url)
-        
-        return [self.dir_item(title="I failed", url="fail")]
-
-    @buggalo.buggalo_try_except({'method': 'scinema.list_by_params'})
-    def list_by_params(self, url):
-        data = json.loads(self.get_data_cached(url))
-        result = []
-        xbmcplugin.addSortMethod(int(sys.argv[1]), xbmcplugin.SORT_METHOD_UNSORTED)
-        xbmcplugin.addSortMethod(int(sys.argv[1]), xbmcplugin.SORT_METHOD_VIDEO_RATING)
-        xbmcplugin.addSortMethod(int(sys.argv[1]), xbmcplugin.SORT_METHOD_MPAA_RATING)
-        xbmcplugin.addSortMethod(int(sys.argv[1]), xbmcplugin.SORT_METHOD_VIDEO_SORT_TITLE)
-        xbmcplugin.addSortMethod(int(sys.argv[1]), xbmcplugin.SORT_METHOD_VIDEO_YEAR)
-        xbmcplugin.addSortMethod(int(sys.argv[1]), xbmcplugin.SORT_METHOD_DATEADDED)
-        xbmcplugin.addSortMethod(int(sys.argv[1]), xbmcplugin.SORT_METHOD_VIDEO_RUNTIME)
-        for m in data:
-            if m['typ'] == 'dir':
-                item = self.dir_item(title=m['title'], url= MOVIES_BASE_URL + m['url'])
-                if m['pic'] != '':
-                    item['img'] = "%s%s" % (BASE_URL, m['pic'])
-            elif m['typ'] != 'latest':
-                item = self.dir_item(title=m['title'], url=url + '/' + m['url'])
-                if m['pic'] != '':
-                    item['img'] = "%s%s" % (BASE_URL, m['pic'])
-            else:
-                item = self._video_item(m)
-                
-            self._filter(result, item)
-        return result
-        
-    @buggalo.buggalo_try_except({'method': 'scinema.list_series'})
-    def list_series(self, url):
-        xbmcplugin.addSortMethod(int(sys.argv[1]), xbmcplugin.SORT_METHOD_UNSORTED)
-        xbmcplugin.addSortMethod(int(sys.argv[1]), xbmcplugin.SORT_METHOD_VIDEO_RATING)
-        xbmcplugin.addSortMethod(int(sys.argv[1]), xbmcplugin.SORT_METHOD_VIDEO_SORT_TITLE)
-        xbmcplugin.addSortMethod(int(sys.argv[1]), xbmcplugin.SORT_METHOD_VIDEO_YEAR)
-        xbmcplugin.addSortMethod(int(sys.argv[1]), xbmcplugin.SORT_METHOD_DATEADDED)
-        data = json.loads(self.get_data_cached(url))
-        result = []
-        for m in data:
-            if m['typ'] == 'get':
-                xbmcplugin.setContent(int(sys.argv[1]), 'episodes')
-                item = self._video_item(m)
-            if m['typ'] == 'latest':
-                xbmcplugin.setContent(int(sys.argv[1]), 'tvshows')
-                item = self._dir_item(m)
-                if m['poster'] != '':
-                    item['img'] = m['poster']
-            else:
-                item = self._video_item(m)
-                
-            self._filter(result, item)
-        return result
-    
-    @buggalo.buggalo_try_except({'method': 'scinema._dir_item'})
-    def _dir_item(self, m):
-        item = self.dir_item(title=m['name'], url=SERIES_BASE_URL + '/get/' + m['url'])
-        for k in m.keys():
-            if k != 'url':
-                item[k] = m[k]
-        year = m['release']
-        item['plot'] = m['description']
-        item['originaltitle'] = m['name_orig']
-        item['sorttitle'] = m['name_seo']
-        item['studio'] = m['studio']
-        item['genre'] = m['genres']
-        item['year'] = year[:4]
-        
-        art = {}
-        if m['fanart'] != '':
-            art['fanart'] = m['fanart']
-        if 'banner' in m:
-            art['banner'] = m['banner']
-        item['art'] = art
-
-        if int(year[:4]) > 0:
-            item['title'] = m['name'] + ' (' + year[:4] + ')'
-        else:
-            item['title'] = m['name']
-        return item
-        
-    @buggalo.buggalo_try_except({'method': 'scinema._video_item'})
-    def _video_item(self, m):
-        if '/json/series' in self.base_url:
-            item = self.video_item(url=self.base_url + '/play/%s/%s/%s' % (m['id'], m['season'], m['episode']), img=m['poster'])
-        else:
-            item = self.video_item(url=self.base_url + '/play/' + m['id'], img=m['poster'])
-        for k in m.keys():
-            if k != 'url':
-                item[k] = m[k]
-        year = m['release']
-        if m['rating'] > 0:
-            item['rating'] = float(m['rating']) / 10
-        
-        if int(year[:4]) > 0:
-            item['title'] = m['name'] + ' (' + year[:4] + ')'
-        else:
-            item['title'] = m['name']
-        item['genre'] = m['genres']
-        item['year'] = year[:4]
-        item['cast'] = m['cast'].split(', ')
-        item['director'] = m['director']
-        if m['mpaa'] != '':
-            item['mpaa'] = m['mpaa']
-        item['plot'] = m['description']
-        item['originaltitle'] = m['name_orig']
-        item['sorttitle'] = m['name_seo']
-        item['studio'] = m['studio']
-        
-        if m['imdb'] != '':
-            item['code'] = 'tt' + m['imdb']
-        art = {}
-        if m['fanart'] != '':
-            art['fanart'] = m['fanart']
-        if 'banner' in m:
-            art['banner'] = m['banner']
-        item['art'] = art
-        
-        return item
+        self.base_url = url
+        return self.items(url)
     
     @buggalo.buggalo_try_except({'method': 'scinema.get_data_cached'})
     @cached(ttl=1)
     def get_data_cached(self, url):
-        return util.request(url,{'X-UID':self.uid})
+        headers = {
+            'X-UID': self.uid,
+            'X-LANG': self.tr['language'],
+            'Accept' : 'application/vnd.bbaron.kodi-plugin-v%s+json' % (top.API_VERSION),
+        }
+        url = self._url(url)
+        util.debug("GET URL: %s" % url)
+        ret = util.request(url, headers)
+        #util.debug("RET: %s" % str(ret))
+        return ret
+    
+    @buggalo.buggalo_try_except({'method': 'scinema._dir_item'})
+    def _dir_item(self, m):
+        item = self.dir_item(title=m['title'], url=self._url(m['url']))
+        for k in m.keys():
+            if k != 'url':
+                item[k] = m[k]
+        item = self.ctx(item, m)
 
-    @buggalo.buggalo_try_except({'method': 'scinema.list_by_letter'})
-    def list_by_letter(self, url):
-        result = []
-        util.debug("Ideme na pismeno!")
-        data = json.loads(self.get_data_cached(url))
-        for m in data:
-            util.debug(m)
-            item = self._video_item(m)
-            self._filter(result, item)
-        util.debug(result)
-        return result
+        return item
 
+    @buggalo.buggalo_try_except({'method': 'scinema._video_item'})
+    def _video_item(self, m):
+        item = self.video_item(self._url(m['url']), img=m['poster'])
+        for k in m.keys():
+            if k != 'url':
+                item[k] = m[k]
+        item = self.ctx(item, m)
+        return item
+    
+    def ctx(self, item, data):
+        menu = {}
+        #util.debug("CTX ITM: %s" % str(item))
+        #util.debug("CTX DAT: %s" % str(data))
+        #if 'dir' in data and data['dir'] == 'tvshows':
+        
+        if 'id' in data and data['type'] != 'dir':
+            try:
+                id = int(data['id'])
+                #menu.update({"report stream": {"action": "report", "id": data['id'], "title": data['title']}})
+            except Exception:
+                pass
+            
+        if 'id' in data and 'season' not in data:
+            menu.update({"$30918": {"action": "add-to-lib", "id": data['id'], "title": data['title']}})
+            
+        if 'id' in data and data['id'] != 'movies':
+            menu.update({"$30923": {"action": "add-to-lib-sub", "id": data['id'], "title": data['title']}})
+            
+        if 'id' in data and data['id'] == 'movies':
+            menu.update({"$30926": {"action": "add-to-lib", "id": data['id'], "title": data['title'], "force": "1"}})
+            #util.debug("[SC] MAME menu!")
+            
+        if 'season' in data:
+            #util.debug("[SC] mame SERIAL")
+            if data['id'] in self.subs.keys():
+                item['title'] = "[COLOR red]*[/COLOR] %s" % item['title']
+                #util.debug("[SC] Serial je v odoberani: %s" % data['title'])
+                menu.update({"$30924": {"action": "remove-from-sub", "id": data['id'], "title": data['title']}})
+            else:
+                #util.debug("[SC] Serial neodoberam: %s" % data['title'])
+                menu.update({"$30918": {"action": "add-to-lib", "id": data['id'], "title": data['title']}})
+                menu.update({"$30923": {"action": "add-to-lib-sub", "id": data['id'], "title": data['title']}})
+        #menu.update({"$30922": {"cmd":'Addon.OpenSettings("%s")' % top.__scriptid__}})
+        #menu.update({"run Schedule": {"action": "subs"}})
+        #menu.update({"clean Schedule": {"action": "rsubs"}})
+        #menu.update({"last": {"action": "last"}})
+        item['menu'] = menu
+        return item
+    
     @buggalo.buggalo_try_except({'method': 'scinema.search'})
     def search(self, keyword):
         sq = {'search': keyword}
-        return self.list_by_params(MOVIES_BASE_URL + '/list/search?' + urllib.urlencode(sq))
+        return self.items(self._url('/Search/?' + urllib.urlencode(sq)))
 
     @buggalo.buggalo_try_except({'method': 'scinema._resolve'})
     def _resolve(self, itm):
@@ -265,11 +241,12 @@ class StreamCinemaContentProvider(ContentProvider):
                         pass
             except:
                 pass
+        itm['title'] = self.parent.encode(itm['title'])
         return itm
     
     @buggalo.buggalo_try_except({'method': 'scinema.resolve'})
     def resolve(self, item, captcha_cb=None, select_cb=None):
-        util.debug("ITEM RESOLVE: " + str(item))
+        #util.debug("ITEM RESOLVE: " + str(item))
         data = json.loads(self.get_data_cached(item['url']))
         if len(data) < 1:
             raise ResolveException('Video is not available.')
@@ -278,4 +255,14 @@ class StreamCinemaContentProvider(ContentProvider):
         elif len(data) > 1 and select_cb:
             return self._resolve(select_cb(data))
 
-buggalo.SUBMIT_URL = submiturl
+    def keyboard(self, title, action):
+        k = xbmc.Keyboard('', title);
+        k.doModal()
+        q = k.getText() if k.isConfirmed() else None
+        if (q == None or q == ''): 
+            return
+        q = urllib.quote_plus(q)
+        url = '%s?action=%s&q=%s' % (sys.argv[0], action, q)
+        control.execute('Container.Update(%s)' % url)
+        
+buggalo.SUBMIT_URL = top.submiturl
