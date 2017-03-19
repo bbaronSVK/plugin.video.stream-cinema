@@ -194,7 +194,7 @@ class KODISCLib(xbmcprovider.XBMCMultiResolverContentProvider):
             item_dir = self.getSetting('library-tvshows')
 
             if not (data['id'] in subs) and addToSubscription:
-                subs.update({data['id']: data['title'], 'last_run':time.time()})
+                subs.update({data['id']: {'title': data['title'], 'last_run':time.time()}})
                 self.setSubs(subs)
 
             if not xbmcvfs.exists(os.path.join(item_dir, 
@@ -247,8 +247,8 @@ class KODISCLib(xbmcprovider.XBMCMultiResolverContentProvider):
                     util.debug("[SC] Refreshing %s" % str(iid))
                     (e, n) = self.add_item({'id': str(iid)})
                     new_items |= n
-                    data.update({'last_run':time.time()})
-                    subs.update({iid:data})
+                    data['last_run'] = time.time()
+                    subs[iid] = data
                     self.setSubs(subs)
             if new_items:
                 xbmc.executebuiltin('UpdateLibrary(video)')
@@ -307,6 +307,8 @@ class KODISCLib(xbmcprovider.XBMCMultiResolverContentProvider):
                     xbmc.executebuiltin('Container.Refresh')
             if action == 'subs':
                 self.evalSchedules()
+            if action == 'rsubs':
+                self.setSubs({})
         elif 'cmd' in params:
             try:
                 if '^;^' in params['cmd']:
@@ -461,6 +463,10 @@ class KODISCLib(xbmcprovider.XBMCMultiResolverContentProvider):
         if 'art' in infoLabels.keys():
             liz.setArt(infoLabels['art'])
 
+        if 'selected' in infoLabels.keys():
+            wnd = xbmcgui.Window(xbmcgui.getCurrentWindowId())
+            util.debug("[SC] wnd: %s [%d]" % (str(wnd), xbmcgui.getCurrentWindowId()))
+            
         try:
             liz.setInfo(type='Video', infoLabels=self._extract_infolabels(infoLabels))
         except:
@@ -537,6 +543,9 @@ class KODISCLib(xbmcprovider.XBMCMultiResolverContentProvider):
             logo = self.noImage
         li = xbmcgui.ListItem(name, path=url, iconImage='DefaultVideo.png', thumbnailImage=logo)
         li.setInfo(type='Video', infoLabels=_infoLabels)
+        if 'selected' in infoLabels.keys():
+            wnd = xbmcgui.Window(xbmcgui.getCurrentWindowId())
+            util.debug("[SC] wnd: %s [%d]" % (str(wnd), xbmcgui.getCurrentWindowId()))
         if 'mvideo' in infoLabels.keys():
             li.addStreamInfo('video', infoLabels['mvideo'])
         if 'maudio' in infoLabels.keys():
@@ -727,10 +736,6 @@ class KODISCLib(xbmcprovider.XBMCMultiResolverContentProvider):
             if data == '':
                 return {}
             subs = eval(data)
-            for url, name in subs.iteritems():
-                if not isinstance(name, dict):
-                    subs[url] = {'name': name,
-                                 'refresh': '1', 'last_run': -1}
             self.setSubs(subs)
             self.subs = subs
         except Exception, e:

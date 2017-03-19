@@ -177,7 +177,7 @@ class StreamCinemaContentProvider(ContentProvider):
         if 'id' in data and data['type'] != 'dir':
             try:
                 id = int(data['id'])
-                menu.update({"report stream": {"action": "report", "id": data['id'], "title": data['title']}})
+                #menu.update({"report stream": {"action": "report", "id": data['id'], "title": data['title']}})
             except Exception:
                 pass
             
@@ -197,8 +197,9 @@ class StreamCinemaContentProvider(ContentProvider):
                 #util.debug("[SC] Serial neodoberam: %s" % data['title'])
                 menu.update({"$30918": {"action": "add-to-lib", "id": data['id'], "title": data['title']}})
                 menu.update({"$30923": {"action": "add-to-lib-sub", "id": data['id'], "title": data['title']}})
-        menu.update({"$30922": {"cmd":'Addon.OpenSettings("%s")' % top.__scriptid__}})
-        #menu.update({"Schedule": {"action": "subs"}})
+        #menu.update({"$30922": {"cmd":'Addon.OpenSettings("%s")' % top.__scriptid__}})
+        #menu.update({"run Schedule": {"action": "subs"}})
+        #menu.update({"clean Schedule": {"action": "rsubs"}})
         item['menu'] = menu
         return item
     @buggalo.buggalo_try_except({'method': 'scinema.search'})
