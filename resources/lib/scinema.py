@@ -72,7 +72,11 @@ class StreamCinemaContentProvider(ContentProvider):
         if url.startswith('http'):
             return url
         
-        if url.startswith('plugin://') or url.startswith('cmd://'):
+        if url.startswith('plugin://'):
+            return url
+        if url.startswith('cmd://'):
+            if '__self__' in url:
+                url.replace('__self__', top.__scriptid__)
             return url
         
         if url.startswith('/'):
@@ -200,6 +204,7 @@ class StreamCinemaContentProvider(ContentProvider):
         #menu.update({"$30922": {"cmd":'Addon.OpenSettings("%s")' % top.__scriptid__}})
         #menu.update({"run Schedule": {"action": "subs"}})
         #menu.update({"clean Schedule": {"action": "rsubs"}})
+        #menu.update({"last": {"action": "last"}})
         item['menu'] = menu
         return item
     @buggalo.buggalo_try_except({'method': 'scinema.search'})

@@ -309,6 +309,9 @@ class KODISCLib(xbmcprovider.XBMCMultiResolverContentProvider):
                 self.evalSchedules()
             if action == 'rsubs':
                 self.setSubs({})
+            if action == 'last':
+                self.list(self.provider.items(self.provider._url("/Last/?%s" % urllib.urlencode({'ids': json.dumps(self.getLast())}))))
+                return xbmcplugin.endOfDirectory(int(sys.argv[1]))
         elif 'cmd' in params:
             try:
                 if '^;^' in params['cmd']:
@@ -610,6 +613,7 @@ class KODISCLib(xbmcprovider.XBMCMultiResolverContentProvider):
         util.info("SC Service Started")
         if top.player is None:
             top.player = myPlayer.MyPlayer()
+            top.player.parent = self
         try:
             sleep_time = int(self.getSetting("start_sleep_time")) * 1000 * 60
         except:
@@ -654,11 +658,28 @@ class KODISCLib(xbmcprovider.XBMCMultiResolverContentProvider):
                 episode = stream['episode']
 
             util.debug("[SC] Hladam titulky")
-            langDict = {'Afrikaans': 'afr', 'Albanian': 'alb', 'Arabic': 'ara', 'Armenian': 'arm', 'Basque': 'baq', 'Bengali': 'ben', 'Bosnian': 'bos', 'Breton': 'bre', 'Bulgarian': 'bul', 'Burmese': 'bur', 'Catalan': 'cat', 'Chinese': 'chi', 'Croatian': 'hrv', 'Czech': 'cze', 'Danish': 'dan', 'Dutch': 'dut', 'English': 'eng', 'Esperanto': 'epo', 'Estonian': 'est', 'Finnish': 'fin', 'French': 'fre', 'Galician': 'glg', 'Georgian': 'geo', 'German': 'ger', 'Greek': 'ell', 'Hebrew': 'heb', 'Hindi': 'hin', 'Hungarian': 'hun', 'Icelandic': 'ice', 'Indonesian': 'ind', 'Italian': 'ita', 'Japanese': 'jpn', 'Kazakh': 'kaz', 'Khmer': 'khm', 'Korean': 'kor', 'Latvian': 'lav', 'Lithuanian': 'lit', 'Luxembourgish': 'ltz', 'Macedonian': 'mac', 'Malay': 'may', 'Malayalam': 'mal', 'Manipuri': 'mni', 'Mongolian': 'mon', 'Montenegrin': 'mne', 'Norwegian': 'nor', 'Occitan': 'oci', 'Persian': 'per', 'Polish': 'pol', 'Portuguese': 'por,pob', 'Portuguese(Brazil)': 'pob,por', 'Romanian': 'rum', 'Russian': 'rus', 'Serbian': 'scc', 'Sinhalese': 'sin', 'Slovak': 'slo', 'Slovenian': 'slv', 'Spanish': 'spa', 'Swahili': 'swa', 'Swedish': 'swe', 'Syriac': 'syr', 'Tagalog': 'tgl', 'Tamil': 'tam', 'Telugu': 'tel', 'Thai': 'tha', 'Turkish': 'tur', 'Ukrainian': 'ukr', 'Urdu': 'urd'}
+            langDict = {'Afrikaans': 'afr', 'Albanian': 'alb', 'Arabic': 'ara', 'Armenian': 'arm', 
+                'Basque': 'baq', 'Bengali': 'ben', 'Bosnian': 'bos', 'Breton': 'bre', 
+                'Bulgarian': 'bul', 'Burmese': 'bur', 'Catalan': 'cat', 'Chinese': 'chi', 
+                'Croatian': 'hrv', 'Czech': 'cze', 'Danish': 'dan', 'Dutch': 'dut', 'English': 'eng', 
+                'Esperanto': 'epo', 'Estonian': 'est', 'Finnish': 'fin', 'French': 'fre', 
+                'Galician': 'glg', 'Georgian': 'geo', 'German': 'ger', 'Greek': 'ell', 
+                'Hebrew': 'heb', 'Hindi': 'hin', 'Hungarian': 'hun', 'Icelandic': 'ice', 
+                'Indonesian': 'ind', 'Italian': 'ita', 'Japanese': 'jpn', 'Kazakh': 'kaz', 
+                'Khmer': 'khm', 'Korean': 'kor', 'Latvian': 'lav', 'Lithuanian': 'lit', 
+                'Luxembourgish': 'ltz', 'Macedonian': 'mac', 'Malay': 'may', 'Malayalam': 'mal', 
+                'Manipuri': 'mni', 'Mongolian': 'mon', 'Montenegrin': 'mne', 'Norwegian': 'nor', 
+                'Occitan': 'oci', 'Persian': 'per', 'Polish': 'pol', 'Portuguese': 'por,pob', 
+                'Portuguese(Brazil)': 'pob,por', 'Romanian': 'rum', 'Russian': 'rus', 'Serbian': 'scc', 
+                'Sinhalese': 'sin', 'Slovak': 'slo', 'Slovenian': 'slv', 'Spanish': 'spa', 
+                'Swahili': 'swa', 'Swedish': 'swe', 'Syriac': 'syr', 'Tagalog': 'tgl', 'Tamil': 'tam', 
+                'Telugu': 'tel', 'Thai': 'tha', 'Turkish': 'tur', 'Ukrainian': 'ukr', 'Urdu': 'urd'}
 
-            codePageDict = {'ara': 'cp1256', 'ar': 'cp1256', 'ell': 'cp1253', 'el': 'cp1253', 'heb': 'cp1255', 'he': 'cp1255', 'tur': 'cp1254', 'tr': 'cp1254', 'rus': 'cp1251', 'ru': 'cp1251'}
+            codePageDict = {'ara': 'cp1256', 'ar': 'cp1256', 'cs': 'cp1250', 'ell': 'cp1253', 
+                'el': 'cp1253', 'heb': 'cp1255', 'he': 'cp1255', 'sk': 'cp1250', 'tur': 'cp1254', 
+                'tr': 'cp1254', 'rus': 'cp1251', 'ru': 'cp1251'}
 
-            quality = ['bluray', 'hdrip', 'brrip', 'bdrip', 'dvdrip', 'webrip', 'hdtv']
+            quality = ['bluray', 'hdrip', 'brrip', 'bdrip', 'dvdrip', 'webrip', 'mhd', 'hdtv']
 
             langs = []
             try:
@@ -734,9 +755,9 @@ class KODISCLib(xbmcprovider.XBMCMultiResolverContentProvider):
         data = self.cache.get("subscription")
         try:
             if data == '':
-                return {}
-            subs = eval(data)
-            self.setSubs(subs)
+                subs = {}
+            else:
+                subs = eval(data)
             self.subs = subs
         except Exception, e:
             util.error(e)
@@ -746,4 +767,33 @@ class KODISCLib(xbmcprovider.XBMCMultiResolverContentProvider):
     def setSubs(self, subs):
         self.subs = subs
         self.cache.set("subscription", repr(subs))
+
+    def getLast(self):
+        data = self.cache.get("last")
+        try:
+            if data == '' or data is None:
+                last = []
+            else:
+                last = eval(data)
+        except Exception, e:
+            last = []
+        util.debug("[SC] getLast %s" % str(last))
+        return last
+        
+    def setLast(self, last):
+        util.debug("[SC] setLast %s" % str(last))
+        self.cache.set("last", repr(last))
+
+    def addLast(self, scid):
+        last = self.getLast()
+        util.debug("[SC] addLast %s -> %s" % (str(scid), str(last)))
+        if scid in last:
+            last.remove(scid)
+        last.insert(0, scid)
+        remove = len(last) - 20
+        if remove > 0:
+            for i in range(remove):
+                last.pop()
+        self.setLast(last)
+
 buggalo.SUBMIT_URL = top.submiturl

@@ -24,6 +24,7 @@ class MyPlayer(xbmc.Player):
             self.scid = None
             self.itemDBID = None
             self.itemType = None
+            self.parent = None
         except Exception:
             self.log("SC Chyba MyPlayer: %s" % str(traceback.format_exc()))
 
@@ -139,6 +140,13 @@ class MyPlayer(xbmc.Player):
                                 self.itemDBID = m['movieid']
                                 break
                 else:
+                    if self.parent is not None:
+                        try:
+                            self.parent.addLast(self.scid)
+                        except Exception, e:
+                            util.error(e)
+                            pass
+                        
                     method = 'VideoLibrary.GetTVShows'
                     value = showtitle #/Season %s/%sx%s.strm" % (showtitle, season, season, episode)
                     field = 'path'

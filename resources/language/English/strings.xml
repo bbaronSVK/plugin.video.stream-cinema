@@ -51,8 +51,16 @@
     
     <string id="30918">Add to library</string>
     <string id="30919">Series</string>
+
+    <string id="30920">Posledné pridané časti</string>
+    <string id="30921">Posledné pridané seriály</string>
+    
+    <string id="30922">Nastavenia</string>
+    <string id="30923">Pridať do knižnice s odberom</string>
+    <string id="30924">Zrušiť odber</string>
     <string id="30925">Library</string>
     <string id="30926">Add to library (all)</string>
+    <string id="30927">Naposledy sledované</string>
     
     <!-- dni v tyzdni -->
     <string id="30911">Pondelok</string>
