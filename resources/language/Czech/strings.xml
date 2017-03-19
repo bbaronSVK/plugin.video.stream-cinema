@@ -2,7 +2,7 @@
 <strings>
     <string id="30010">webshare.cz</string>
     <string id="30101">Uživatelské jméno</string>
-    <string id="30102">Uživatelsé heslo</string>
+    <string id="30102">Uživatelské heslo</string>
     
     <string id="30020">Titulky</string>
     <string id="30201">Povolit titulky</string>
@@ -38,7 +38,7 @@
     <string id="30909">Rok</string>
     <string id="30910">TV dnes</string>
     
-    <string id="30918">P+ridat nové knihovny</string>
+    <string id="30918">Přidat nové do knihovny</string>
     <string id="30919">Série</string>
     
     <string id="30920">Poslední přidané části</string>
