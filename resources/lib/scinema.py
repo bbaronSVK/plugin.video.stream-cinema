@@ -187,6 +187,10 @@ class StreamCinemaContentProvider(ContentProvider):
             
         if 'id' in data and 'season' not in data:
             menu.update({"$30918": {"action": "add-to-lib", "id": data['id'], "title": data['title']}})
+            
+        if 'id' in data and data['id'] != 'movies':
+            menu.update({"$30923": {"action": "add-to-lib-sub", "id": data['id'], "title": data['title']}})
+            
         if 'id' in data and data['id'] == 'movies':
             menu.update({"$30926": {"action": "add-to-lib", "id": data['id'], "title": data['title'], "force": "1"}})
             #util.debug("[SC] MAME menu!")

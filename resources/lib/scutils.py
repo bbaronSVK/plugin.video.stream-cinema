@@ -97,6 +97,9 @@ class KODISCLib(xbmcprovider.XBMCMultiResolverContentProvider):
         error = False
         new = False
         new_items = False
+        e = False
+        n = False
+        subs = self.getSubs()
         
         dialog = xbmcgui.DialogProgress()
         dialog.create('Stream Cinema CZ & SK', 'Add all to library')
@@ -121,7 +124,7 @@ class KODISCLib(xbmcprovider.XBMCMultiResolverContentProvider):
                 except Exception:
                     util.debug('ERR: %s' % str(traceback.format_exc()) )
                     pass
-
+                
                 if 1:
                     param = copy.deepcopy(params)
                     util.debug("I: %s" % str(params))
@@ -130,7 +133,9 @@ class KODISCLib(xbmcprovider.XBMCMultiResolverContentProvider):
                     if params['id'] == 'movies':
                         (e, n) = self.add_item(param, addToSubscription, i)
                     else:
-                        (e, n) = self.add_item(param, addToSubscription)
+                        if addToSubscription == False or (i['id'] not in subs) \
+                           or (i['id'] in subs and self.canCheck(subs[i['id']]['last_run'])):
+                            (e, n) = self.add_item(param, addToSubscription)
                         
                     error |= e
                     new |= n
@@ -224,6 +229,10 @@ class KODISCLib(xbmcprovider.XBMCMultiResolverContentProvider):
         if error and not ('notify' in params):
             self.showNotification('Failed, Please check kodi logs', 'Linking')
         return (error, new_items)
+
+    def canCheck(self, last_run):
+        next_check = last_run + (int(self.getSetting('refresh_time')) * 3600 * 24)
+        return next_check < time.time()
     
     def evalSchedules(self):
         if not self.scanRunning() and not self.isPlaying():
@@ -239,8 +248,7 @@ class KODISCLib(xbmcprovider.XBMCMultiResolverContentProvider):
                 if self.scanRunning() or self.isPlaying():
                     self.cache.delete("subscription.last_run")
                     return
-                next_check = data['last_run'] + (int(self.getSetting('refresh_time')) * 3600 * 24)
-                if next_check < time.time():
+                if self.canCheck(data['last_run']):
                     if not notified:
                         self.showNotification('Subscription', 'Chcecking')
                         notified = True
