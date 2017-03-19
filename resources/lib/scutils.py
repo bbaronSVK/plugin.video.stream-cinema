@@ -41,10 +41,10 @@ class KODISCLib(xbmcprovider.XBMCMultiResolverContentProvider):
         #self._settings()
         try:
             import StorageServer
-            self.cache = StorageServer.StorageServer("Downloader")
+            self.cache = StorageServer.StorageServer(top.__scriptname__)
         except:
             import storageserverdummy as StorageServer
-            self.cache = StorageServer.StorageServer("Downloader")
+            self.cache = StorageServer.StorageServer(top.__scriptname__)
 
     def _parse_settings(self, itm):
         util.info('--------------------------------------------------------')
@@ -178,9 +178,6 @@ class KODISCLib(xbmcprovider.XBMCMultiResolverContentProvider):
         if 'title' not in data:
             return
         
-        if not 'refresh' in params:
-            params['refresh'] = str(self.getSetting("refresh_time"))
-        
         if 'ep' not in data:
             item_dir = self.getSetting('library-movies')
             xml_path = os.path.join(item_dir, self.normalize_filename(data['title']),
@@ -193,12 +190,12 @@ class KODISCLib(xbmcprovider.XBMCMultiResolverContentProvider):
             if not ('notify' in params):
                 self.showNotification(data['title'], 'Checking new content')
 
-            subs = self.get_subs()
+            subs = self.getSubs()
             item_dir = self.getSetting('library-tvshows')
 
             if not (data['id'] in subs) and addToSubscription:
-                subs.update({data['id']: data['title']})
-                self.set_subs(subs)
+                subs.update({data['id']: data['title'], 'last_run':time.time()})
+                self.setSubs(subs)
 
             if not xbmcvfs.exists(os.path.join(item_dir, 
                             self.normalize_filename(data['title']),
@@ -221,13 +218,44 @@ class KODISCLib(xbmcprovider.XBMCMultiResolverContentProvider):
                     
         if not error and new_items and not ('update' in params) and not ('notify' in params):
             self.showNotification(data['title'], 'New content')
-            #xbmc.executebuiltin('UpdateLibrary(video)')
+            xbmc.executebuiltin('UpdateLibrary(video)')
         elif not error and not ('notify' in params):
             self.showNotification(data['title'], 'No new content')
         if error and not ('notify' in params):
             self.showNotification('Failed, Please check kodi logs', 'Linking')
         return (error, new_items)
     
+    def evalSchedules(self):
+        if not self.scanRunning() and not self.isPlaying():
+            notified = False
+            util.info("[SC] Loading subscriptions")
+            subs = self.getSubs()
+            util.debug("[SC] Subs: %s" % str(subs))
+            new_items = False
+            for iid, data in subs.iteritems():
+                if xbmc.abortRequested:
+                    util.info("[SC] Exiting")
+                    return
+                if self.scanRunning() or self.isPlaying():
+                    self.cache.delete("subscription.last_run")
+                    return
+                next_check = data['last_run'] + (int(self.getSetting('refresh_time')) * 3600 * 24)
+                if next_check < time.time():
+                    if not notified:
+                        self.showNotification('Subscription', 'Chcecking')
+                        notified = True
+                    util.debug("[SC] Refreshing %s" % str(iid))
+                    (e, n) = self.add_item({'id': str(iid)})
+                    new_items |= n
+                    data.update({'last_run':time.time()})
+                    subs.update({iid:data})
+                    self.setSubs(subs)
+            if new_items:
+                xbmc.executebuiltin('UpdateLibrary(video)')
+            notified = False
+        else:
+            util.info("SOSAC Scan skipped")
+
     def getTVDB(self, params):
         if 'imdb' in params:
             data = self.provider.get_data_cached('http://thetvdb.com/api/GetSeriesByRemoteID.php?=' +
@@ -261,10 +289,10 @@ class KODISCLib(xbmcprovider.XBMCMultiResolverContentProvider):
             action = params['action']
             subs = False
             if action == 'remove-from-sub':
-                subs = self.get_subs()
+                subs = self.getSubs()
                 if params['id'] in subs.keys():
                     del subs[params['id']]
-                    self.set_subs(subs)
+                    self.setSubs(subs)
                     self.showNotification(params['title'], 'Removed from subscription')
                     xbmc.executebuiltin('Container.Refresh')
             if action == 'add-to-lib-sub':
@@ -277,6 +305,8 @@ class KODISCLib(xbmcprovider.XBMCMultiResolverContentProvider):
                     self.add_item(params, subs)
                 if subs:
                     xbmc.executebuiltin('Container.Refresh')
+            if action == 'subs':
+                self.evalSchedules()
         elif 'cmd' in params:
             try:
                 if '^;^' in params['cmd']:
@@ -289,6 +319,13 @@ class KODISCLib(xbmcprovider.XBMCMultiResolverContentProvider):
             except Exception:
                 util.debug("ERROR: %s" % str(traceback.format_exc()))
                 pass
+    
+    def isPlaying(self):
+        return xbmc.Player().isPlaying()
+
+    def scanRunning(self):
+        return (xbmc.getCondVisibility('Library.IsScanningVideo') or
+                xbmc.getCondVisibility('Library.IsScanningMusic'))
 
     def play(self, item):
         util.debug("PLAY ITEM: %s" % str(item))
@@ -557,8 +594,8 @@ class KODISCLib(xbmcprovider.XBMCMultiResolverContentProvider):
     @staticmethod
     def sleep(sleep_time):
         while not xbmc.abortRequested and sleep_time > 0:
-            sleep_time -= 1
-            xbmc.sleep(1)
+            sleep_time -= 100
+            xbmc.sleep(100)
 
     def service(self):
         util.info("SC Service Started")
@@ -570,7 +607,9 @@ class KODISCLib(xbmcprovider.XBMCMultiResolverContentProvider):
             sleep_time = self.sleep_time
             pass
 
-        #self.sleep(sleep_time)
+        util.debug("[SC] start delay: %s" % str(sleep_time))
+        self.sleep(sleep_time)
+        util.debug("[SC] sleep end")
 
         try:
             self.last_run = float(self.cache.get("subscription.last_run"))
@@ -578,6 +617,8 @@ class KODISCLib(xbmcprovider.XBMCMultiResolverContentProvider):
             self.last_run = time.time()
             self.cache.set("subscription.last_run", str(self.last_run))
             pass
+        
+        util.debug("[SC] last_rum: %s" % str(self.last_run))
 
         if not xbmc.abortRequested and time.time() > self.last_run:
             self.evalSchedules()
@@ -589,11 +630,8 @@ class KODISCLib(xbmcprovider.XBMCMultiResolverContentProvider):
                 self.last_run = time.time()
                 self.cache.set("subscription.last_run", str(self.last_run))
             self.sleep(self.sleep_time)
-        util.info("SC Shutdown")
+        util.info("[SC] Shutdown")
     
-    def evalSchedules(self):
-        util.debug("evalSchedules")
-
     def findSubtitles(self, stream):
         try:
             if not self.getSetting('subtitles') == 'true': 
@@ -681,7 +719,7 @@ class KODISCLib(xbmcprovider.XBMCMultiResolverContentProvider):
             util.debug(traceback.format_exc())
             pass
 
-    def get_subs(self):
+    def getSubs(self):
         if self.subs is not None:
             return self.subs
         data = self.cache.get("subscription")
@@ -693,14 +731,14 @@ class KODISCLib(xbmcprovider.XBMCMultiResolverContentProvider):
                 if not isinstance(name, dict):
                     subs[url] = {'name': name,
                                  'refresh': '1', 'last_run': -1}
-            self.set_subs(subs)
+            self.setSubs(subs)
             self.subs = subs
         except Exception, e:
             util.error(e)
             subs = {}
         return subs
 
-    def set_subs(self, subs):
+    def setSubs(self, subs):
         self.subs = subs
         self.cache.set("subscription", repr(subs))
 buggalo.SUBMIT_URL = top.submiturl

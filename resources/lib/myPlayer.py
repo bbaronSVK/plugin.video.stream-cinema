@@ -22,6 +22,8 @@ class MyPlayer(xbmc.Player):
             self.itemDuration = '00:00:00'
             self.win = xbmcgui.Window(10000)
             self.scid = None
+            self.itemDBID = None
+            self.itemType = None
         except Exception:
             self.log("SC Chyba MyPlayer: %s" % str(traceback.format_exc()))
 
@@ -54,14 +56,16 @@ class MyPlayer(xbmc.Player):
         xbmc.log(str([text]), xbmc.LOGDEBUG)
         
     def setWatched(self):
-        if self.itemType == u'episode':
+        if self.itemDBID == None:
+            return
+        if self.itemType == 'episode':
             metaReq = {"jsonrpc": "2.0",
                        "method": "VideoLibrary.SetEpisodeDetails",
                        "params": {"episodeid": self.itemDBID,
                                   "playcount": 1},
                        "id": 1}
             self.executeJSON(metaReq)
-        elif self.itemType == u'movie':
+        elif self.itemType == 'movie':
             metaReq = {"jsonrpc": "2.0",
                        "method": "VideoLibrary.SetMovieDetails",
                        "params": {"movieid": self.itemDBID,
@@ -70,6 +74,7 @@ class MyPlayer(xbmc.Player):
             self.executeJSON(metaReq)
 
     def createResumePoint(self, seconds, total):
+        return
         try:
             pomer = seconds / total
             if pomer < 0.05:
@@ -111,9 +116,57 @@ class MyPlayer(xbmc.Player):
             year = xbmc.getInfoLabel('VideoPlayer.Year')
             title = xbmc.getInfoLabel('VideoPlayer.Title')
             imdb = xbmc.getInfoLabel("VideoPlayer.IMDBNumber") #"ListItem.IMDBNumber")
-            if 0 and imdb is None:
-                imdb = xbmc.getInfoLabel("ListItem.Property(IMDBNumber)")
 
+            if showtitle:
+                self.itemType = 'episode'
+            else:
+                self.itemType = 'movie'
+
+            try:
+                if self.itemType == 'movie':
+                    method = 'VideoLibrary.GetMovies'
+                    value = "%s (%s).strm" % (str(title), str(year))
+                    field = 'filename'
+                    res = self.executeJSON({'jsonrpc': '2.0', 'method': method, 
+                        'params': {'filter':
+                            {'operator': 'contains', 'field': field, 'value': value}
+                        }, 'id': 1})
+
+                    if 'result' in res:
+                        for m in res['result']['movies']:
+                            util.debug("[SC] m: %s" % str(m))
+                            if 'movieid' in m:
+                                self.itemDBID = m['movieid']
+                                break
+                else:
+                    method = 'VideoLibrary.GetTVShows'
+                    value = showtitle #/Season %s/%sx%s.strm" % (showtitle, season, season, episode)
+                    field = 'path'
+                    res = self.executeJSON({'jsonrpc': '2.0', 'method': method, 
+                        'params': {'filter':
+                            {'operator': 'contains', 'field': field, 'value': value}
+                        }, 'id': 1})
+
+                    if 'result' in res:
+                        for m in res['result']['tvshows']:
+                            if 'tvshowid' in m:
+                                self.itemDBID = int(m['tvshowid'])
+                                res = self.executeJSON({'jsonrpc': '2.0', 
+                                    'method': 'VideoLibrary.GetEpisodes', 'params': {
+                                        'tvshowid': int(m['tvshowid']), 'season': int(season), 
+                                        'properties': ['episode', 'file'], 
+                                        'sort': {'method': 'episode'}
+                                        }, 'id': 1})
+                                for e in res['result']['episodes']:
+                                    if int(e['episode']) == int(episode):
+                                        self.itemDBID = e['episodeid']
+                                        break
+                                break
+
+            except Exception:
+                self.log("[SC] Chyba JSONRPC: %s" % str(traceback.format_exc()))
+                pass
+                        
             res = self.executeJSON({'jsonrpc': '2.0', 'method': 'Player.GetItem', 
                 'params': {'playerid': 1}, 'id': 1})
             if res:
@@ -123,51 +176,46 @@ class MyPlayer(xbmc.Player):
                 except:
                     util.debug("[SC] onPlayBackStarted() - Exception trying to get playing filename, player suddenly stopped.")
                     return
-                util.debug("[SC] Zacalo sa prehravat: SCID: [%s] imdb: %s dur: %s est: %s fi: [%s] | %sx%s - title: %s (year: %s) showtitle: %s" % (str(self.scid), str(imdb), self.itemDuration, self.estimateFinishTime, _filename, str(season), str(episode), str(title), str(year), str(showtitle)))
-                data = {'scid': self.scid, 'action': 'start'}
+                util.debug("[SC] Zacalo sa prehravat: DBID: [%s], SCID: [%s] imdb: %s dur: %s est: %s fi: [%s] | %sx%s - title: %s (year: %s) showtitle: %s" % (str(self.itemDBID), str(self.scid), str(imdb), self.itemDuration, self.estimateFinishTime, _filename, str(season), str(episode), str(title), str(year), str(showtitle)))
+                data = {'scid': self.scid, 'action': 'start', 'ep': episode, 'se': season}
+                    
                 self.action(data)
                 if 'item' in res and 'id' not in res['item']:
                     util.debug("[SC] prehravanie mimo kniznice")
         except Exception:
-            self.log("SC Chyba MyPlayer: %s" % str(traceback.format_exc()))
+            self.log("[SC] Chyba MyPlayer: %s" % str(traceback.format_exc()))
             pass
 
     def onPlayBackEnded(self):
         self.log("[SC] Skoncilo sa prehravat")
+        self.setWatched()
         data = {'scid': self.scid, 'action': 'end'}
         self.action(data)
+        self.itemDBID = None;
         return
-        self.setWatched()
 
     def onPlayBackStopped(self):
         self.log("[SC] Stoplo sa prehravanie")
         data = {'scid': self.scid, 'action': 'stop'}
         self.action(data)
-        return
+        self.itemDBID = None;
         try:
-            # Player.TimeRemaining  - už zde nemá hodnotu
-            # Player.FinishTime - kdy přehrávání skutečně zkončilo
-            timeDifference = 55555
-            timeRatio = 55555
             self.realFinishTime = xbmc.getInfoLabel(
                 'Player.FinishTime(hh:mm:ss)')
             timeDifference = self.get_sec(self.estimateFinishTime) - \
                 self.get_sec(self.realFinishTime)
             timeRatio = timeDifference.seconds / \
                 float((self.itemDuration).seconds)
-            # upravit podmínku na 0.05 tj. zbývá shlédnout 5%
-            if abs(timeRatio) < 0.1:
+            if abs(timeRatio) < 0.2:
+                util.debug("[SC] videne %s" % str(timeRatio))
                 self.setWatched()
             else:
+                util.debug("[SC] vytvorit pokracovanie %s" % str(timeRatio))
                 self.createResumePoint((1 - timeRatio) * float((self.itemDuration).seconds),
                                        float((self.itemDuration).seconds))
         except Exception:
             pass
-            buggalo.onExceptionRaised({'self.itemDuration: ': self.itemDuration,
-                                       'self.estimateFinishTime: ': self.estimateFinishTime,
-                                       'self.realFinishTime: ': self.realFinishTime,
-                                       'timeDifference: ': timeDifference,
-                                       'timeRatio: ': timeRatio, })
+        return
         
     def waitForChange(self):
         scutils.KODISCLib.sleep(200)
@@ -209,8 +257,10 @@ class MyPlayer(xbmc.Player):
         return
     
     def action(self, data):
-        self.log("[SC] action: %s" % str(data))
         url = "%s/Stats" % (top.BASE_URL)
         data.update({'est': self.estimateFinishTime})
+        if (self.itemDuration).seconds > 0:
+            data.update({'dur':(self.itemDuration).seconds})
+        self.log("[SC] action: %s" % str(data))
         util.post_json(url, data, {'X-UID': top.uid})
         

@@ -63,8 +63,8 @@ class StreamCinemaContentProvider(ContentProvider):
     def capabilities(self):
         return ['resolve', 'categories', 'search']
     
-    def get_subs(self):
-        return self.parent.get_subs()
+    def getSubs(self):
+        return self.parent.getSubs()
     
     @buggalo.buggalo_try_except({'method': 'scinema._url'})
     def _url(self, url):
@@ -86,7 +86,7 @@ class StreamCinemaContentProvider(ContentProvider):
     
     @buggalo.buggalo_try_except({'method': 'scinema.items'})
     def items(self, url):
-        self.subs = self.get_subs()
+        self.subs = self.getSubs()
         data = self._json(url)
         result = []
         if data.get("menu"):
@@ -198,6 +198,7 @@ class StreamCinemaContentProvider(ContentProvider):
                 menu.update({"$30918": {"action": "add-to-lib", "id": data['id'], "title": data['title']}})
                 menu.update({"$30923": {"action": "add-to-lib-sub", "id": data['id'], "title": data['title']}})
         menu.update({"$30922": {"cmd":'Addon.OpenSettings("%s")' % top.__scriptid__}})
+        #menu.update({"Schedule": {"action": "subs"}})
         item['menu'] = menu
         return item
     @buggalo.buggalo_try_except({'method': 'scinema.search'})
