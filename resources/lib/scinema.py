@@ -207,10 +207,11 @@ class StreamCinemaContentProvider(ContentProvider):
         #menu.update({"last": {"action": "last"}})
         item['menu'] = menu
         return item
+    
     @buggalo.buggalo_try_except({'method': 'scinema.search'})
     def search(self, keyword):
         sq = {'search': keyword}
-        return self.list_by_params(MOVIES_BASE_URL + '/list/search?' + urllib.urlencode(sq))
+        return self.items(self._url('/Search/?' + urllib.urlencode(sq)))
 
     @buggalo.buggalo_try_except({'method': 'scinema._resolve'})
     def _resolve(self, itm):
