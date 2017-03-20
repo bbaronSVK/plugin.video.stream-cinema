@@ -8,6 +8,10 @@ player = None
 uid = None
 submiturl = 'http://movies.bbaron.sk/plugin/submit/'
 
+(v1, v2, v3) = str(xbmcplugin.__version__).split('.')
+if int(v1) == 2 and int(v2) <= 20:
+    xbmcplugin.SORT_METHOD_VIDEO_USER_RATING = 20
+
 # lebo medved na 4 je maco
 sortmethod = {
     14:	xbmcplugin.SORT_METHOD_ALBUM,
