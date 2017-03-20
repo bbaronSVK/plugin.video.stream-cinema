@@ -33,6 +33,7 @@ from provider import cached
 import urllib
 import util
 import xbmcplugin
+import xbmcgui
 import top
 import tracker
 
@@ -86,12 +87,19 @@ class StreamCinemaContentProvider(ContentProvider):
     
     @buggalo.buggalo_try_except({'method': 'scinema._json'})
     def _json(self, url):
-        return json.loads(self.get_data_cached(url))
+        try:
+            return json.loads(self.get_data_cached(url))
+        except Exception, e:
+            util.debug("[SC] chybna URL %s" % str(url))
+            util.error(e)
     
     @buggalo.buggalo_try_except({'method': 'scinema.items'})
     def items(self, url):
         self.subs = self.getSubs()
         data = self._json(url)
+        if data is None or isinstance(data, list):
+            xbmcgui.Dialog().ok( 'Chyba' , 'Odkaz pouziva stare API, ktore uz nieje podporovane.' )
+            return [{'title': 'i failed', 'url':'failed', 'type':'dir'}]
         result = []
         if data.get("menu"):
             for m in data["menu"]:
@@ -108,7 +116,7 @@ class StreamCinemaContentProvider(ContentProvider):
                 #util.debug("SYSTEM!!!!")
                 self.system(data["system"])
         else:
-            result = [{'title': 'i failed', 'url':'failed'}]
+            result = [{'title': 'i failed', 'url':'failed', 'type':'dir'}]
         #util.debug('--------------------- DONE -----------------')
         return result
 

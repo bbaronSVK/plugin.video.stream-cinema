@@ -19,7 +19,7 @@ class MyPlayer(xbmc.Player):
             self.log("[SC] player 1")
             self.estimateFinishTime = '00:00:00'
             self.realFinishTime = '00:00:00'
-            self.itemDuration = '00:00:00'
+            self.itemDuration = self.get_sec('00:00:00')
             self.win = xbmcgui.Window(10000)
             self.scid = None
             self.itemDBID = None
@@ -267,8 +267,11 @@ class MyPlayer(xbmc.Player):
     def action(self, data):
         url = "%s/Stats" % (top.BASE_URL)
         data.update({'est': self.estimateFinishTime})
-        if (self.itemDuration).seconds > 0:
-            data.update({'dur':(self.itemDuration).seconds})
+        try:
+            if (self.itemDuration).seconds > 0:
+                data.update({'dur':(self.itemDuration).seconds})
+        except Exception:
+            pass
         self.log("[SC] action: %s" % str(data))
         util.post_json(url, data, {'X-UID': top.uid})
         
