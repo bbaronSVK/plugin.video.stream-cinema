@@ -73,7 +73,7 @@ class Webshare():
                 return False
             salt = xml.find('salt').text
             # create hashes
-            password = hashlib.sha1(md5crypt(self.password, salt)).hexdigest()
+            password = hashlib.sha1(md5crypt(self.password.encode('utf-8'), salt.encode('utf-8'))).hexdigest()
             digest = hashlib.md5(self.username + ':Webshare:' + self.password).hexdigest()
             # login
             headers,req = self._create_request('',{'username_or_email':self.username,'password':password,'digest':digest,'keep_logged_in':1})

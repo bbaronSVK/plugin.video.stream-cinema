@@ -1,7 +1,8 @@
-import xbmcplugin
+import xbmcplugin, xbmcaddon
 
 __scriptid__ = 'plugin.video.stream-cinema'
 __scriptname__ = 'stream-cinema.online'
+__addon__ = xbmcaddon.Addon(id=__scriptid__)
 BASE_URL="http://stream-cinema.online/kodi"
 API_VERSION="1"
 player = None

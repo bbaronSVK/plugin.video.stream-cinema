@@ -34,6 +34,7 @@ import urllib
 import util
 import xbmcplugin
 import xbmcgui
+import xbmc
 import top
 import tracker
 
@@ -98,8 +99,7 @@ class StreamCinemaContentProvider(ContentProvider):
         self.subs = self.getSubs()
         data = self._json(url)
         if data is None or isinstance(data, list):
-            xbmcgui.Dialog().ok( 'Chyba' , 'Odkaz pouziva stare API, ktore uz nieje podporovane.' )
-            return [{'title': 'i failed', 'url':'failed', 'type':'dir'}]
+            self._oldapi()
         result = []
         if data.get("menu"):
             for m in data["menu"]:
@@ -147,9 +147,17 @@ class StreamCinemaContentProvider(ContentProvider):
         self.base_url = url
         return self.items(url)
     
+    def _oldapi(self):
+        xbmc.executebuiltin("Container.Update(plugin://%s)" % (top.__scriptid__))
+        
     @buggalo.buggalo_try_except({'method': 'scinema.get_data_cached'})
-    @cached(ttl=1)
+    #@cached(ttl=1)
     def get_data_cached(self, url):
+        try:
+            url.index('/json/')
+            self._oldapi()
+        except Exception:
+            pass
         headers = {
             'X-UID': self.uid,
             'X-LANG': self.tr['language'],
@@ -216,7 +224,7 @@ class StreamCinemaContentProvider(ContentProvider):
         #menu.update({"$30922": {"cmd":'Addon.OpenSettings("%s")' % top.__scriptid__}})
         #menu.update({"run Schedule": {"action": "subs"}})
         #menu.update({"clean Schedule": {"action": "rsubs"}})
-        #menu.update({"last": {"action": "last"}})
+        #menu.update({"last": {'cp': 'czsklib', 'list': 'http://stream-cinema.online/json/movies-a-z'}})
         item['menu'] = menu
         return item
     
@@ -237,6 +245,7 @@ class StreamCinemaContentProvider(ContentProvider):
                         self.ws = wx(self.parent.getSetting('wsuser'), self.parent.getSetting('wspass'))
                     itm['url'] = self.ws.resolve(itm.get('params').get('play').get('ident'))
                 except:
+                    buggalo.onExceptionRaised()
                     pass
         else:
             try:

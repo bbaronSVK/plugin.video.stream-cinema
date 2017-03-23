@@ -24,11 +24,10 @@ import xbmcaddon, xbmc, uuid
 import util
 from resources.lib.scinema import StreamCinemaContentProvider
 from resources.lib.scutils import KODISCLib
-from resources.lib.top import __scriptid__, __scriptname__
+from resources.lib.top import __scriptid__, __scriptname__,__addon__
 
 #__scriptid__ = 'plugin.video.stream-cinema'
 #__scriptname__ = 'stream-cinema.online'
-__addon__ = xbmcaddon.Addon(id=__scriptid__)
 __language__ = __addon__.getLocalizedString
 __set__ = __addon__.getSetting
 

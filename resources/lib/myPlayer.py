@@ -265,6 +265,8 @@ class MyPlayer(xbmc.Player):
         return
     
     def action(self, data):
+        if self.scid is None:
+            return
         url = "%s/Stats" % (top.BASE_URL)
         data.update({'est': self.estimateFinishTime})
         try:
