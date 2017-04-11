@@ -3,13 +3,15 @@ import xbmc
 import xbmcgui
 import json
 import time
-import top
+import sctop
+import math
 import os
 from datetime import datetime, timedelta
 import _strptime
 import buggalo
 import util
 import traceback
+import trakt
 import scutils
 
 class MyPlayer(xbmc.Player):
@@ -19,12 +21,16 @@ class MyPlayer(xbmc.Player):
             self.log("[SC] player 1")
             self.estimateFinishTime = '00:00:00'
             self.realFinishTime = '00:00:00'
-            self.itemDuration = self.get_sec('00:00:00')
+            self.itemDuration = 0
+            self.watchedTime = 0
             self.win = xbmcgui.Window(10000)
             self.scid = None
+            self.ids = None
             self.itemDBID = None
             self.itemType = None
-            self.parent = None
+            self.parent = kwargs.get('parent')
+            self.se = None
+            self.ep = None
         except Exception:
             self.log("SC Chyba MyPlayer: %s" % str(traceback.format_exc()))
 
@@ -57,6 +63,16 @@ class MyPlayer(xbmc.Player):
         xbmc.log(str([text]), xbmc.LOGDEBUG)
         
     def setWatched(self):
+        if self.ids is not None and trakt.getTraktCredentialsInfo() == True \
+            and trakt.getTraktAddonMovieInfo() == False:
+            util.debug("[SC] nemame instalovany trakt.tv, tak oznacime film/serial za videny")
+            if self.se.isdigit() and self.ep.isdigit():
+                util.debug("[SC] serial [%s]x[%s]" % (str(self.se), str(self.ep)))
+                trakt.markEpisodeAsWatchedT(self.ids, self.se, self.ep)
+            else:
+                util.debug("[SC] film")
+                trakt.markMovieAsWatchedT(self.ids)
+            
         if self.itemDBID == None:
             return
         if self.itemType == 'episode':
@@ -75,44 +91,57 @@ class MyPlayer(xbmc.Player):
             self.executeJSON(metaReq)
 
     def createResumePoint(self, seconds, total):
-        return
+        if 1 or self.scid is None:
+            return
         try:
             pomer = seconds / total
             if pomer < 0.05:
                 return
-            self.pomSlovnik.update({self.itemDBID: seconds})
+            resume = self.parent.getResumePoint()
+            resume.update({self.scid: seconds})
+            self.parent.setResumePoint(resume)
         except Exception:
             buggalo.onExceptionRaised({'seconds: ': seconds})
         return
 
     def onPlayBackStarted(self):
+        if self.scid is not None:
+            self.onPlayBackStopped()
+        self.se = None
+        self.ep = None
+        self.watchedTime = 0
         self.log("[SC] Zacalo sa prehravat")
-        mojPlugin = self.win.getProperty(top.__scriptid__)
-        if top.__scriptid__ not in mojPlugin:
+        mojPlugin = self.win.getProperty(sctop.__scriptid__)
+        if sctop.__scriptid__ not in mojPlugin:
             util.debug("[SC] Nieje to moj plugin ... ")
             return;
         util.debug("[SC] JE to moj plugin ... %s" % str(mojPlugin))
         self.scid = self.win.getProperty('scid')
-        self.win.clearProperty(top.__scriptid__)
+        try: 
+            self.ids = json.loads(self.win.getProperty('%s.ids' % sctop.__scriptid__))
+        except: 
+            self.ids = {}
+            pass
+        resume = self.win.getProperty('scresume')
+        self.win.clearProperty(sctop.__scriptid__)
+        self.win.clearProperty('%s.ids' % sctop.__scriptid__)
         self.win.clearProperty('scid')
+        self.win.clearProperty('scresume')
+        if resume:
+            util.debug("[SC] seek %s" % str(resume))
+            self.seekTime(resume)
         try:
             if not self.isPlayingVideo():
                 return
             
-            while True:
-                scutils.KODISCLib.sleep(1000)
-                if xbmc.abortRequested:
-                    return
-                self.itemDuration = xbmc.getInfoLabel(
-                    'Player.TimeRemaining(hh:mm:ss)')
-                if (self.itemDuration != '') and (self.itemDuration != '00:00:00'):
-                    self.itemDuration = self.get_sec(self.itemDuration)
-                    break
+            self.itemDuration = self.getTotalTime()
             # plánovaný čas dokončení 100 % přehrání
             self.estimateFinishTime = xbmc.getInfoLabel(
                 'Player.FinishTime(hh:mm:ss)')
             season = xbmc.getInfoLabel('VideoPlayer.Season')
             episode = xbmc.getInfoLabel('VideoPlayer.Episode')
+            self.se = season
+            self.ep = episode
             showtitle = xbmc.getInfoLabel('VideoPlayer.TVShowTitle')
             year = xbmc.getInfoLabel('VideoPlayer.Year')
             title = xbmc.getInfoLabel('VideoPlayer.Title')
@@ -126,6 +155,12 @@ class MyPlayer(xbmc.Player):
             try:
                 if self.itemType == 'movie':
                     method = 'VideoLibrary.GetMovies'
+                    try:
+                        if self.ids is not None and trakt.getTraktCredentialsInfo() == True:
+                            trakt.addTraktCollection({'movies':[{'ids':self.ids}]})
+                    except:
+                        self.log("[SC] trakt.tv error - nepodarilo sa pridat film do kolekcie: %s" % str(traceback.format_exc()))
+                        pass
                     value = "%s (%s).strm" % (str(title), str(year))
                     field = 'filename'
                     res = self.executeJSON({'jsonrpc': '2.0', 'method': method, 
@@ -140,6 +175,8 @@ class MyPlayer(xbmc.Player):
                                 self.itemDBID = m['movieid']
                                 break
                 else:
+                    if self.ids is not None and trakt.getTraktCredentialsInfo() == True:
+                        trakt.addTraktCollection({'shows':[{'ids':self.ids}]})
                     if self.parent is not None:
                         try:
                             self.parent.addLast(self.scid)
@@ -184,7 +221,7 @@ class MyPlayer(xbmc.Player):
                 except:
                     util.debug("[SC] onPlayBackStarted() - Exception trying to get playing filename, player suddenly stopped.")
                     return
-                util.debug("[SC] Zacalo sa prehravat: DBID: [%s], SCID: [%s] imdb: %s dur: %s est: %s fi: [%s] | %sx%s - title: %s (year: %s) showtitle: %s" % (str(self.itemDBID), str(self.scid), str(imdb), self.itemDuration, self.estimateFinishTime, _filename, str(season), str(episode), str(title), str(year), str(showtitle)))
+                util.debug("[SC] Zacalo sa prehravat: DBID: [%s], SCID: [%s] imdb: %s dur: %s est: %s fi: [%s] | %sx%s - title: %s (year: %s) showtitle: %s" % (str(self.itemDBID), str(self.scid), str(imdb), str(self.itemDuration), self.estimateFinishTime, _filename, str(season), str(episode), str(title), str(year), str(showtitle)))
                 data = {'scid': self.scid, 'action': 'start', 'ep': episode, 'se': season}
                     
                 self.action(data)
@@ -194,36 +231,67 @@ class MyPlayer(xbmc.Player):
             self.log("[SC] Chyba MyPlayer: %s" % str(traceback.format_exc()))
             pass
 
+        util.debug("[SC] start wtime")
+            
+        while True:
+            if xbmc.abortRequested or not self.isPlayingVideo():
+                return
+            self.watchedTime = self.getTime()
+            #util.debug("[SC] changed wtime %s" % str(self.watchedTime))
+            scutils.KODISCLib.sleep(1000)
+
     def onPlayBackEnded(self):
         self.log("[SC] Skoncilo sa prehravat")
         self.setWatched()
         data = {'scid': self.scid, 'action': 'end'}
         self.action(data)
-        self.itemDBID = None;
+        self.itemDBID = None
+        self.scid = None
+        self.ids = None
+        self.ep = None
+        self.se = None
         return
 
     def onPlayBackStopped(self):
         self.log("[SC] Stoplo sa prehravanie")
-        data = {'scid': self.scid, 'action': 'stop'}
+        data = {'scid': self.scid, 'action': 'stop', 'prog': self.timeRatio()}
+        
+            
+        self.log("[SC] DATA: %s" % str(data))
         self.action(data)
-        self.itemDBID = None;
         try:
-            self.realFinishTime = xbmc.getInfoLabel(
-                'Player.FinishTime(hh:mm:ss)')
-            timeDifference = self.get_sec(self.estimateFinishTime) - \
-                self.get_sec(self.realFinishTime)
-            timeRatio = timeDifference.seconds / \
-                float((self.itemDuration).seconds)
-            if abs(timeRatio) < 0.2:
+            timeRatio = self.timeRatio()
+            util.debug("[SC] timeratio: %s" % str(timeRatio))
+            if abs(timeRatio) > 0.75:
                 util.debug("[SC] videne %s" % str(timeRatio))
                 self.setWatched()
             else:
                 util.debug("[SC] vytvorit pokracovanie %s" % str(timeRatio))
-                self.createResumePoint((1 - timeRatio) * float((self.itemDuration).seconds),
-                                       float((self.itemDuration).seconds))
-        except Exception:
+                self.createResumePoint((1 - timeRatio) * float(self.itemDuration),
+                                       float(self.itemDuration))
+        except Exception, e:
+            util.debug(e)
             pass
+
+        self.itemDBID = None
+        self.scid = None
+        self.ids = None
+        self.ep = None
+        self.se = None
         return
+
+    def timeRatio(self):
+        try:
+            util.debug("[SC] watched %f duration %f" % (self.watchedTime, self.itemDuration))
+            return (self.watchedTime / math.floor(self.itemDuration))
+        except Exception, e:
+            util.debug("[SC] timeRatio error")
+            util.debug(e)
+            pass
+        self.realFinishTime = xbmc.getInfoLabel('Player.FinishTime(hh:mm:ss)')
+        return (self.get_sec(self.estimateFinishTime).seconds - \
+            self.get_sec(self.realFinishTime).seconds) / \
+            math.floor(self.itemDuration)
         
     def waitForChange(self):
         scutils.KODISCLib.sleep(200)
@@ -239,41 +307,42 @@ class MyPlayer(xbmc.Player):
     def onPlayBackResumed(self):
         self.log("[SC] Znova sa prehrava")
         self.waitForChange()
-        data = {'scid': self.scid, 'action': 'resume'}
+        data = {'scid': self.scid, 'action': 'resume', 'prog': self.timeRatio()}
         self.action(data)
         return;
 
     def onPlayBackSpeedChanged(self, speed):
         self.log("[SC] Zmennila sa rychlost prehravania %s" % speed)
         self.waitForChange()
-        data = {'scid': self.scid, 'action': 'speed', 'speed': speed}
+        data = {'scid': self.scid, 'action': 'speed', 'speed': speed, 'prog': self.timeRatio()}
         self.action(data)
         return
 
     def onPlayBackSeek(self, time, seekOffset):
         self.log("[SC] Seekujem %s %s" % (time, seekOffset))
         self.waitForChange()
-        data = {'scid': self.scid, 'action': 'seek', 'time': time, 'seekOffset': seekOffset}
+        data = {'scid': self.scid, 'action': 'seek', 'time': time, 'seekOffset': seekOffset, 'prog': self.timeRatio()}
         self.action(data)
         return
     
     def onPlayBackPaused(self):
         self.log("[SC] Pauza")
         self.waitForChange()
-        data = {'scid': self.scid, 'action': 'pause'}
+        data = {'scid': self.scid, 'action': 'pause', 'prog': self.timeRatio()}
         self.action(data)
         return
     
     def action(self, data):
         if self.scid is None:
             return
-        url = "%s/Stats" % (top.BASE_URL)
+        url = "%s/Stats" % (sctop.BASE_URL)
         data.update({'est': self.estimateFinishTime})
+        data.update({'se': self.se, 'ep': self.ep})
         try:
-            if (self.itemDuration).seconds > 0:
-                data.update({'dur':(self.itemDuration).seconds})
+            if self.itemDuration > 0:
+                data.update({'dur': self.itemDuration})
         except Exception:
             pass
         self.log("[SC] action: %s" % str(data))
-        util.post_json(url, data, {'X-UID': top.uid})
+        util.post_json(url, data, {'X-UID': sctop.uid})
         

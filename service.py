@@ -20,18 +20,11 @@
 #  *
 #  */
 
-import xbmcaddon
 import xbmc
 import util
 from resources.lib.scinema import StreamCinemaContentProvider
 from resources.lib.scutils import KODISCLib
-from resources.lib.top import __scriptid__, __scriptname__
-
-#__scriptid__ = 'plugin.video.stream-cinema'
-#__scriptname__ = 'stream-cinema.online'
-__addon__ = xbmcaddon.Addon(id=__scriptid__)
-__language__ = __addon__.getLocalizedString
-__set__ = __addon__.getSetting
+from resources.lib.sctop import __addon__,__set__
 
 settings = {'quality': __set__('quality'), 'downloads': xbmc.translatePath(__set__('downloads'))}
 uid = __set__('uid')

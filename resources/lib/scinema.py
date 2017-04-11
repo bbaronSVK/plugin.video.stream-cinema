@@ -35,7 +35,8 @@ import util
 import xbmcplugin
 import xbmcgui
 import xbmc
-import top
+import sctop
+import trakt
 import tracker
 
 reload(sys)
@@ -47,7 +48,7 @@ class StreamCinemaContentProvider(ContentProvider):
     subs = None
 
     def __init__(self, username=None, password=None, filter=None, uid=None):
-        ContentProvider.__init__(self, name='czsklib', base_url=top.BASE_URL, username=username,
+        ContentProvider.__init__(self, name='czsklib', base_url=sctop.BASE_URL, username=username,
                                  password=password, filter=filter)
         
         self.tr = tracker.TrackerInfo().getSystemInfo()
@@ -78,11 +79,11 @@ class StreamCinemaContentProvider(ContentProvider):
             return url
         if url.startswith('cmd://'):
             if '__self__' in url:
-                url.replace('__self__', top.__scriptid__)
+                url.replace('__self__', sctop.__scriptid__)
             return url
         
         if url.startswith('/'):
-            return top.BASE_URL + url
+            return sctop.BASE_URL + url
         
         return self.base_url.rstrip('/') + '/' + url.lstrip('./')
     
@@ -95,9 +96,10 @@ class StreamCinemaContentProvider(ContentProvider):
             util.error(e)
     
     @buggalo.buggalo_try_except({'method': 'scinema.items'})
-    def items(self, url):
+    def items(self, url=None, data=None):
         self.subs = self.getSubs()
-        data = self._json(url)
+        if data is None:
+            data = self._json(url)
         if data is None or isinstance(data, list):
             self._oldapi()
         result = []
@@ -129,11 +131,11 @@ class StreamCinemaContentProvider(ContentProvider):
             xbmcplugin.setPluginCategory(int(sys.argv[1]), data["setPluginCategory"])
         
         if "addSortMethod" in data:
-            xbmcplugin.addSortMethod(int(sys.argv[1]), top.sortmethod[int(data["addSortMethod"])])
+            xbmcplugin.addSortMethod(int(sys.argv[1]), sctop.sortmethod[int(data["addSortMethod"])])
 
         if data.get('addSortMethods'):
             for m in data.get("addSortMethods"):
-                xbmcplugin.addSortMethod(int(sys.argv[1]), top.sortmethod[int(m)])
+                xbmcplugin.addSortMethod(int(sys.argv[1]), sctop.sortmethod[int(m)])
         
         if "setPluginFanart" in data:
             xbmcplugin.setPluginFanart(int(sys.argv[1]), data["setPluginFanart"])
@@ -148,7 +150,7 @@ class StreamCinemaContentProvider(ContentProvider):
         return self.items(url)
     
     def _oldapi(self):
-        xbmc.executebuiltin("Container.Update(plugin://%s)" % (top.__scriptid__))
+        xbmc.executebuiltin("Container.Update(plugin://%s)" % (sctop.__scriptid__))
         
     @buggalo.buggalo_try_except({'method': 'scinema.get_data_cached'})
     #@cached(ttl=1)
@@ -161,7 +163,8 @@ class StreamCinemaContentProvider(ContentProvider):
         headers = {
             'X-UID': self.uid,
             'X-LANG': self.tr['language'],
-            'Accept' : 'application/vnd.bbaron.kodi-plugin-v%s+json' % (top.API_VERSION),
+            'X-VER': sctop.API_VERSION,
+            'Accept' : 'application/vnd.bbaron.kodi-plugin-v%s+json' % (sctop.API_VERSION),
         }
         url = self._url(url)
         util.debug("GET URL: %s" % url)
@@ -191,23 +194,32 @@ class StreamCinemaContentProvider(ContentProvider):
     def ctx(self, item, data):
         menu = {}
         #util.debug("CTX ITM: %s" % str(item))
-        #util.debug("CTX DAT: %s" % str(data))
+        util.debug("CTX DAT: %s" % str(data))
         #if 'dir' in data and data['dir'] == 'tvshows':
         
-        if 'id' in data and data['type'] != 'dir':
+        if 'id' in data and data['id'].isdigit():
+            menu.update({"$30942": {"cmd":'Action("Info")'}})
             try:
                 id = int(data['id'])
                 #menu.update({"report stream": {"action": "report", "id": data['id'], "title": data['title']}})
             except Exception:
                 pass
             
-        if 'id' in data and 'season' not in data:
-            menu.update({"$30918": {"action": "add-to-lib", "id": data['id'], "title": data['title']}})
+        if 'trakt' in data and data['trakt'].isdigit() and trakt.getTraktCredentialsInfo() == True:
+            #name, imdb, tvdb, content
+            content = 'series' if 'season' in data and data['season'].isdigit() else 'movie' 
+            imdb = 'tt%07d' % int(data['imdb']) if 'imdb' in data else 0
+            tvdb = data['tvdb'] if 'tvdb' in data else 0
+            menu.update({"Trakt menu": {"action": "traktManager", 'name': data['title'], 'imdb': imdb, 'tvdb': tvdb, 'content':content}})
             
-        if 'id' in data and data['id'] != 'movies':
+        if 'id' in data and data['id'].isdigit() and 'season' not in data:
+            menu.update({"$30918": {"action": "add-to-lib", "id": 'movies/%d' % int(data['id']), "title": data['title']}})
+            
+        if 'id' in data and data['id'] == 'series':
             menu.update({"$30923": {"action": "add-to-lib-sub", "id": data['id'], "title": data['title']}})
             
         if 'id' in data and data['id'] == 'movies':
+            menu.update({"$30918": {"action": "add-to-lib", "id": data['id'], "title": data['title']}})
             menu.update({"$30926": {"action": "add-to-lib", "id": data['id'], "title": data['title'], "force": "1"}})
             #util.debug("[SC] MAME menu!")
             
@@ -221,10 +233,11 @@ class StreamCinemaContentProvider(ContentProvider):
                 #util.debug("[SC] Serial neodoberam: %s" % data['title'])
                 menu.update({"$30918": {"action": "add-to-lib", "id": data['id'], "title": data['title']}})
                 menu.update({"$30923": {"action": "add-to-lib-sub", "id": data['id'], "title": data['title']}})
-        #menu.update({"$30922": {"cmd":'Addon.OpenSettings("%s")' % top.__scriptid__}})
+        #menu.update({"$30922": {"cmd":'Addon.OpenSettings("%s")' % sctop.__scriptid__}})
         #menu.update({"run Schedule": {"action": "subs"}})
-        #menu.update({"clean Schedule": {"action": "rsubs"}})
+        #menu.update({"clean Schedule": {"action": "trakt"}})
         #menu.update({"last": {'cp': 'czsklib', 'list': 'http://stream-cinema.online/json/movies-a-z'}})
+        
         item['menu'] = menu
         return item
     
@@ -247,6 +260,9 @@ class StreamCinemaContentProvider(ContentProvider):
                 except:
                     buggalo.onExceptionRaised()
                     pass
+            else:
+                sctop.openSettings('0.1')
+                        
         else:
             try:
                 hmf = urlresolver.HostedMediaFile(url=itm['url'], include_disabled=False,
@@ -264,13 +280,21 @@ class StreamCinemaContentProvider(ContentProvider):
     @buggalo.buggalo_try_except({'method': 'scinema.resolve'})
     def resolve(self, item, captcha_cb=None, select_cb=None):
         #util.debug("ITEM RESOLVE: " + str(item))
-        data = json.loads(self.get_data_cached(item['url']))
-        if len(data) < 1:
-            raise ResolveException('Video is not available.')
-        if len(data) == 1:
-            return self._resolve(data[0])
-        elif len(data) > 1 and select_cb:
-            return self._resolve(select_cb(data))
+        if sctop.BASE_URL in item['url']:
+            data = json.loads(self.get_data_cached(item['url']))
+            if 'strms' in data:
+                util.debug("[SC] data info: %s" % str(data['info']))
+                out = [sctop.merge_dicts(data['info'], i) for i in data['strms']]
+                data = out
+            util.debug("[SC] data: %s" % str(data))
+            if len(data) < 1:
+                raise ResolveException('Video is not available.')
+            if len(data) == 1:
+                return self._resolve(data[0])
+            elif len(data) > 1 and select_cb:
+                return self._resolve(select_cb(data))
+        else:
+            return self._resolve(item)
 
     def keyboard(self, title, action):
         k = xbmc.Keyboard('', title);
@@ -282,4 +306,4 @@ class StreamCinemaContentProvider(ContentProvider):
         url = '%s?action=%s&q=%s' % (sys.argv[0], action, q)
         control.execute('Container.Update(%s)' % url)
         
-buggalo.SUBMIT_URL = top.submiturl
+buggalo.SUBMIT_URL = sctop.submiturl

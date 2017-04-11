@@ -1,8 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <settings>
     <category label="30010">
+        <setting type="lsep" label="30100" />
         <setting label="30101" id="wsuser" type="text" default="" />
         <setting label="30102" id="wspass" type="text" default="" option="hidden" />
+        <setting type="lsep" label="30103" />
+        <setting id="trakt.user" type="action" label="30104" option="close" action="RunPlugin(plugin://plugin.video.stream-cinema/?action=617574685472616b74)" />
+        <setting id="trakt.token" type="text" option="hidden" visible="false" label="" default="" />
+        <setting id="trakt.refresh" type="text" option="hidden" visible="false" label="" default="" />
     </category>
     <category label="30020">
         <setting label="30201" id="subtitles" type="bool" default="false" />

@@ -1,3 +1,22 @@
+[B]1.1.4[/B]
+- opravene bugy: 
+ - stahovanie serialov bez serie a epizody, 
+ - pocas prehravania a po skonceni sa zobrazuje stale rovnaky nazov filmu/serialu vratane z TV programu
+ - vyziadane prihlasenie na WS
+ - kopec dalsieho
+
+- pridana podpora pre trakt 
+ - prihlasenie na trakt.tv cez plugin
+ - presna identifikacia filmu/serialu
+ - uz nieje potrebne zobrazovat pocas prehravania originalny nazov
+ - moznost pridavat filmy/serialy do zoznamov
+ - moznost vytvarat vlastne privatne zoznamy
+ - automaticky pridava film/serial do kolekcie, aby sa dal oznacit za videny
+ - ak nieje nainstalovany trakt.tv plugin, tak plugin oznacuje film/serial za videny ak sa prehra 75% a viac
+
+[B]1.1.0[/B]
+nova API
+
 [B]1.0.6:[/B]
 fix s nazvom suboru pre stahovanie + posielanie spravnej pripony
 

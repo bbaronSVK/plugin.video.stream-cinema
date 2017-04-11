@@ -1,8 +1,11 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes"?>
 <strings>
-    <string id="30010">webshare.cz</string>
+    <string id="30010">Accounts</string>
+    <string id="30100">webshare.cz</string>
     <string id="30101">Username</string>
     <string id="30102">Password</string>
+    <string id="30103">Trakt</string>
+    <string id="30104">Authorize...</string>
     
     <string id="30020">Subtitles</string>
     <string id="30201">Enable subtitles</string>
@@ -51,6 +54,28 @@
     <string id="30926">Add to library (all)</string>
     <string id="30927">Last seen</string>
     <string id="30928">TV program</string>
+    <string id="30929">Latest streams</string>
+    <string id="30930">1) Visit: [COLOR skyblue]%s[/COLOR]</string>
+    <string id="30931">2) When prompted enter [COLOR skyblue]%s[/COLOR]</string>
+    <string id="30932">An account already exists.[CR]Do you want to reset?</string>
+    <string is="30933">Do you want to reset?</string>
+    
+    <!-- trakt manager -->
+    <string id="30934">Add to [B]Collection/B]</string>
+    <string id="30935">Remove from [B]Collection[/B]</string>
+    <string id="30936">Add to [B]Watchlist[/B]</string>
+    <string id="30937">Remove from [B]Watchlist[/B]</string>
+    <string id="30938">Add to [B]new List[/B]</string>
+    <string id="30939">Add to [B]%s[/B]</string>
+    <string id="30940">Remove from [B]%s[/B]</string>
+    
+    <string id="30941">Trakt Manager</string>
+    
+    <string id="30942">Show info</string>
+    
+    <string id="30943">My lists</string>
+    <string id="30944">Watchlist</string>
+        
     
     <!-- dni v tyzdni -->
     <string id="30911">Monday</string>

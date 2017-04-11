@@ -1,8 +1,11 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes"?>
 <strings>
-    <string id="30010">webshare.cz</string>
+    <string id="30010">Účty</string>
+    <string id="30100">webshare.cz</string>
     <string id="30101">Login</string>
     <string id="30102">Heslo</string>
+    <string id="30103">Trakt</string>
+    <string id="30104">Autorizácia...</string>
     
     <string id="30020">Titulky</string>
     <string id="30201">Povoliť titulky</string>
@@ -38,7 +41,7 @@
     <string id="30909">Rok</string>
     <string id="30910">TV dnes</string>
     
-    <string id="30918">Pridť nové do knižnice</string>
+    <string id="30918">Pridať nové do knižnice</string>
     <string id="30919">Séria</string>
     
     <string id="30920">Posledné pridané časti</string>
@@ -51,7 +54,28 @@
     <string id="30926">Pridať do knižnice (všetko)</string>
     <string id="30927">Naposledy sledované</string>
     <string id="30928">TV program na 14 dni</string>
+    <string id="30929">Posledné pridané</string>
+    <string id="30930">1) Navštívte: [COLOR skyblue]%s[/COLOR]</string>
+    <string id="30931">2) Po výzve zadajte [COLOR skyblue]%s[/COLOR]</string>
+    <string id="30932">Účet už je autorizovany.[CR]Chcete sa odhlasit?</string>
+    <string is="30933">Chcete sa odhlasit?</string>
     
+    <!-- trakt manager -->
+    <string id="30934">Pridať do [B]Zbierky[/B]</string>
+    <string id="30935">Odstrániť zo [B]Zbierky[/B]</string>
+    <string id="30936">Pridať do [B]Zoznamu na pozretie[/B]</string>
+    <string id="30937">Odobrať zo [B]Zoznamu na pozretie[/B]</string>
+    <string id="30938">Pridať do [B]nového zoznamu[/B]</string>
+    <string id="30939">Pridať do [B]%s[/B]</string>
+    <string id="30940">Odobrať z [B]%s[/B]</string>
+    
+    <string id="30941">Správca Traktu</string>
+    
+    <string id="30942">Zobraz info</string>
+    
+    <string id="30943">Moje zoznamy</string>
+    <string id="30944">Zoznam na pozretie</string>
+        
     <!-- dni v tyzdni -->
     <string id="30911">Pondelok</string>
     <string id="30912">Utorok</string>    
