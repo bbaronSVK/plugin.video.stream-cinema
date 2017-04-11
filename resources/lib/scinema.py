@@ -280,6 +280,7 @@ class StreamCinemaContentProvider(ContentProvider):
     @buggalo.buggalo_try_except({'method': 'scinema.resolve'})
     def resolve(self, item, captcha_cb=None, select_cb=None):
         #util.debug("ITEM RESOLVE: " + str(item))
+        item['url'] = self._url(item['url'])
         if sctop.BASE_URL in item['url']:
             data = json.loads(self.get_data_cached(item['url']))
             if 'strms' in data:

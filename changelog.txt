@@ -1,3 +1,6 @@
+[B]1.1.5[/B]
+- fix prehravania z kniznice
+
 [B]1.1.4[/B]
 - opravene bugy: 
  - stahovanie serialov bez serie a epizody, 
