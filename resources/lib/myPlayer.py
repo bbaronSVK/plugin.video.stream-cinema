@@ -122,9 +122,16 @@ class MyPlayer(xbmc.Player):
         except: 
             self.ids = {}
             pass
+        try: 
+            stream = json.loads(self.win.getProperty('%s.stream' % sctop.__scriptid__))
+            util.debug("[SC] stream %s" % str(stream))
+        except: 
+            stream = {}
+            pass
         resume = self.win.getProperty('scresume')
         self.win.clearProperty(sctop.__scriptid__)
         self.win.clearProperty('%s.ids' % sctop.__scriptid__)
+        self.win.clearProperty('%s.stream' % sctop.__scriptid__)
         self.win.clearProperty('scid')
         self.win.clearProperty('scresume')
         if resume:
@@ -138,14 +145,27 @@ class MyPlayer(xbmc.Player):
             # plánovaný čas dokončení 100 % přehrání
             self.estimateFinishTime = xbmc.getInfoLabel(
                 'Player.FinishTime(hh:mm:ss)')
-            season = xbmc.getInfoLabel('VideoPlayer.Season')
-            episode = xbmc.getInfoLabel('VideoPlayer.Episode')
-            self.se = season
-            self.ep = episode
-            showtitle = xbmc.getInfoLabel('VideoPlayer.TVShowTitle')
-            year = xbmc.getInfoLabel('VideoPlayer.Year')
-            title = xbmc.getInfoLabel('VideoPlayer.Title')
-            imdb = xbmc.getInfoLabel("VideoPlayer.IMDBNumber") #"ListItem.IMDBNumber")
+            if 'originaltitle' in stream:
+                season = stream.get('season')
+                episode = stream.get('episode')
+                showtitle = stream.get('originaltitle')
+                year = stream.get('year')
+                title = stream.get('originaltitle')
+                try: imdb = 'tt%07d' % int(stream.get('imdb')) if stream.get('imdb').isdigit() else None
+                except:
+                    imdb = None
+                    util.debug("[SC] imdb %s" % str(traceback.format_exc()))
+                self.se = season
+                self.ep = episode
+            else:
+                season = xbmc.getInfoLabel('VideoPlayer.Season')
+                episode = xbmc.getInfoLabel('VideoPlayer.Episode')
+                self.se = season
+                self.ep = episode
+                showtitle = xbmc.getInfoLabel('VideoPlayer.TVShowTitle')
+                year = xbmc.getInfoLabel('VideoPlayer.Year')
+                title = xbmc.getInfoLabel('VideoPlayer.Title')
+                imdb = xbmc.getInfoLabel("VideoPlayer.IMDBNumber") #"ListItem.IMDBNumber")
 
             if showtitle:
                 self.itemType = 'episode'

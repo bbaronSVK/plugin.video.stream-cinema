@@ -33,8 +33,8 @@
     <string id="30901">Filmy</string>
     <string id="30902">Seriály</string>
     <string id="30903">A-Z</string>
-    <string id="30904">Nově přidané</string>
-    <string id="30905">Populární</string>
+    <string id="30904">Nově přidané streamy</string>
+    <string id="30905">Nejsledovanější</string>
     <string id="30906">Země</string>
     <string id="30907">Kvalita</string>
     <string id="30908">Žánr</string>
@@ -52,29 +52,29 @@
     <string id="30924">Zrušit odběr</string>
     <string id="30925">Knihovna</string>
     <string id="30926">Přidat do knihovny (vše)</string>
-    <string id="30927">Naposled sledované</string>
+    <string id="30927">Poslední sledované</string>
     <string id="30928">TV program na 14 dni</string>
-    <string id="30929">Poslední přidané</string>
-    <string id="30930">1) Navštívte: [COLOR skyblue]%s[/COLOR]</string>
-    <string id="30931">2) Po výzve zadajte [COLOR skyblue]%s[/COLOR]</string>
-    <string id="30932">Účet už je autorizovany.[CR]Chcete sa odhlasit?</string>
-    <string is="30933">Chcete sa odhlasit?</string>
+    <string id="30929">Nově přidané</string>
+    <string id="30930">1) Navštivte: [COLOR red]%s[/COLOR]</string>
+    <string id="30931">2) Po výzvě zadejte [COLOR red]%s[/COLOR]</string>
+    <string id="30932">Účet už je autorizovany.[CR]Chcete se odhlasit?</string>
+    <string is="30933">Chcete se odhlasit?</string>
     
     <!-- trakt manager -->
-    <string id="30934">Pridať do [B]Zbierky[/B]</string>
-    <string id="30935">Odstrániť zo [B]Zbierky[/B]</string>
-    <string id="30936">Pridať do [B]Zoznamu na pozretie[/B]</string>
-    <string id="30937">Odobrať zo [B]Zoznamu na pozretie[/B]</string>
-    <string id="30938">Pridať do [B]nového zoznamu[/B]</string>
-    <string id="30939">Pridať do [B]%s[/B]</string>
-    <string id="30940">Odobrať z [B]%s[/B]</string>
+    <string id="30934">Přidat do [B]Sbírky[/B]</string>
+    <string id="30935">Odstránit ze [B]Sbírky[/B]</string>
+    <string id="30936">Přidat do [B]Seznamu ke shlédnutí[/B]</string>
+    <string id="30937">Odebrat ze [B]Seznamu ke shlédnutí[/B]</string>
+    <string id="30938">Přidat do [B]nového seznamu[/B]</string>
+    <string id="30939">Přidat do [B]%s[/B]</string>
+    <string id="30940">Odebrat ze [B]%s[/B]</string>
     
-    <string id="30941">Správca Traktu</string>
+    <string id="30941">Správce Traktu</string>
     
-    <string id="30942">Zobraz info</string>
+    <string id="30942">Zobrazit info</string>
     
-    <string id="30943">Moje zoznamy</string>
-    <string id="30944">Zoznam na pozretie</string>
+    <string id="30943">Moje seznamy</string>
+    <string id="30944">Seznam ke shlédnutí</string>
         
     
     <!-- dni v tyzdni -->

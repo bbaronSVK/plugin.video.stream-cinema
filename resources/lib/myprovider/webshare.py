@@ -83,7 +83,10 @@ class Webshare():
                 util.error('Server returned error status, response: %s' % data)
                 return False
             self.token = xml.find('token').text
-            util.cache_cookies(None)
+            try:
+                util.cache_cookies(None)
+            except:
+                pass
             util.info('Login successfull')
             return True
         return False

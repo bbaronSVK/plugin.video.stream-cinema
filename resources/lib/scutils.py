@@ -338,6 +338,9 @@ class KODISCLib(xbmcprovider.XBMCMultiResolverContentProvider):
             if action == 'trakt':
                 movies = self.getTraktLastActivity('series') #trakt.getWatchedActivity()
                 util.debug("[SC] movies: %s" % str(movies))
+            if action == 'test':
+                data = myPlayer.MyPlayer.executeJSON({'jsonrpc': '2.0', 'id': 0, 'method': 'VideoLibrary.GetMovies', 'params': {'properties': ['title', 'imdbnumber', 'year', 'playcount', 'lastplayed', 'file', 'dateadded', 'runtime', 'userrating']}})
+                util.debug("[SC] RPC: %s" % str(json.dumps(data)))
         elif 'cmd' in params:
             try:
                 if '^;^' in params['cmd']:
@@ -401,6 +404,7 @@ class KODISCLib(xbmcprovider.XBMCMultiResolverContentProvider):
 
             xbmcgui.Window(10000).setProperty('script.trakt.ids', json.dumps(ids))
             xbmcgui.Window(10000).setProperty('%s.ids' % sctop.__scriptid__, json.dumps(ids))
+            xbmcgui.Window(10000).setProperty('%s.stream' % sctop.__scriptid__, json.dumps(stream))
             self.win.setProperty('scid', stream['id'])
             
             if 'headers' in stream.keys():
