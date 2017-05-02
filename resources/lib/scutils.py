@@ -417,6 +417,14 @@ class KODISCLib(xbmcprovider.XBMCMultiResolverContentProvider):
             il = self._extract_infolabels(stream)
             if 'dtitle' in item['info']:
                 il['title'] = item['info']['dtitle']
+                
+            if 'art' in stream:
+                util.debug("[SC] Play MAME ART")
+                if 'poster' in stream['art'] and 'thumb' not in stream['art']:
+                    stream['art'].update({'thumb':stream['art']['poster']})
+                li.setArt(stream['art']);
+            else:
+                util.debug("[SC] Play nemame ART")
             
             self.setUniq(li, stream)
             
