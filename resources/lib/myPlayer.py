@@ -148,7 +148,10 @@ class MyPlayer(xbmc.Player):
             if 'originaltitle' in stream:
                 season = stream.get('season')
                 episode = stream.get('episode')
-                showtitle = stream.get('originaltitle')
+                if episode is not None and season is not None:
+                    showtitle = stream.get('originaltitle')
+                else:
+                    showtitle = None
                 year = stream.get('year')
                 title = stream.get('originaltitle')
                 try: imdb = 'tt%07d' % int(stream.get('imdb')) if stream.get('imdb').isdigit() else None
@@ -167,9 +170,11 @@ class MyPlayer(xbmc.Player):
                 title = xbmc.getInfoLabel('VideoPlayer.Title')
                 imdb = xbmc.getInfoLabel("VideoPlayer.IMDBNumber") #"ListItem.IMDBNumber")
 
-            if showtitle:
+            if episode is not None:
+                util.debug("[SC] Serial");
                 self.itemType = 'episode'
             else:
+                util.debug("[SC] Film");
                 self.itemType = 'movie'
 
             try:
