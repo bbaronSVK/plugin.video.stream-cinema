@@ -76,7 +76,11 @@
     <string id="30943">My lists</string>
     <string id="30944">Watchlist</string>
         
-    
+    <string id="30945">Failed to sign in to WebShare</string>
+    <string id="30946">Do you want to open the settings?</string>
+    <string id="30947">You have not an active VIP on WebShare</string>
+    <string id="30948">Remain the only %s of days with WebShare VIP</string>
+        
     <!-- dni v tyzdni -->
     <string id="30911">Monday</string>
     <string id="30912">Tuesday</string>    

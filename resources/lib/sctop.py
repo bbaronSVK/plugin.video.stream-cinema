@@ -73,7 +73,7 @@ def selectDialog(list, heading=addonInfo('name')):
     return dialog.select(heading, list)
 
 def infoDialog(message, heading=addonInfo('name'), icon='', time=3000, sound=False):
-    if icon == '': icon = addonIcon()
+    if icon == '': icon = icon=__addon__.getAddonInfo('icon')
     elif icon == 'INFO': icon = xbmcgui.NOTIFICATION_INFO
     elif icon == 'WARNING': icon = xbmcgui.NOTIFICATION_WARNING
     elif icon == 'ERROR': icon = xbmcgui.NOTIFICATION_ERROR

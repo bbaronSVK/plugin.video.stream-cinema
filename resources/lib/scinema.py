@@ -223,9 +223,9 @@ class StreamCinemaContentProvider(ContentProvider):
             menu.update({"$30926": {"action": "add-to-lib", "id": data['id'], "title": data['title'], "force": "1"}})
             #util.debug("[SC] MAME menu!")
             
-        if 'season' in data:
-            #util.debug("[SC] mame SERIAL")
-            if data['id'] in self.subs.keys():
+        util.debug("[SC] data %s" % str(data))
+        if 'season' in data or data.get('id') == 'series':
+            if data['id'] in self.subs.keys() and data['id'] != 'series':
                 item['title'] = "[COLOR red]*[/COLOR] %s" % item['title']
                 #util.debug("[SC] Serial je v odoberani: %s" % data['title'])
                 menu.update({"$30924": {"action": "remove-from-sub", "id": data['id'], "title": data['title']}})
@@ -253,18 +253,37 @@ class StreamCinemaContentProvider(ContentProvider):
         if itm.get('provider') == 'plugin.video.online-files' and itm.get('params').get('cp') == 'webshare.cz':
             if self.parent.getSetting('wsuser') != "":
                 try:
-                    if self.ws is None:
-                        from myprovider.webshare import Webshare as wx
-                        self.ws = wx(self.parent.getSetting('wsuser'), self.parent.getSetting('wspass'))
+                    from myprovider.webshare import Webshare as wx
+                    self.ws = wx(self.parent.getSetting('wsuser'), self.parent.getSetting('wspass'))
+                    if not self.ws.login():
+                        res = sctop.yesnoDialog(sctop.getString(30945), sctop.getString(30946), "")
+                        if res == True:
+                            sctop.openSettings('201.101')
+                        return None
+                    else:
+                        udata = self.ws.userData()
+                        util.debug("[SC] udata: %s" % str(udata))
+                        if udata == False:
+                            util.debug("[SC] NIEJE VIP ucet")
+                            res = sctop.yesnoDialog(sctop.getString(30947), "", "")
+                            if res == True:
+                                sctop.openSettings('0.1')
+                                return None
+                        elif int(udata) <= 10:
+                            sctop.infoDialog(sctop.getString(30948) % str(udata), icon="WARNING")
+                            util.debug("[SC] VIP ucet konci")
+                                
                     itm['url'] = self.ws.resolve(itm.get('params').get('play').get('ident'))
                 except:
                     buggalo.onExceptionRaised()
                     pass
             else:
-                sctop.openSettings('0.1')
+                sctop.infoDialog(sctop.getString(30945), icon="WARNING")
+                #sctop.openSettings('0.1')
                         
         else:
             try:
+                raise ResolveException('zatial nic...')
                 hmf = urlresolver.HostedMediaFile(url=itm['url'], include_disabled=False,
                                                   include_universal=False)
                 if hmf.valid_url() is True:

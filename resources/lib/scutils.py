@@ -88,7 +88,7 @@ class KODISCLib(xbmcprovider.XBMCMultiResolverContentProvider):
         arg = {"play": "/Play/%d" % int(params['id']), "title": params['title']}
         if 'season' in params:
             arg.update({"play":"/Play/%d/%d/%d" % (int(params['id']), int(params['season']), int(params['episode']))})
-        return xbmcutil._create_plugin_url(arg)
+        return xbmcutil._create_plugin_url(arg, 'plugin://%s/' % sctop.__scriptid__)
     
     def add_multi_item(self, params, addToSubscription=False):
         error = False
@@ -468,20 +468,26 @@ class KODISCLib(xbmcprovider.XBMCMultiResolverContentProvider):
                     infoLabels[label] = item[label]
                 else:
                     infoLabels[label] = util.decode_html(item[label])
-        if item.get('imdb') and int(item.get('imdb')) > 0 and item.get('season') is None:
-            if 'tt%07d' % int(item.get('imdb')) in self.getTraktLastActivity():
-                util.debug("[SC] oznacujem za videne z trakt.tv %s" % str(item))
-                infoLabels['playcount'] = 1
-            util.debug("[SC] item ma imdb %s" % str(item.get('imdb')))
-            
-        if item.get('tvdb') and int(item.get('tvdb')) > 0 and item.get('season') is not None and item.get('episode') is not None:
-            playcount = [i[2] for i in self.getTraktLastActivity('series') if i[0] == item.get('tvdb')]
-            playcount = playcount[0] if len(playcount) > 0 else []
-            playcount = [i for i in playcount if int(item.get('season')) == int(i[0]) and int(item.get('episode')) == int(i[1])]
-            playcount = 1 if len(playcount) > 0 else 0
-            infoLabels['playcount'] = playcount
-            util.debug("[SC] item ma tvdb %s %sx%s %s" % (str(item.get('tvdb')), str(item.get('season')), str(item.get('episode')), str(playcount)))
-            
+        try:
+            if item.get('imdb') and int(item.get('imdb')) > 0 and item.get('season') is None:
+                if 'tt%07d' % int(item.get('imdb')) in self.getTraktLastActivity():
+                    util.debug("[SC] oznacujem za videne z trakt.tv %s" % str(item))
+                    infoLabels['playcount'] = 1
+                util.debug("[SC] item ma imdb %s" % str(item.get('imdb')))
+        except:
+            pass
+        
+        try:
+            if item.get('tvdb') and int(item.get('tvdb')) > 0 and item.get('season') is not None and item.get('episode') is not None:
+                playcount = [i[2] for i in self.getTraktLastActivity('series') if i[0] == item.get('tvdb')]
+                playcount = playcount[0] if len(playcount) > 0 else []
+                playcount = [i for i in playcount if int(item.get('season')) == int(i[0]) and int(item.get('episode')) == int(i[1])]
+                playcount = 1 if len(playcount) > 0 else 0
+                infoLabels['playcount'] = playcount
+                util.debug("[SC] item ma tvdb %s %sx%s %s" % (str(item.get('tvdb')), str(item.get('season')), str(item.get('episode')), str(playcount)))
+        except:
+            pass
+        
         #infoLabels['overlay'] = 7
         return infoLabels
 
@@ -715,6 +721,7 @@ class KODISCLib(xbmcprovider.XBMCMultiResolverContentProvider):
 
     def service(self):
         util.info("SC Service Started")
+        #dialog = sctop.dialog.textviewer('heading', 'Prosim podporte vyvoj pluginu na adrese: http://stream-cinema.online/')
         if sctop.player is None:
             sctop.player = myPlayer.MyPlayer(parent=self)
         try:

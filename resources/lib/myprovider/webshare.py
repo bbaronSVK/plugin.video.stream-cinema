@@ -23,12 +23,6 @@ from crypto.md5crypt import md5crypt
 import elementtree.ElementTree as ET
 import hashlib
 from provider import ResolveException
-import random
-import re
-import sys
-import traceback
-import urllib
-import urllib2
 import urlparse
 import util
 
@@ -39,8 +33,6 @@ class Webshare():
         self.password = password
         self.base_url = 'http://webshare.cz/'
         self.token = ''
-        #util.init_urllib()
-        self.login()
         
     def _url(self, url):
         """
@@ -63,13 +55,13 @@ class Webshare():
         if not self.username and not self.password:
             return True # fall back to free account
         elif self.username and self.password and len(self.username)>0 and len(self.password)>0:
-            util.info('Login user=%s, pass=*****' % self.username)
+            util.info('[SC] Login user=%s, pass=*****' % self.username)
             # get salt
             headers,req = self._create_request('',{'username_or_email':self.username})
             data = util.post(self._url('api/salt/'),req,headers=headers)
             xml = ET.fromstring(data)
             if not xml.find('status').text == 'OK':
-                util.error('Server returned error status, response: %s' % data)
+                util.error('[SC] Server returned error status, response: %s' % data)
                 return False
             salt = xml.find('salt').text
             # create hashes
@@ -80,15 +72,24 @@ class Webshare():
             data = util.post(self._url('api/login/'),req,headers=headers)
             xml = ET.fromstring(data)
             if not xml.find('status').text == 'OK':
-                util.error('Server returned error status, response: %s' % data)
+                util.error('[SC] Server returned error status, response: %s' % data)
                 return False
             self.token = xml.find('token').text
             try:
                 util.cache_cookies(None)
             except:
                 pass
-            util.info('Login successfull')
+            util.info('[SC] Login successfull')
             return True
+        return False
+
+    def userData(self):
+        if self.token:
+            headers,req = self._create_request('/',{'wst':self.token})
+            data = util.post(self._url('api/user_data/'), req, headers=headers)
+            xml = ET.fromstring(data)
+            if xml.find('vip').text == '1':
+                return xml.find('vip_days').text
         return False
 
     def resolve(self,ident):
@@ -98,7 +99,7 @@ class Webshare():
         data = util.post(self._url('api/file_link/'), req, headers=headers)
         xml = ET.fromstring(data)
         if not xml.find('status').text == 'OK':
-            util.error('Server returned error status, response: %s' % data)
+            util.error('[SC] Server returned error status, response: %s' % data)
             raise ResolveException(xml.find('message').text)
         url = xml.find('link').text
         return url

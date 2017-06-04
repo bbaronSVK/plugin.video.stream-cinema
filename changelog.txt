@@ -1,3 +1,7 @@
+[B]1.1.9[/B]
+- fix s kniznicou a serialmy, ked sa generovali zle URL pre .strm
+- dalsie fixy
+
 [B]1.1.5[/B]
 - fix prehravania z kniznice
 

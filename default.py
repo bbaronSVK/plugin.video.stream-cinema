@@ -20,7 +20,7 @@
 #  *
 #  */
 
-import xbmc, uuid
+import xbmc
 import util
 from resources.lib.scinema import StreamCinemaContentProvider
 from resources.lib.scutils import KODISCLib
@@ -31,9 +31,18 @@ from resources.lib.sctop import __addon__,__set__
 
 settings = {'quality': __set__('quality'), 'downloads': xbmc.translatePath(__set__('downloads'))}
 uid = __set__('uid')
-if uid == '':
-    uid = str(uuid.uuid4())
-    __addon__.setSetting('uid', uid)
+try:
+    import uuid
+    if uid == '':
+        uid = str(uuid.uuid4())
+        __addon__.setSetting('uid', uid)
+except:
+    if uid == '':
+        import random
+        import string
+        uid = ''.join(random.choice(string.ascii_uppercase + string.digits) for _ in range(32))
+        __addon__.setSetting('uid', uid)
+    pass
 
 params = util.params()
 util.info('[sc] PARAMS: ' + str(params))

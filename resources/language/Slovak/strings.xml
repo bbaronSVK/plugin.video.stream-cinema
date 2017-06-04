@@ -75,6 +75,11 @@
     
     <string id="30943">Moje zoznamy</string>
     <string id="30944">Zoznam na pozretie</string>
+    
+    <string id="30945">Nepodarilo sa prihlásiť na WebShare</string>
+    <string id="30946">Chceš otvoriť nastavenia?</string>
+    <string id="30947">Nemáš aktívne VIP na WebShare</string>
+    <string id="30948">Ostáva ti už len %s dní s VIP na WebShare</string>
         
     <!-- dni v tyzdni -->
     <string id="30911">Pondelok</string>
