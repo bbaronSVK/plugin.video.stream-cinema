@@ -265,10 +265,7 @@ class StreamCinemaContentProvider(ContentProvider):
                         util.debug("[SC] udata: %s" % str(udata))
                         if udata == False:
                             util.debug("[SC] NIEJE VIP ucet")
-                            res = sctop.yesnoDialog(sctop.getString(30947), "", "")
-                            if res == True:
-                                sctop.openSettings('0.1')
-                                return None
+                            sctop.infoDialog(sctop.getString(30947), icon="WARNING")
                         elif int(udata) <= 10:
                             sctop.infoDialog(sctop.getString(30948) % str(udata), icon="WARNING")
                             util.debug("[SC] VIP ucet konci")
