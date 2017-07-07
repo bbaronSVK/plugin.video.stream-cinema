@@ -690,7 +690,7 @@ class KODISCLib(xbmcprovider.XBMCMultiResolverContentProvider):
                     else:
                         items.append((mi, 'RunPlugin(%s)' % sctop._create_plugin_url(action)))
                 else:
-                    items.append((mi, 'RunPlugin(%s)' % xbmcutil._create_plugin_url(action)))
+                    items.append((mi, 'RunPlugin(%s)' % sctop._create_plugin_url(action)))
 
         if len(items) > 0:
             li.addContextMenuItems(items)
