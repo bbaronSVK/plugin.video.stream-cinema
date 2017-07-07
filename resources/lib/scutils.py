@@ -21,7 +21,6 @@ import xbmc
 import xbmcgui
 import xbmcplugin
 import xbmcprovider
-import xbmcutil
 import xbmcvfs
 import xmlrpclib
 import zlib
@@ -88,7 +87,7 @@ class KODISCLib(xbmcprovider.XBMCMultiResolverContentProvider):
         arg = {"play": "/Play/%d" % int(params['id']), "title": params['title']}
         if 'season' in params:
             arg.update({"play":"/Play/%d/%d/%d" % (int(params['id']), int(params['season']), int(params['episode']))})
-        return xbmcutil._create_plugin_url(arg, 'plugin://%s/' % sctop.__scriptid__)
+        return sctop._create_plugin_url(arg, 'plugin://%s/' % sctop.__scriptid__)
     
     def add_multi_item(self, params, addToSubscription=False):
         error = False
@@ -567,16 +566,16 @@ class KODISCLib(xbmcprovider.XBMCMultiResolverContentProvider):
                     action_type = action['action-type']
                     del action['action-type']
                     if action_type == 'list':
-                        items.append((mi, 'Container.Update(%s)' % xbmcutil._create_plugin_url(action)))
+                        items.append((mi, 'Container.Update(%s)' % sctop._create_plugin_url(action)))
                     elif action_type == 'play':
-                        items.append((mi, 'PlayMedia(%s)' % xbmcutil._create_plugin_url(action)))
+                        items.append((mi, 'PlayMedia(%s)' % sctop._create_plugin_url(action)))
                     else:
-                        items.append((mi, 'RunPlugin(%s)' % xbmcutil._create_plugin_url(action)))
+                        items.append((mi, 'RunPlugin(%s)' % sctop._create_plugin_url(action)))
                 else:
-                    items.append((mi, 'RunPlugin(%s)' % xbmcutil._create_plugin_url(action)))
+                    items.append((mi, 'RunPlugin(%s)' % sctop._create_plugin_url(action)))
         if len(items) > 0:
             liz.addContextMenuItems(items)
-        return xbmcplugin.addDirectoryItem(handle=int(sys.argv[1]), url=xbmcutil._create_plugin_url(params),
+        return xbmcplugin.addDirectoryItem(handle=int(sys.argv[1]), url=sctop._create_plugin_url(params),
                                            listitem=liz, isFolder=True)
 
     def render_video(self,item):
@@ -647,7 +646,7 @@ class KODISCLib(xbmcprovider.XBMCMultiResolverContentProvider):
         if 'Title' not in _infoLabels:
             _infoLabels['Title'] = name
         util.debug("[SC] params: %s" % str(params))
-        url = xbmcutil._create_plugin_url(params)
+        url = sctop._create_plugin_url(params)
         if logo == '' or logo is None:
             logo = self.noImage
         li = xbmcgui.ListItem(name, path=url, iconImage='DefaultVideo.png', thumbnailImage=logo)
@@ -683,13 +682,13 @@ class KODISCLib(xbmcprovider.XBMCMultiResolverContentProvider):
                     action_type = action['action-type']
                     del action['action-type']
                     if action_type == 'list':
-                        items.append((mi, 'Container.Update(%s)' % xbmcutil._create_plugin_url(action)))
+                        items.append((mi, 'Container.Update(%s)' % sctop._create_plugin_url(action)))
                     elif action_type == 'play':
-                        items.append((mi, 'PlayMedia(%s)' % xbmcutil._create_plugin_url(action)))
+                        items.append((mi, 'PlayMedia(%s)' % sctop._create_plugin_url(action)))
                     elif action_type == 'trailer':
                         items.append((mi, 'PlayMedia(%s)' % action['url']))
                     else:
-                        items.append((mi, 'RunPlugin(%s)' % xbmcutil._create_plugin_url(action)))
+                        items.append((mi, 'RunPlugin(%s)' % sctop._create_plugin_url(action)))
                 else:
                     items.append((mi, 'RunPlugin(%s)' % xbmcutil._create_plugin_url(action)))
 

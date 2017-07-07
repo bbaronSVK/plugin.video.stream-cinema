@@ -4,10 +4,12 @@ import urllib
 import urllib2
 import util
 import xbmc
+import sys
 import json
 import xbmcaddon
 import xbmcgui
 import xbmcplugin
+import xbmcutil
 
 __scriptid__ = 'plugin.video.stream-cinema'
 __scriptname__ = 'stream-cinema.online'
@@ -210,6 +212,14 @@ def post_json(url, data, headers={}, output="content"):
         return data
     else:
         return (data, code)
+
+def _create_plugin_url(params, plugin=sys.argv[0]):
+    url = []
+    for key in params.keys():
+        value = str(xbmcutil.decode_html(params[key]))
+        value = value.encode('utf-8')
+        url.append(key + '=' + value.encode('hex',) + '&')
+    return plugin + '?' + ''.join(url)
 
 def merge_dicts(*dict_args):
     result = {}
