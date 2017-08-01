@@ -1,3 +1,6 @@
+[B]1.1.13[/B]
+- pridana moznost otestovat rychlost na webshare a "najlepsi" dostupny server
+
 [B]1.1.9[/B]
 - fix s kniznicou a serialmy, ked sa generovali zle URL pre .strm
 - dalsie fixy

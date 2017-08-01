@@ -6,6 +6,9 @@
     <string id="30102">Uživatelské heslo</string>
     <string id="30103">Trakt</string>
     <string id="30104">Autorizace...</string>
+    <string id="30105">heslo na webshare nesmí obsahovat diakritiku a speciální znaky</string>
+    <string id="30106">zaregistrovat se můžete na webshare.cz</string>
+    <string id="30107">Spustit test připojení...</string>
     
     <string id="30020">Titulky</string>
     <string id="30201">Povolit titulky</string>

@@ -334,6 +334,22 @@ class KODISCLib(xbmcprovider.XBMCMultiResolverContentProvider):
                 return xbmcplugin.endOfDirectory(int(sys.argv[1]))
             if action == 'authTrakt':
                 trakt.authTrakt()
+            if action == 'speedtest':
+                from speedtest import speedTest, pretty_speed
+                pg = sctop.progressDialog
+                pg.create('SpeedTest')
+                pg.update(10)
+                wspeedtest = speedTest('speedtest.webshare.cz', 1)
+                pg.update(20, wspeedtest.host)
+                wsdown = wspeedtest.download()
+                pg.update(50)
+                speedtest = speedTest()
+                pg.update(60, speedtest.host)
+                bedown = speedtest.download()
+                pg.update(100)
+                pg.close()
+                sctop.dialog.ok("SpeedTest", "%s: %s" % (wspeedtest.host, str(pretty_speed(wsdown))), "%s: %s" % (speedtest.host, str(pretty_speed(bedown))))
+                
             if action == 'trakt':
                 movies = self.getTraktLastActivity('series') #trakt.getWatchedActivity()
                 util.debug("[SC] movies: %s" % str(movies))

@@ -29,7 +29,7 @@ from resources.lib.sctop import __addon__,__set__
 #__scriptid__ = 'plugin.video.stream-cinema'
 #__scriptname__ = 'stream-cinema.online'
 
-settings = {'quality': __set__('quality'), 'downloads': xbmc.translatePath(__set__('downloads'))}
+settings = {'quality': __set__('quality'), 'lang': __set__('language'), 'downloads': xbmc.translatePath(__set__('downloads'))}
 uid = __set__('uid')
 try:
     import uuid

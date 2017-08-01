@@ -6,6 +6,9 @@
     <string id="30102">Heslo</string>
     <string id="30103">Trakt</string>
     <string id="30104">Autorizácia...</string>
+    <string id="30105">heslo na webshare nesmie obsahovať diakritiku a špeciálne znaky</string>
+    <string id="30106">zaregistrovať sa môžete na webshare.cz</string>
+    <string id="30106">Spustiť test pripojenia...</string>
     
     <string id="30020">Titulky</string>
     <string id="30201">Povoliť titulky</string>
@@ -76,10 +79,10 @@
     <string id="30943">Moje zoznamy</string>
     <string id="30944">Zoznam na pozretie</string>
     
-    <string id="30945">Nepodarilo sa prihlásiť na WebShare</string>
+    <string id="30945">Nepodarilo sa prihlásiť na WebShare.cz</string>
     <string id="30946">Chceš otvoriť nastavenia?</string>
-    <string id="30947">Nemáš aktívne VIP na WebShare</string>
-    <string id="30948">Ostáva ti už len %s dní s VIP na WebShare</string>
+    <string id="30947">Nemáš aktívne VIP na WebShare.cz</string>
+    <string id="30948">Ostáva ti už len %s dní s VIP na WebShare.cz</string>
         
     <!-- dni v tyzdni -->
     <string id="30911">Pondelok</string>
