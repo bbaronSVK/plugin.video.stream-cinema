@@ -8,7 +8,6 @@
     <string id="30104">Authorize...</string>
     <string id="30105">webshare password can't contain accents and special characters</string>
     <string id="30106">You can sign up at webshare.cz</string>
-    <string id="30107">Run internet speed test...</string>
     
     <string id="30020">Subtitles</string>
     <string id="30201">Enable subtitles</string>
@@ -31,6 +30,22 @@
     <string id="30401">TVShow folder</string>
     <string id="30402">Subscription service sleep on start</string>
     <string id="30403">Default show check time (days)</string>
+    
+    <string id="30050">SpeedTest</string>
+    <string id="30500">Run internet speed test...</string>
+    <string id="30502"></string>
+    <string id="30501">Select download size</string>
+    <!-- "250KB", "500KB", "1MB", "2MB", "4.5MB", "7.5MB", "12MB", "17MB", "24MB", "31MB" -->
+    <string id="30551">250KB - slow internet connection</string> 
+    <string id="30552">500KB</string> 
+    <string id="30553">1MB</string> 
+    <string id="30554">2MB - DSL</string> 
+    <string id="30555">4.5MB</string> 
+    <string id="30556">7.5MB</string> 
+    <string id="30557">12MB - fast internet connection</string> 
+    <string id="30558">17MB</string> 
+    <string id="30559">24MB</string> 
+    <string id="30560">31MB - very fast internet connection</string> 
 
     <!-- texty v menu -->
     <string id="30901">Movies</string>

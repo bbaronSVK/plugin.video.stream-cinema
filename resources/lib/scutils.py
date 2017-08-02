@@ -334,21 +334,41 @@ class KODISCLib(xbmcprovider.XBMCMultiResolverContentProvider):
                 return xbmcplugin.endOfDirectory(int(sys.argv[1]))
             if action == 'authTrakt':
                 trakt.authTrakt()
-            if action == 'speedtest':
+            if action == 'speedtest': #                               1:350    2:500    3:750  4:1000 5:1500   6:2000   7:2500 8:3000  9:3500   10:4000
+                g = sctop.getString
+                x = [g(30551), g(30552), g(30553), g(30554), g(30555), 
+                    g(30556), g(30557), g(30558), g(30559), g(30560)]
+                ret = [1500, 2000]
+                try:
+                    ret =sctop.dialog.multiselect(g(30501), x, preselect=[5,6])
+                except:
+                    try:
+                        xret = sctop.dialog.select(g(30501), x)
+                        ret = [xret]
+                    except:
+                        pass
+                _files = [0, 350, 500, 750, 1000, 1500, 2000, 2500, 3000, 3500, 4000]
+                out = []
+                for i in ret:
+                    out.append(_files[i])
+                if len(out) < 1:
+                    out = [1500, 2000]
                 from speedtest import speedTest, pretty_speed
+                run = 2
                 pg = sctop.progressDialog
-                pg.create('SpeedTest')
-                pg.update(10)
-                wspeedtest = speedTest('speedtest.webshare.cz', 1)
-                pg.update(20, wspeedtest.host)
+                pg.create(g(30050))
+                pg.update(0)
+                wspeedtest = speedTest('speedtest.webshare.cz', run, out)
+                pg.update(10, wspeedtest.host)
                 wsdown = wspeedtest.download()
                 pg.update(50)
-                speedtest = speedTest()
+                speedtest = speedTest(None, run, out)
                 pg.update(60, speedtest.host)
                 bedown = speedtest.download()
                 pg.update(100)
                 pg.close()
-                sctop.dialog.ok("SpeedTest", "%s: %s" % (wspeedtest.host, str(pretty_speed(wsdown))), "%s: %s" % (speedtest.host, str(pretty_speed(bedown))))
+                sctop.dialog.ok(g(30050), "%s: %s" % (wspeedtest.host, str(pretty_speed(wsdown))), "%s: %s" % (speedtest.host, str(pretty_speed(bedown))))
+                sctop.openSettings('1.0')
                 
             if action == 'trakt':
                 movies = self.getTraktLastActivity('series') #trakt.getWatchedActivity()

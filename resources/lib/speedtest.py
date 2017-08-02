@@ -28,15 +28,14 @@ class speedTest():
         'Java': 'Java/1.6.0_12',
     }
     
-    DOWNLOAD_FILES = [
-        '/speedtest/random350x350.jpg',
-        '/speedtest/random500x500.jpg',
-        '/speedtest/random1500x1500.jpg'
-    ]
-
-    def __init__(self, host=None, runs=3):
+    def __init__(self, host=None, runs=3, size=[1500,2000]):
         self._host = host
         self.runs = runs
+        self.DOWNLOAD_FILES = []
+        util.debug("size: %s" % str(size))
+        for i in size:
+            self.DOWNLOAD_FILES.append('/speedtest/random%sx%s.jpg' % (i, i))
+        util.debug('FILES: %s' % str(self.DOWNLOAD_FILES))
     
     @property
     def host(self):
@@ -68,7 +67,7 @@ class speedTest():
             self.connect(self.host) for i in range(self.runs)
         ]
         total_start_time = time()
-        for current_file in speedTest.DOWNLOAD_FILES:
+        for current_file in self.DOWNLOAD_FILES:
             threads = []
             for run in range(self.runs):
                 thread = Thread(

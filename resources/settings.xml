@@ -12,8 +12,9 @@
         <setting id="trakt.token" type="text" option="hidden" visible="false" label="" default="" />
         <setting id="trakt.refresh" type="text" option="hidden" visible="false" label="" default="" />
     </category>
-    <category label="SpeedTest">
-        <setting id="speedtest" type="action" label="30107" option="close" action="RunPlugin(plugin://plugin.video.stream-cinema/?action=737065656474657374)" />
+    <category label="30050">
+        <setting id="speedtest" type="action" label="30500" option="close" action="RunPlugin(plugin://plugin.video.stream-cinema/?action=737065656474657374)" />
+        <setting type="lsep" label="30502" />
     </category>
     <category label="30020">
         <setting label="30201" id="subtitles" type="bool" default="false" />
