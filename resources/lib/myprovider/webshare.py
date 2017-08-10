@@ -54,8 +54,11 @@ class Webshare():
     def login(self):
         if not self.username and not self.password:
             return True # fall back to free account
+        elif self.token:
+            return True
         elif self.username and self.password and len(self.username)>0 and len(self.password)>0:
             util.info('[SC] Login user=%s, pass=*****' % self.username)
+            
             # get salt
             headers,req = self._create_request('',{'username_or_email':self.username})
             data = util.post(self._url('api/salt/'),req,headers=headers)

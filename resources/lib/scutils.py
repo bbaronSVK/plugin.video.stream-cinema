@@ -339,11 +339,13 @@ class KODISCLib(xbmcprovider.XBMCMultiResolverContentProvider):
                 x = [g(30551), g(30552), g(30553), g(30554), g(30555), 
                     g(30556), g(30557), g(30558), g(30559), g(30560)]
                 ret = [1500, 2000]
+                run = 2
                 try:
                     ret =sctop.dialog.multiselect(g(30501), x, preselect=[5,6])
                 except:
                     try:
                         xret = sctop.dialog.select(g(30501), x)
+                        run = 5
                         ret = [xret]
                     except:
                         pass
@@ -354,7 +356,6 @@ class KODISCLib(xbmcprovider.XBMCMultiResolverContentProvider):
                 if len(out) < 1:
                     out = [1500, 2000]
                 from speedtest import speedTest, pretty_speed
-                run = 2
                 pg = sctop.progressDialog
                 pg.create(g(30050))
                 pg.update(0)

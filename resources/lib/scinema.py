@@ -103,7 +103,7 @@ class StreamCinemaContentProvider(ContentProvider):
         if data is None or isinstance(data, list):
             self._oldapi()
         result = []
-        if data.get("menu"):
+        if data is not None and data.get("menu"):
             for m in data["menu"]:
                 try:
                     #util.debug("MENU: %s" % str(m))
@@ -235,7 +235,7 @@ class StreamCinemaContentProvider(ContentProvider):
                 menu.update({"$30923": {"action": "add-to-lib-sub", "id": data['id'], "title": data['title']}})
         #menu.update({"$30922": {"cmd":'Addon.OpenSettings("%s")' % sctop.__scriptid__}})
         #menu.update({"run Schedule": {"action": "subs"}})
-        #menu.update({"clean Schedule": {"action": "test"}})
+        menu.update({"test": {"action": "test"}})
         #menu.update({"last": {'cp': 'czsklib', 'list': 'http://stream-cinema.online/json/movies-a-z'}})
         
         item['menu'] = menu
