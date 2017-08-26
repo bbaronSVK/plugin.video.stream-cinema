@@ -1,3 +1,12 @@
+[B]1.2.0[/B]
+- Nova API 1.2
+- nove nastavenia:
+  - automaticky vyber streamu (jazyk, sekundarny jazyk, kvalita)
+  - odfiltrovanie HEVC streamov
+  - filtrovanie streamov podla nameranej rychlosti na webshare.cz
+- v kontextovom menu je moznost vybrat stream
+- v "Moje zoznamy (trakt.tv)" je mozne pridat cely zoznam do kniznice
+
 [B]1.1.13[/B]
 - pridana moznost otestovat rychlost na webshare a "najlepsi" dostupny server
 

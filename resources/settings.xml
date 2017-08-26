@@ -6,7 +6,7 @@
         <setting label="30102" id="wspass" type="text" default="" option="hidden" />
         <setting type="lsep" label="30105" />
         <setting type="lsep" label="30106" />
-        <setting type="lsep" label="[CR]" />
+        <setting type="sep" />
         <setting type="lsep" label="30103" />
         <setting id="trakt.user" type="action" label="30104" option="close" action="RunPlugin(plugin://plugin.video.stream-cinema/?action=617574685472616b74)" />
         <setting id="trakt.token" type="text" option="hidden" visible="false" label="" default="" />
@@ -14,10 +14,28 @@
     </category>
     <category label="30050">
         <setting id="speedtest" type="action" label="30500" option="close" action="RunPlugin(plugin://plugin.video.stream-cinema/?action=737065656474657374)" />
-        <setting type="lsep" label="30502" />
+        <setting type="sep" />
+        <setting id="bitrate" type="text" default="" visible="false" />
+        <setting label="30504" id="bitratefilter" type="bool" default="false" enable="gt(-1,0)" />
+        <setting label="30503" id="bitrateformated" type="text" default="N/A" enable="false" />
+        <setting type="lsep" label="30502" enable="eq(-2,true)"/>
+    </category>
+    <category label="30060">
+        <setting label="30600" id="filter_enable" type="bool" default="false"/>
+        <setting type="sep" />
+        <setting label="30601" id="filter_prio" subsetting="true" type="select" values="Audio|Video" enable="eq(-2,true) + eq(2,true) + eq(6,true)" default="Audio" />
+        <setting type="sep" />
+        <setting label="30602" id="filter_audio" subsetting="true" type="bool" default="false" enable="eq(-4,true)"/>
+        <setting label="30603" id="filter_lang.1" subsetting="true" type="select" values="CZ|SK|EN|JP" enable="eq(-1,true) + eq(-5,true)" default="CZ" />
+        <setting label="30604" id="filter_lang.2" subsetting="true" type="select" values="CZ|SK|EN|JP" enable="eq(-2,true) + eq(-6,true)" default="SK" />
+        <setting type="sep" />
+        <setting label="30605" id="filter_video" subsetting="true" type="bool" default="false" enable="eq(-8,true)"/>
+        <setting label="30606" id="filter_quality" subsetting="true" type="select" values="4K|1080p|720p|SD" enable="eq(-1,true) + eq(-9,true)" default="1080p"/>
+        <setting type="sep" />
+        <setting label="30607" id="filter_hevc" subsetting="true" type="bool" enable="eq(-11,true)" default="false"/>
     </category>
     <category label="30020">
-        <setting label="30201" id="subtitles" type="bool" default="false" />
+        <setting label="30201" id="subtitles" type="bool" default="true" />
         <setting type="sep" />
         <setting label="30202" id="subtitles.utf" type="bool" enable="!eq(-2,false)" default="false" />
         <setting type="sep" />
@@ -40,6 +58,8 @@
         <setting type="sep" />
         <setting label="30402" id="start_sleep_time" type="slider" default="10" range="0,60" option="int" />
         <setting label="30403" id="refresh_time" type="slider" default="1" range="0,60" option="int" />
+        <setting type="sep" />
+        <setting label="30404" id="download-movies" type="bool" default="false" />
     </category>
     <setting label="" id="uid" type="text" default="" visible="false" />
 </settings>

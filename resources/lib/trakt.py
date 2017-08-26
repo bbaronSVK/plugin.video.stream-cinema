@@ -189,8 +189,9 @@ def getLists():
         {
             'type': 'dir', 
             'title': '$30944', 
-            'url': 'cmd://Container.Update("%s")' % \
-                (xbmcutil._create_plugin_url({'action':'traktShowList', 'id':'watchlist'}))
+            #'url': 'cmd://Container.Update("%s")' % \
+            'action':'traktShowList', 
+            'id':'watchlist'
         }
         #,
         #{
@@ -200,13 +201,7 @@ def getLists():
         #        (xbmcutil._create_plugin_url({'action':'traktShowList', 'id':'progress'}))
         #}
         ]
-    lists = [{'action':'traktShowList', 'title': i['name'], 'id': i['ids']['slug']} for i in result]
-    lists = [{
-        'type': 'dir',
-        'title': i['title'], 
-        'url': 'cmd://Container.Update("%s")' % \
-            (xbmcutil._create_plugin_url(i))} \
-        for i in lists]
+    lists = [{'action':'traktShowList', 'title': i['name'], 'id': i['ids']['slug'], 'type':'dir', 'tl':i['ids']['slug']} for i in result]
     items += lists
     return items
 

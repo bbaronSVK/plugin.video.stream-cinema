@@ -25,6 +25,8 @@ import hashlib
 from provider import ResolveException
 import urlparse
 import util
+import xbmcgui
+
 
 class Webshare():
 
@@ -32,7 +34,7 @@ class Webshare():
         self.username = username
         self.password = password
         self.base_url = 'http://webshare.cz/'
-        self.token = ''
+        self.token = None
         
     def _url(self, url):
         """
@@ -52,11 +54,16 @@ class Webshare():
         return headers,req
 
     def login(self):
-        if not self.username and not self.password:
+        if not self.username or not self.password:
+            self.logout()
             return True # fall back to free account
-        elif self.token:
-            return True
-        elif self.username and self.password and len(self.username)>0 and len(self.password)>0:
+        elif self.token is not None:
+            if self.userData() is not False:
+                return True
+            self.token = None
+        
+        if self.username and self.password and len(self.username)>0 and len(self.password)>0:
+            self.logout()
             util.info('[SC] Login user=%s, pass=*****' % self.username)
             
             # get salt
@@ -86,14 +93,33 @@ class Webshare():
             return True
         return False
 
-    def userData(self):
+    def userData(self, all=False):
         if self.token:
             headers,req = self._create_request('/',{'wst':self.token})
             data = util.post(self._url('api/user_data/'), req, headers=headers)
             xml = ET.fromstring(data)
+            if all == True:
+                return xml
+            xbmcgui.Window(10000).setProperty('ws.ident', xml.find('ident').text)
+            util.debug("[SC] userInfo: %s %s" % (xml.find('ident').text, xml.find('vip').text))
             if xml.find('vip').text == '1':
-                return xml.find('vip_days').text
+                xbmcgui.Window(10000).setProperty('ws.vip', '1')
+                xbmcgui.Window(10000).setProperty('ws.ident', xml.find('ident').text)
+                return int(xml.find('vip_days').text)
+            else:
+                xbmcgui.Window(10000).setProperty('ws.vip', '0')
+                
         return False
+    
+    def logout(self):
+        util.info("[SC] logout")
+        headers,req = self._create_request('/',{'wst':self.token})
+        util.post(self._url('api/logout/'), req, headers=headers)
+        try:
+            util.cache_cookies(None)
+        except:
+            util.debug("[SC] chyba logout")
+            pass
 
     def resolve(self,ident):
         headers,req = self._create_request('/',{'ident':ident,'wst':self.token})

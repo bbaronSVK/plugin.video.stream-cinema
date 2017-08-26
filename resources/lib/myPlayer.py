@@ -13,6 +13,7 @@ import util
 import traceback
 import trakt
 import scutils
+from hashlib import md5
 
 class MyPlayer(xbmc.Player):
 
@@ -257,13 +258,18 @@ class MyPlayer(xbmc.Player):
             pass
 
         util.debug("[SC] start wtime")
-            
+        timer = 0    
         while True:
             if xbmc.abortRequested or not self.isPlayingVideo():
                 return
             self.watchedTime = self.getTime()
             #util.debug("[SC] changed wtime %s" % str(self.watchedTime))
-            scutils.KODISCLib.sleep(1000)
+            scutils.KODISCLib.sleep(900)
+            timer += 1
+            if timer >= 60:
+                timer = 0
+                data = {'scid': self.scid, 'action': 'ping', 'prog': self.timeRatio()}
+                self.action(data)
 
     def onPlayBackEnded(self):
         self.log("[SC] Skoncilo sa prehravat")
@@ -308,7 +314,7 @@ class MyPlayer(xbmc.Player):
     def timeRatio(self):
         try:
             util.debug("[SC] watched %f duration %f" % (self.watchedTime, self.itemDuration))
-            return (self.watchedTime / math.floor(self.itemDuration))
+            return float("%.3f" % (self.watchedTime / math.floor(self.itemDuration)))
         except Exception, e:
             util.debug("[SC] timeRatio error")
             util.debug(e)
@@ -364,10 +370,15 @@ class MyPlayer(xbmc.Player):
         data.update({'est': self.estimateFinishTime})
         data.update({'se': self.se, 'ep': self.ep})
         try:
+            data.update({'ws': xbmcgui.Window(10000).getProperty('ws.ident'), 'vip': xbmcgui.Window(10000).getProperty('ws.vip')})
+        except:
+            pass
+        try:
             if self.itemDuration > 0:
                 data.update({'dur': self.itemDuration})
         except Exception:
             pass
         self.log("[SC] action: %s" % str(data))
-        util.post_json(url, data, {'X-UID': sctop.uid})
+        url = self.parent.provider._url(url)
+        sctop.post_json(url, data, {'X-UID': sctop.uid})
         

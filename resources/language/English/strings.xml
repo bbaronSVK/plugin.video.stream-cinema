@@ -30,11 +30,14 @@
     <string id="30401">TVShow folder</string>
     <string id="30402">Subscription service sleep on start</string>
     <string id="30403">Default show check time (days)</string>
+    <string id="30404">Automatically add movies to the library</string>
     
     <string id="30050">SpeedTest</string>
     <string id="30500">Run internet speed test...</string>
-    <string id="30502"></string>
     <string id="30501">Select download size</string>
+    <string id="30502">Turning on filtering may not show all available content</string>
+    <string id="30503">Download speed (webshare.cz)</string>
+    <string id="30504">Filter stream by download speed</string>
     <!-- "250KB", "500KB", "1MB", "2MB", "4.5MB", "7.5MB", "12MB", "17MB", "24MB", "31MB" -->
     <string id="30551">250KB - slow internet connection</string> 
     <string id="30552">500KB</string> 
@@ -46,6 +49,16 @@
     <string id="30558">17MB</string> 
     <string id="30559">24MB</string> 
     <string id="30560">31MB - very fast internet connection</string> 
+
+    <string id="30060">Aut. stream selection</string>
+    <string id="30600">Enable automatic stream selection</string>
+    <string id="30601">Selection priority</string>
+    <string id="30602">Filter by audio</string>
+    <string id="30603">Primary language</string>
+    <string id="30604">Secondary language</string>
+    <string id="30605">Filter by quality</string>
+    <string id="30606">Quality</string>
+    <string id="30607">Remove HEVC stream</string>
 
     <!-- texty v menu -->
     <string id="30901">Movies</string>
@@ -98,7 +111,12 @@
     <string id="30946">Do you want to open the settings?</string>
     <string id="30947">You have not an active VIP on WebShare</string>
     <string id="30948">Remain the only %s of days with WebShare VIP</string>
-        
+    <string id="30949">Select stream</string>
+    <string id="30950">New</string>
+    <string id="30951">People (Movies)</string>
+    <string id="30952">People (Series)</string>
+    <string id="30953">Search</string>
+    
     <!-- dni v tyzdni -->
     <string id="30911">Monday</string>
     <string id="30912">Tuesday</string>    

@@ -30,11 +30,14 @@
     <string id="30401">Priečinok pre seriály</string>
     <string id="30402">Oneskoriť štart služby o (minuty)</string>
     <string id="30403">Predvolený čas pre obnovu seriálu (dni)</string>
+    <string id="30404">Automaticky pridávať filmy do knižnice</string>
     
     <string id="30050">SpeedTest</string>
     <string id="30500">Spustiť test pripojenia...</string>
-    <string id="30502"></string>
     <string id="30501">Vyber sťahované veľkosti súborov</string>
+    <string id="30502">Zapnutím filtrovania sa nemusí zobrazovať všetok dostupný obsah</string>
+    <string id="30503">Nameraná rýchlosť (webshare.cz)</string>
+    <string id="30504">Filtrovať streamy podľa rýchlosti</string>
     <!-- "250KB", "500KB", "1MB", "2MB", "4.5MB", "7.5MB", "12MB", "17MB", "24MB", "31MB" -->
     <string id="30551">250KB - pomalé pripojenie</string> 
     <string id="30552">500KB</string> 
@@ -47,6 +50,16 @@
     <string id="30559">24MB</string> 
     <string id="30560">31MB - optika</string> 
 
+    <string id="30060">Aut. výber streamu</string>
+    <string id="30600">Povoliť automatický výber streamu</string>
+    <string id="30601">Priorita výberu</string>
+    <string id="30602">Filtrovať podla audia</string>
+    <string id="30603">Primárny jazyk</string>
+    <string id="30604">Sekundarny jazyk</string>
+    <string id="30605">Filtrovať podla kvality</string>
+    <string id="30606">Vybraná kvalita</string>
+    <string id="30607">Vyradiť HEVC stream</string>
+    
     <!-- texty v menu -->
     <string id="30901">Filmy</string>
     <string id="30902">Seriály</string>
@@ -98,6 +111,11 @@
     <string id="30946">Chceš otvoriť nastavenia?</string>
     <string id="30947">Nemáš aktívne VIP na WebShare.cz</string>
     <string id="30948">Ostáva ti už len %s dní s VIP na WebShare.cz</string>
+    <string id="30949">Vybrať stream</string>
+    <string id="30950">Novinky</string>
+    <string id="30951">Ľudia (filmy)</string>
+    <string id="30952">Ľudia (seriály)</string>
+    <string id="30953">Vyhľadávanie</string>
         
     <!-- dni v tyzdni -->
     <string id="30911">Pondelok</string>

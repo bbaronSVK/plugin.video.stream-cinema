@@ -31,11 +31,14 @@
     <string id="30401">Složka pro seriály</string>
     <string id="30402">Zpozdit start služby o (minuty)</string>
     <string id="30403">Čas pro obnovu seriálu (dni)</string>
+    <string id="30404">Automaticky přidávat filmy do knihovny</string>    
     
     <string id="30050">SpeedTest</string>
     <string id="30500">Spustit test připojení...</string>
-    <string id="30502"></string>
     <string id="30501">Vyber stahované velikosti souborů</string>
+    <string id="30502">Zapnutím filtrování se nemusí zobrazovat všechen dostupný obsah</string>
+    <string id="30503">Naměrená rychlost (webshare.cz)</string>
+    <string id="30504">Filtrovat streamy podle rychlosti</string>
     <!-- "250KB", "500KB", "1MB", "2MB", "4.5MB", "7.5MB", "12MB", "17MB", "24MB", "31MB" -->
     <string id="30551">250KB - pomale připojení</string> 
     <string id="30552">500KB</string> 
@@ -48,6 +51,16 @@
     <string id="30559">24MB</string> 
     <string id="30560">31MB - optika</string> 
 
+    <string id="30060">Aut. výběr streamu</string>
+    <string id="30600">Povolit automatický výběr streamu</string>
+    <string id="30601">Priorita výběru</string>
+    <string id="30602">Filtrování podle audia</string>
+    <string id="30603">Primární jazyk</string>
+    <string id="30604">Sekundární jazyk</string>
+    <string id="30605">Filtrování podle kvality</string>
+    <string id="30606">Vybraná kvalita</string>
+    <string id="30607">Vyradit HEVC stream</string>
+
     <!-- texty v menu -->
     <string id="30901">Filmy</string>
     <string id="30902">Seriály</string>
@@ -59,7 +72,7 @@
     <string id="30908">Žánr</string>
     <string id="30909">Rok</string>
     <string id="30910">TV dnes</string>
-    
+
     <string id="30918">Přidat nové do knihovny</string>
     <string id="30919">Série</string>
     
@@ -99,7 +112,12 @@
     <string id="30946">Chcete otvoriť nastavenia?</string>
     <string id="30947">Nemate aktivne VIP na WebShare</string>
     <string id="30948">Zbývá ti už jen %s dní s VIP na WebShare VIP</string>
-
+    <string id="30949">Vybrat stream</string>
+    <string id="30950">Novinky</string>
+    <string id="30951">Lidé (filmy)</string>
+    <string id="30952">Lidé (seriály)</string>
+    <string id="30953">Vyhledávání</string>
+    
     <!-- dni v tyzdni -->
     <string id="30911">Pondělí</string>
     <string id="30912">Úterý</string>    

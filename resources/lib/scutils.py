@@ -24,12 +24,15 @@ import xbmcprovider
 import xbmcvfs
 import xmlrpclib
 import zlib
+from collections import defaultdict
+from provider import ResolveException
 
 class KODISCLib(xbmcprovider.XBMCMultiResolverContentProvider):
     last_run = 0
     sleep_time = 1000 * 1 * 60
     subs = None
     mPlayer = None
+    force = False
 
     def __init__(self, provider, settings, addon):
         xbmcprovider.XBMCMultiResolverContentProvider.__init__(self, provider, settings, addon)
@@ -53,6 +56,28 @@ class KODISCLib(xbmcprovider.XBMCMultiResolverContentProvider):
             if 'items' in b:
                 self._parse_settings(b['items'])
         util.info('--------------------------------------------------------')
+
+    def run(self, params):
+        if params == {} or params == self.params():
+            return self.root()
+        if 'list' in params.keys():
+            self.list(self.provider.list(params['list']))
+            return xbmcplugin.endOfDirectory(int(sys.argv[1]))
+        if 'down' in params.keys():
+            self.force = True
+            return self.download({'url': params['down'], 'title': params['title'], 'force': '1'})
+        if 'play' in params.keys():
+            return self.play({'url': params['play'], 'info': params})
+        if 'search-list' in params.keys():
+            return self.search_list()
+        if 'search' in params.keys():
+            return self.do_search(params['search'])
+        if 'search-remove' in params.keys():
+            return self.search_remove(params['search-remove'])
+        if 'search-edit' in params.keys():
+            return self.search_edit(params['search-edit'])
+        if self.run_custom:
+            return self.run_custom(params)
 
     def add_item_to_library(self, item_path, item_url):
         error = False
@@ -153,22 +178,61 @@ class KODISCLib(xbmcprovider.XBMCMultiResolverContentProvider):
             xbmc.executebuiltin('UpdateLibrary(video)')
         elif not error and not ('notify' in params):
             self.showNotification(self.getString(30901), 'No new content')
-        if error and not ('notify' in params):
+        elif error and not ('notify' in params):
             self.showNotification('Failed, Please check kodi logs', 'Linking')
         
     def movienfo(self, data):
         out = ''
-        if 'imdb' in data and int(data['imdb']) > 0:
+        if 'imdb' in data and data['imdb'] is not None and int(data['imdb']) > 0:
             out += "http://www.imdb.com/title/tt%08d/\n" % int(data['imdb'])
-        if 'tmdb' in data and int(data['tmdb']) > 0:
+        if 'tmdb' in data and data['tmdb'] is not None and int(data['tmdb']) > 0:
             out += "https://www.themoviedb.org/movie/%d/\n" % int(data['tmdb'])
-        if 'csfd' in data and int(data['csfd']) > 0:
+        if 'csfd' in data and data['csfd'] is not None and int(data['csfd']) > 0:
             out += "http://www.csfd.cz/film/%d-\n" % int(data['csfd'])
-        if 'tvdb' in data and int(data['tvdb']) > 0:
+        if 'tvdb' in data and data['tvdb'] is not None and int(data['tvdb']) > 0:
             out += "http://thetvdb.com/index.php?tab=series&id=%d\n" % int(data['tvdb'])
             
         util.debug("XML: %s" % out)
         return str(out)
+    
+    def add_item_trakt(self, params):
+        if trakt.getTraktCredentialsInfo() == True:
+            util.debug("[SC] add_item_trakt: %s" % str(params))
+            ids = trakt.getList(params['tl'])
+            data = self.provider._json(self.provider._url("/Search/?%s" % urllib.urlencode({'ids': json.dumps(ids)})))
+            if 'menu' in data:
+                error = False
+                new = False
+                e = False
+                n = False
+                
+                dialog = sctop.progressDialog
+                dialog.create('Stream Cinema CZ & SK', 'Add all to library')
+                total = float(len(data['menu']))
+                num = 0
+                for i in data['menu']:
+                    num += 1
+                    perc = float(num / total) * 100
+                    util.info("percento: %d - (%d / %d)" % (int(perc), int(num), int(total)))
+                    if dialog.iscanceled():
+                        return                    
+                    try:
+                        dialog.update(int(perc), "%s" % (i['title']))
+                    except Exception:
+                        util.debug('[SC] ERR: %s' % str(traceback.format_exc()) )
+                        pass
+                    (e, n) = self.add_item({'notify':False,'id':i['id']}, False)
+                        
+                    error |= e
+                    new |= n
+                if not error and new:
+                    self.showNotification(self.getString(30901), 'New content')
+                    xbmc.executebuiltin('UpdateLibrary(video)')
+                elif not error:
+                    self.showNotification(self.getString(30901), 'No new content')
+                elif error:
+                    self.showNotification('Failed, Please check kodi logs', 'Linking')
+                    
         
     def add_item(self, params, addToSubscription=False, data=None):
         error = False
@@ -230,6 +294,15 @@ class KODISCLib(xbmcprovider.XBMCMultiResolverContentProvider):
         next_check = last_run + (int(self.getSetting('refresh_time')) * 3600 * 24)
         return next_check < time.time()
     
+    def csearch(self, params):
+        util.debug("[SC] vyhladavanie: %s " % str(params))
+        kb = sctop.keyboard()
+        kb.doModal()
+        if kb.isConfirmed():
+            what = kb.getText()
+            self.list(self.provider.search(what, params['id']))
+            return xbmcplugin.endOfDirectory(int(sys.argv[1]))
+    
     def evalSchedules(self):
         if not self.scanRunning() and not self.isPlaying():
             notified = False
@@ -238,12 +311,16 @@ class KODISCLib(xbmcprovider.XBMCMultiResolverContentProvider):
             util.debug("[SC] Subs: %s" % str(subs))
             new_items = False
             for iid, data in subs.iteritems():
+                util.debug("[SC] sub id: %s" % str(iid))
                 if xbmc.abortRequested:
                     util.info("[SC] Exiting")
                     return
                 if self.scanRunning() or self.isPlaying():
                     self.cache.delete("subscription.last_run")
                     return
+                if iid == 'movie':
+                    util.debug("[SC] movie nepokracujem")
+                    continue
                 if self.canCheck(data['last_run']):
                     if not notified:
                         self.showNotification('Subscription', 'Chcecking')
@@ -254,11 +331,31 @@ class KODISCLib(xbmcprovider.XBMCMultiResolverContentProvider):
                     data['last_run'] = time.time()
                     subs[iid] = data
                     self.setSubs(subs)
+                    
+            if sctop.getSettingAsBool('download-movies'):
+                if 'movie' in subs:
+                    data = subs['movie']
+                else:
+                    data = {'last_run': time.time()}
+                
+                util.debug("[SC] data: %s" % str(data))
+                    
+                if self.canCheck(data['last_run']):
+                    util.debug("[SC] movie stahujeme")
+                    data['last_run'] = time.time()
+                    subs['movie'] = data
+                    self.setSubs(subs)
+                    self.add_multi_item({'id':'movies'}, False)
+                else:
+                    util.debug("[SC] movie netreba stahovat")
+            else:
+                util.debug("[SC] movie library disabled")
+                
             if new_items:
                 xbmc.executebuiltin('UpdateLibrary(video)')
             notified = False
         else:
-            util.info("SOSAC Scan skipped")
+            util.info("[SC] Scan skipped")
 
     def getTVDB(self, params):
         if 'imdb' in params:
@@ -294,6 +391,7 @@ class KODISCLib(xbmcprovider.XBMCMultiResolverContentProvider):
             subs = False
             if action == 'remove-from-sub':
                 subs = self.getSubs()
+                util.debug("[SC] subs: %s" % str(subs))
                 if params['id'] in subs.keys():
                     del subs[params['id']]
                     self.setSubs(subs)
@@ -309,6 +407,9 @@ class KODISCLib(xbmcprovider.XBMCMultiResolverContentProvider):
                     self.add_item(params, subs)
                 if subs:
                     xbmc.executebuiltin('Container.Refresh')
+            if action == 'add-to-lib-trakt':
+                self.add_item_trakt(params)
+                return
             if action == 'subs':
                 self.evalSchedules()
             if action == 'rsubs':
@@ -339,13 +440,13 @@ class KODISCLib(xbmcprovider.XBMCMultiResolverContentProvider):
                 x = [g(30551), g(30552), g(30553), g(30554), g(30555), 
                     g(30556), g(30557), g(30558), g(30559), g(30560)]
                 ret = [1500, 2000]
-                run = 2
+                run = 4
                 try:
                     ret =sctop.dialog.multiselect(g(30501), x, preselect=[5,6])
                 except:
                     try:
                         xret = sctop.dialog.select(g(30501), x)
-                        run = 5
+                        run = 8
                         ret = [xret]
                     except:
                         pass
@@ -368,15 +469,27 @@ class KODISCLib(xbmcprovider.XBMCMultiResolverContentProvider):
                 bedown = speedtest.download()
                 pg.update(100)
                 pg.close()
+                sctop.setSetting('bitrate', int(wsdown))
+                sctop.setSetting('bitrateformated', str(pretty_speed(wsdown)))
                 sctop.dialog.ok(g(30050), "%s: %s" % (wspeedtest.host, str(pretty_speed(wsdown))), "%s: %s" % (speedtest.host, str(pretty_speed(bedown))))
                 sctop.openSettings('1.0')
-                
+            if action == 'play-force':
+                self.force = True;
+                try :
+                    self.play({'url': params['play'], 'info': params})
+                except:
+                    util.debug("[SC] ERROR: %s" % str(traceback.format_exc()))
+                    pass
+                util.debug("[SC] ----------------------------------------")
             if action == 'trakt':
                 movies = self.getTraktLastActivity('series') #trakt.getWatchedActivity()
                 util.debug("[SC] movies: %s" % str(movies))
+            if action == 'csearch':
+                return self.csearch(params)
             if action == 'test':
-                data = myPlayer.MyPlayer.executeJSON({'jsonrpc': '2.0', 'id': 0, 'method': 'VideoLibrary.GetMovies', 'params': {'properties': ['title', 'imdbnumber', 'year', 'playcount', 'lastplayed', 'file', 'dateadded', 'runtime', 'userrating']}})
-                util.debug("[SC] RPC: %s" % str(json.dumps(data)))
+                self.evalSchedules()
+                #data = myPlayer.MyPlayer.executeJSON({'jsonrpc': '2.0', 'id': 0, 'method': 'VideoLibrary.GetMovies', 'params': {'properties': ['title', 'imdbnumber', 'year', 'playcount', 'lastplayed', 'file', 'dateadded', 'runtime', 'userrating']}})
+                #util.debug("[SC] RPC: %s" % str(json.dumps(data)))
         elif 'cmd' in params:
             try:
                 if '^;^' in params['cmd']:
@@ -427,8 +540,32 @@ class KODISCLib(xbmcprovider.XBMCMultiResolverContentProvider):
             util.debug("[SC] uniq err: %s" % str(traceback.format_exc()))
             pass
 
+    def list(self, items):
+        params = self.params()
+        for item in items:
+            if item['type'] == 'dir':
+                self.render_dir(item)
+            elif item['type'] == 'next':
+                params.update({'list': item['url']})
+                xbmcutil.add_dir(xbmcutil.__lang__(30007), params, xbmcutil.icon('next.png'))
+            elif item['type'] == 'prev':
+                params.update({'list': item['url']})
+                xbmcutil.add_dir(xbmcutil.__lang__(30008), params, xbmcutil.icon('prev.png'))
+            elif item['type'] == 'new':
+                params.update({'list': item['url']})
+                xbmcutil.add_dir(xbmcutil.__lang__(30012), params, xbmcutil.icon('new.png'))
+            elif item['type'] == 'top':
+                params.update({'list': item['url']})
+                xbmcutil.add_dir(xbmcutil.__lang__(30013), params, xbmcutil.icon('top.png'))
+            elif item['type'] == 'video':
+                self.render_video(item)
+            else:
+                self.render_default(item)
+                
     def play(self, item):
         util.debug("PLAY ITEM: %s" % str(item))
+        if 'info' in item and 'force' in item['info'] or 'force' in item:
+            self.force = True
         stream = self.resolve(item['url'])
         
         if stream:
@@ -481,6 +618,10 @@ class KODISCLib(xbmcprovider.XBMCMultiResolverContentProvider):
                 #util.debug("Seturnm titulky: " + str(stream['subs']))
                 li.setSubtitles([stream['subs']])
             self.win.setProperty(sctop.__scriptid__, sctop.__scriptid__)
+            util.debug("[SC] mozem zacat prehravat %s" % str(stream))
+            if self.force == True:
+                return xbmc.Player().play(stream['url'], li, False, -1)
+            util.debug("[SC] setResolvedUrl")
             xbmcplugin.setResolvedUrl(int(sys.argv[1]), True, li)
         
     def _settings(self):
@@ -529,11 +670,13 @@ class KODISCLib(xbmcprovider.XBMCMultiResolverContentProvider):
 
     def render_dir(self,item):
         params = self.params()
-        if item['url'].startswith('cmd://'):
-            #util.debug('command!!!')
-            params.update({'cmd':item['url'][6:]})
-        else:
-            params.update({'list':item['url']})
+        params.update(item)
+        if 'url' in item:
+            if item['url'].startswith('cmd://'):
+                #util.debug('command!!!')
+                params.update({'cmd':item['url'][6:]})
+            else:
+                params.update({'list':item['url']})
         title = str(item['title'])
         try:
             title.index('$')
@@ -957,5 +1100,154 @@ class KODISCLib(xbmcprovider.XBMCMultiResolverContentProvider):
             for i in range(remove):
                 last.pop()
         self.setLast(last)
+
+    def filter_bitrate(self, resolved):
+        bt = sctop.getSettingAsInt('bitrate')
+        if bt > 0 and sctop.getSettingAsBool('bitratefilter'):
+            tmp = []
+            for s in resolved:
+                util.debug("[SC] bitrate video %s vs %s" % (str(s.get('bitrate', 0)), str(bt)))
+                if int(s.get('bitrate', 0)) <= bt:
+                    util.debug("[SC] pridavam BT %s" % str(s.get('bitrate', 0)))
+                    tmp.append(s)
+                else:
+                    util.debug("[SC] pomaly net pre BT %s" % str(s.get('bitrate', 0)))
+            if len(tmp) > 1:
+                resolved = tmp
+            
+        return resolved
+    
+    def _filter_lang(self, resolved, lang, prio):
+        import re
+
+        tmp = []
+        util.debug("[SC] filter lang %s" % str(lang))
+        for s in resolved:
+            if s['quality'] == '3D-SBS':
+                continue
+            if 'lang' in s and s['lang'] != '' and s['lang'] == lang:
+                util.debug("[SC] pridavam stream s jazykom %s" % str(lang))
+                tmp.append(s)
+        
+        if prio == True and len(tmp) > 1:
+            tmpq = self.filter_quality(tmp, False)
+            if len(tmpq) >= 1:
+                util.debug("[SC] vyberame najlepsi stream z %s" % str(tmpq))
+                return [tmpq[0]]
+        elif len(tmp) == 1:
+            return tmp
+        
+        return [] if prio == True else resolved
+        
+    def filter_lang(self, resolved, prio = False):
+        if sctop.getSettingAsBool('filter_audio') == False:
+            util.debug("[SC] nemame zapnute filtrovanie podla audia")
+            return resolved
+        
+        util.debug("[SC] lang.1 %s" % sctop.getSetting('filter_lang.1'))
+        tmp = self._filter_lang(resolved, sctop.getSetting('filter_lang.1'), prio)
+        if len(tmp) == 0:
+            util.debug("[SC] lang.2 %s" % sctop.getSetting('filter_lang.2'))
+            tmp = self._filter_lang(resolved, sctop.getSetting('filter_lang.2'), prio)
+            
+        if len(tmp) == 1:
+            util.debug("[SC] mame vybrany len jeden stream %s" % str(tmp))
+            return tmp
+        
+        if len(tmp) >= 1 and prio == False:
+            util.debug("[SC] prioprita podla videa, vyberame prvy stream s audiom")
+            resolved = [tmp[0]]
+
+        return resolved
+    
+    def filter_quality(self, resolved, prio = False):
+        if sctop.getSettingAsBool('filter_video') == False:
+            util.debug("[SC] nemame zapnute filtrovanie podla kvality videa")
+            return resolved
+        
+        res = sctop.getSetting('filter_quality')
+        util.debug("[SC] filter kvality nastaveny na %s" % str(res))
+        sources = {}
+        for item in resolved:
+            if item['quality'] == '3D-SBS':
+                continue
+                
+            if item['quality'] in sources.keys():
+                sources[item['quality']].append(item)
+            else:
+                sources[item['quality']] = [item]
+  
+        if prio == True and res in sources:
+            return self.filter_lang(sources[res])
+  
+        if prio == False and res in sources:
+            util.debug('[SC] mame prioritu vyberame prvy stream s videom pre rozlisenie %s' % str(res))
+            return [sources[res][0]]
+        
+        return resolved
+    
+    def filter_hevc(self, resolved):
+        tmp = []
+        for i in resolved:
+            if not ('vinfo' in i and re.search('HEVC', i['vinfo'])):
+                tmp.append(i)
+        return tmp
+    
+    def filter_priority(self, resolved):
+        if sctop.getSettingAsBool('filter_enable') == False:
+            util.debug("[SC] nemame zapnuty filter streamov, tak nic nefiltrujeme")
+            return resolved
+        
+        if sctop.getSettingAsBool('filter_hevc'):
+            resolved = self.filter_hevc(resolved)
+        
+        if sctop.getSettingAsBool('filter_audio') and not sctop.getSettingAsBool('filter_video'):
+            return self.filter_lang(resolved, False)
+
+        if not sctop.getSettingAsBool('filter_audio') and sctop.getSettingAsBool('filter_video'):
+            return self.filter_quality(resolved, False)
+        
+        util.debug("[SC] pokusame sa filtrovat stream podla audia a kvality")
+        if sctop.getSetting('filter_prio') == 'Audio':
+            util.debug("[SC] priorita na audio stopu")
+            resolved = self.filter_lang(resolved, True)
+        else:
+            util.debug("[SC] priorita na video stopu")
+            resolved = self.filter_quality(resolved, True)
+        
+        return resolved
+
+    def filter_resolved(self, resolved):
+        resolved = self.filter_bitrate(resolved)
+        resolved = self.filter_priority(resolved)    
+        return resolved
+
+    def resolve(self, url):
+        item = self.provider.video_item()
+        item.update({'url': url})
+
+        def select_cb(resolved):
+            if len(resolved) > 1 and self.force == False:
+                resolved = self.filter_resolved(resolved)
+                
+            if len(resolved) > 1 or self.force == True:
+                # if user requested something but 'ask me' or filtered result is exactly 1
+                dialog = xbmcgui.Dialog()
+                opts = []
+                for r in resolved:
+                    d = defaultdict(lambda: '', r)
+                    if d['sinfo'] == True:
+                        d['lang'] = '%s+tit' % d['lang']
+                    opts.append('[B][%s] %s%s[/B] - %s%s' % (d['lang'], d['quality'], d['vinfo'], d['size'], d['ainfo']))
+                ret = dialog.select(resolved[0]['title'], opts)
+                if ret >= 0:
+                    return resolved[ret]
+                else:
+                    return None
+            return resolved[0]
+        try:
+            return self.provider.resolve(item, select_cb=select_cb)
+        except ResolveException, e:
+            self._handle_exc(e)
 
 buggalo.SUBMIT_URL = sctop.submiturl

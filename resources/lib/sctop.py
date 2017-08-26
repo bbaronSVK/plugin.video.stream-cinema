@@ -18,7 +18,7 @@ __set__ = __addon__.getSetting
 __language__ = __addon__.getLocalizedString
 
 BASE_URL="http://stream-cinema.online/kodi"
-API_VERSION="1.1"
+API_VERSION="1.2"
 player = None
 uid = None
 traktlistlast = None
@@ -175,6 +175,7 @@ def post(url, data, headers={}, output="content"):
     postdata = urllib.urlencode(data)
     req = urllib2.Request(url, postdata, headers)
     req.add_header('User-Agent', util.UA)
+    util.debug("[SC] post: %s" % url )
     if util._cookie_jar is not None:
         util._cookie_jar.add_cookie_header(req)
     try:
@@ -216,7 +217,7 @@ def post_json(url, data, headers={}, output="content"):
 def _create_plugin_url(params, plugin=sys.argv[0]):
     url = []
     for key in params.keys():
-        value = str(xbmcutil.decode_html(params[key]))
+        value = str(params[key])
         value = value.encode('utf-8')
         url.append(key + '=' + value.encode('hex',) + '&')
     return plugin + '?' + ''.join(url)
