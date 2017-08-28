@@ -216,7 +216,7 @@ class StreamCinemaContentProvider(ContentProvider):
     def ctx(self, item, data):
         menu = {}
         #util.debug("CTX ITM: %s" % str(item))
-        util.debug("CTX DAT: %s" % str(data))
+        #util.debug("CTX DAT: %s" % str(data))
         #if 'dir' in data and data['dir'] == 'tvshows':
         
         if 'tl' in item:
@@ -251,7 +251,7 @@ class StreamCinemaContentProvider(ContentProvider):
             menu.update({"$30926": {"action": "add-to-lib", "id": data['id'], "title": data['title'], "force": "1"}})
             #util.debug("[SC] MAME menu!")
             
-        util.debug("[SC] data %s" % str(data))
+        #util.debug("[SC] data %s" % str(data))
         if 'season' in data or data.get('id') == 'series':
             if data['id'] in self.subs.keys() and data['id'] != 'series':
                 item['title'] = "[COLOR red]*[/COLOR] %s" % item['title']
@@ -272,6 +272,9 @@ class StreamCinemaContentProvider(ContentProvider):
     @buggalo.buggalo_try_except({'method': 'scinema.search'})
     def search(self, keyword, id=None):
         sq = {'search': keyword, 'id': id}
+        if str(id).startswith('search-people'):
+            sq.update({'ms':'1'})
+        util.debug("[SC] search %s" % str(sq))
         return self.items(None, self._json(self._url('/Search/'), sq))
 
     @buggalo.buggalo_try_except({'method': 'scinema._resolve'})
