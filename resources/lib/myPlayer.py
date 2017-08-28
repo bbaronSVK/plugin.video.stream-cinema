@@ -67,7 +67,7 @@ class MyPlayer(xbmc.Player):
         if self.ids is not None and trakt.getTraktCredentialsInfo() == True \
             and trakt.getTraktAddonMovieInfo() == False:
             util.debug("[SC] nemame instalovany trakt.tv, tak oznacime film/serial za videny")
-            if self.se.isdigit() and self.ep.isdigit():
+            if self.se is not None and self.se.isdigit() and self.ep is not None and self.ep.isdigit():
                 util.debug("[SC] serial [%s]x[%s]" % (str(self.se), str(self.ep)))
                 trakt.markEpisodeAsWatchedT(self.ids, self.se, self.ep)
             else:
@@ -183,7 +183,8 @@ class MyPlayer(xbmc.Player):
                     method = 'VideoLibrary.GetMovies'
                     try:
                         if self.ids is not None and trakt.getTraktCredentialsInfo() == True:
-                            trakt.addTraktCollection({'movies':[{'ids':self.ids}]})
+                            #trakt.addTraktCollection({'movies':[{'ids':self.ids}]})
+                            pass
                     except:
                         self.log("[SC] trakt.tv error - nepodarilo sa pridat film do kolekcie: %s" % str(traceback.format_exc()))
                         pass
@@ -202,7 +203,8 @@ class MyPlayer(xbmc.Player):
                                 break
                 else:
                     if self.ids is not None and trakt.getTraktCredentialsInfo() == True:
-                        trakt.addTraktCollection({'shows':[{'ids':self.ids}]})
+                        #trakt.addTraktCollection({'shows':[{'ids':self.ids}]})
+                        pass
                     if self.parent is not None:
                         try:
                             self.parent.addLast(self.scid)

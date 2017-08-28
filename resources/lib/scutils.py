@@ -431,7 +431,7 @@ class KODISCLib(xbmcprovider.XBMCMultiResolverContentProvider):
                 if trakt.getTraktCredentialsInfo() == True:
                     util.debug("[SC] params: %s" % str(params))
                     ids = trakt.getList(params['id'])
-                    self.list(self.provider.items(self.provider._url("/Search/?%s" % urllib.urlencode({'ids': json.dumps(ids)}))))
+                    self.list(self.provider.items(None, self.provider._json("/Search/", {'ids': json.dumps(ids)})))
                 return xbmcplugin.endOfDirectory(int(sys.argv[1]))
             if action == 'authTrakt':
                 trakt.authTrakt()

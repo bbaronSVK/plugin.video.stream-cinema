@@ -99,9 +99,9 @@ class StreamCinemaContentProvider(ContentProvider):
         return nurl
 
     @buggalo.buggalo_try_except({'method': 'scinema._json'})
-    def _json(self, url):
+    def _json(self, url, post=False):
         try:
-            return json.loads(self.get_data_cached(url))
+            return json.loads(self.get_data_cached(url, post))
         except Exception, e:
             util.debug("[SC] chybna URL %s" % str(url))
             util.error(e)
@@ -167,7 +167,7 @@ class StreamCinemaContentProvider(ContentProvider):
         
     @buggalo.buggalo_try_except({'method': 'scinema.get_data_cached'})
     #@cached(ttl=1)
-    def get_data_cached(self, url):
+    def get_data_cached(self, url, post=False):
         try:
             url.index('/json/')
             self._oldapi()
@@ -180,8 +180,11 @@ class StreamCinemaContentProvider(ContentProvider):
             'Accept' : 'application/vnd.bbaron.kodi-plugin-v%s+json' % (sctop.API_VERSION),
         }
         url = self._url(url)
-        util.debug("GET URL: %s" % url)
         try:
+            if post != False:
+                util.debug("POST URL: %s %s" % (url, str(post)))
+                return util.post(url, post, headers)
+            util.debug("GET URL: %s" % url)
             return util.request(url, headers)
         except:
             sctop.dialog.ok("error", url)
@@ -269,7 +272,7 @@ class StreamCinemaContentProvider(ContentProvider):
     @buggalo.buggalo_try_except({'method': 'scinema.search'})
     def search(self, keyword, id=None):
         sq = {'search': keyword, 'id': id}
-        return self.items(self._url('/Search/?' + urllib.urlencode(sq)))
+        return self.items(None, self._json(self._url('/Search/'), sq))
 
     @buggalo.buggalo_try_except({'method': 'scinema._resolve'})
     def _resolve(self, itm):
