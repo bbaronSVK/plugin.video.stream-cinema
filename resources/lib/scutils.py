@@ -490,7 +490,7 @@ class KODISCLib(xbmcprovider.XBMCMultiResolverContentProvider):
                 self.list(self.provider.items(self.provider._url("/Search/actor?%s" % urllib.urlencode({'id':params['id'], 'type': params['subtype']}))))
                 return xbmcplugin.endOfDirectory(int(sys.argv[1]))
             if action == 'test':
-                #self.evalSchedules()
+                self.evalSchedules()
                 #data = myPlayer.MyPlayer.executeJSON({'jsonrpc': '2.0', 'id': 0, 'method': 'VideoLibrary.GetMovies', 'params': {'properties': ['title', 'imdbnumber', 'year', 'playcount', 'lastplayed', 'file', 'dateadded', 'runtime', 'userrating']}})
                 #util.debug("[SC] RPC: %s" % str(json.dumps(data)))
         elif 'cmd' in params:
