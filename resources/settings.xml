@@ -62,4 +62,5 @@
         <setting label="30404" id="download-movies" type="bool" default="false" />
     </category>
     <setting label="" id="uid" type="text" default="" visible="false" />
+    <setting label="" id="ver" type="text" default="" visible="false" />
 </settings>

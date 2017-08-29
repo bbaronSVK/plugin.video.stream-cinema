@@ -116,6 +116,8 @@
     <string id="30951">People (Movies)</string>
     <string id="30952">People (Series)</string>
     <string id="30953">Search</string>
+    <string id="30954">New version of plugin</string>
+    <string id="30955">New version of plugin (%s) has been uploaded. The plugin needs to be updated to work properly. If you have an automatic update, you can update yourself by clicking OK. If this does not happen, update the plugin manually.</string>
     
     <!-- dni v tyzdni -->
     <string id="30911">Monday</string>

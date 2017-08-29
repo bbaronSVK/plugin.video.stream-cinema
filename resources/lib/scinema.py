@@ -152,6 +152,14 @@ class StreamCinemaContentProvider(ContentProvider):
         
         if "setPluginFanart" in data:
             xbmcplugin.setPluginFanart(int(sys.argv[1]), data["setPluginFanart"])
+            
+        if "version" in data:
+            util.info("[SC] kontrola verzie: %s %s" % (str(sctop.addonInfo('version')), data["version"]))
+            if sctop.addonInfo('version') != data["version"] and sctop.getSetting('ver') != data['version']:
+                sctop.dialog.ok(sctop.getString(30954), sctop.getString(30955) % data['version'])
+                xbmc.executebuiltin('UpdateAddonRepos')
+                sctop.setSetting('ver', data['version'])
+            pass
 
     @buggalo.buggalo_try_except({'method': 'scinema.categories'})
     def categories(self):

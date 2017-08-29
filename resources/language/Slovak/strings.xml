@@ -116,6 +116,8 @@
     <string id="30951">Ľudia (filmy)</string>
     <string id="30952">Ľudia (seriály)</string>
     <string id="30953">Vyhľadávanie</string>
+    <string id="30954">Nová verzia pluginu</string>
+    <string id="30955">Vyšla nová verzia pluginu (%s). Pre správne fungovanie je potrebné plugin aktualizovať. Ak máte automatickú aktualizaciu, tak sa vám plugin sám aktualizuje po kliknuti na OK. Ak sa tak nestane, aktualizujte plugin ručne.</string>
         
     <!-- dni v tyzdni -->
     <string id="30911">Pondelok</string>

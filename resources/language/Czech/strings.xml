@@ -117,6 +117,8 @@
     <string id="30951">Lidé (filmy)</string>
     <string id="30952">Lidé (seriály)</string>
     <string id="30953">Vyhledávání</string>
+    <string id="30954">Nová verze pluginu</string>
+    <string id="30955">Byla nahrána nová verze pluginu (%s). Zásuvný modul musí být aktualizován tak, aby fungoval správně. Pokud máte automatickou aktualizaci, můžete se aktualizovat kliknutím na tlačítko OK. Pokud se tak nestane, aktualizujte plugin ručně.</string>
     
     <!-- dni v tyzdni -->
     <string id="30911">Pondělí</string>
