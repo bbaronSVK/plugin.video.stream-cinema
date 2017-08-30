@@ -221,6 +221,7 @@ class StreamCinemaContentProvider(ContentProvider):
         item = self.ctx(item, m)
         return item
     
+    @buggalo.buggalo_try_except({'method': 'scinema.ctx'})
     def ctx(self, item, data):
         menu = {}
         #util.debug("CTX ITM: %s" % str(item))
@@ -352,6 +353,7 @@ class StreamCinemaContentProvider(ContentProvider):
         else:
             return self._resolve(item)
 
+    @buggalo.buggalo_try_except({'method': 'scinema.keyboard'})
     def keyboard(self, title, action):
         k = xbmc.Keyboard('', title);
         k.doModal()

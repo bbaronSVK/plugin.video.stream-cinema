@@ -219,7 +219,8 @@ def _create_plugin_url(params, plugin=sys.argv[0]):
     for key in params.keys():
         value = str(params[key])
         value = value.encode('utf-8')
-        url.append(key + '=' + value.encode('hex',) + '&')
+        if value.encode('hex') != "": 
+            url.append(key + '=' + value.encode('hex',) + '&')
     return plugin + '?' + ''.join(url)
 
 def merge_dicts(*dict_args):

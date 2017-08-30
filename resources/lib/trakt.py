@@ -191,7 +191,8 @@ def getLists():
             'title': '$30944', 
             #'url': 'cmd://Container.Update("%s")' % \
             'action':'traktShowList', 
-            'id':'watchlist'
+            'id':'watchlist',
+            'tl':'watchlist'
         }
         #,
         #{

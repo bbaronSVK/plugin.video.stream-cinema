@@ -57,10 +57,11 @@ class KODISCLib(xbmcprovider.XBMCMultiResolverContentProvider):
                 self._parse_settings(b['items'])
         util.info('--------------------------------------------------------')
 
+    @buggalo.buggalo_try_except({'method': 'scutils.run'})
     def run(self, params):
         if params == {} or params == self.params():
             return self.root()
-        if 'list' in params.keys():
+        if 'list' in params.keys() and params['list'] != '':
             self.list(self.provider.list(params['list']))
             return xbmcplugin.endOfDirectory(int(sys.argv[1]))
         if 'down' in params.keys():
@@ -79,6 +80,7 @@ class KODISCLib(xbmcprovider.XBMCMultiResolverContentProvider):
         if self.run_custom:
             return self.run_custom(params)
 
+    @buggalo.buggalo_try_except({'method': 'scutils.add_item_to_library'})
     def add_item_to_library(self, item_path, item_url):
         error = False
         new = False
@@ -108,12 +110,14 @@ class KODISCLib(xbmcprovider.XBMCMultiResolverContentProvider):
         util.debug("[SC] add item: %s" % item_path)
         return (error, new)
     
+    @buggalo.buggalo_try_except({'method': 'scutils._link'})
     def _link(self, params):
         arg = {"play": "/Play/%d" % int(params['id']), "title": params['title']}
         if 'season' in params:
             arg.update({"play":"/Play/%d/%d/%d" % (int(params['id']), int(params['season']), int(params['episode']))})
         return sctop._create_plugin_url(arg, 'plugin://%s/' % sctop.__scriptid__)
     
+    @buggalo.buggalo_try_except({'method': 'scutils.add_multi_item'})
     def add_multi_item(self, params, addToSubscription=False):
         error = False
         new = False
@@ -180,7 +184,8 @@ class KODISCLib(xbmcprovider.XBMCMultiResolverContentProvider):
             self.showNotification(self.getString(30901), 'No new content')
         elif error and not ('notify' in params):
             self.showNotification('Failed, Please check kodi logs', 'Linking')
-        
+    
+    @buggalo.buggalo_try_except({'method': 'scutils.movieinfo'})
     def movienfo(self, data):
         out = ''
         if 'imdb' in data and data['imdb'] is not None and int(data['imdb']) > 0:
@@ -195,6 +200,7 @@ class KODISCLib(xbmcprovider.XBMCMultiResolverContentProvider):
         util.debug("XML: %s" % out)
         return str(out)
     
+    @buggalo.buggalo_try_except({'method': 'scutils.add_item_trakt'})
     def add_item_trakt(self, params):
         if trakt.getTraktCredentialsInfo() == True:
             util.debug("[SC] add_item_trakt: %s" % str(params))
@@ -233,7 +239,7 @@ class KODISCLib(xbmcprovider.XBMCMultiResolverContentProvider):
                 elif error:
                     self.showNotification('Failed, Please check kodi logs', 'Linking')
                     
-        
+    @buggalo.buggalo_try_except({'method': 'scutils.add_item'})
     def add_item(self, params, addToSubscription=False, data=None):
         error = False
         new_items = False
@@ -290,10 +296,12 @@ class KODISCLib(xbmcprovider.XBMCMultiResolverContentProvider):
             self.showNotification('Failed, Please check kodi logs', 'Linking')
         return (error, new_items)
 
+    @buggalo.buggalo_try_except({'method': 'scutils.canCheck'})
     def canCheck(self, last_run):
         next_check = last_run + (int(self.getSetting('refresh_time')) * 3600 * 24)
         return next_check < time.time()
     
+    @buggalo.buggalo_try_except({'method': 'scutils.csearch'})
     def csearch(self, params):
         util.debug("[SC] vyhladavanie: %s " % str(params))
         kb = sctop.keyboard()
@@ -303,6 +311,7 @@ class KODISCLib(xbmcprovider.XBMCMultiResolverContentProvider):
             self.list(self.provider.search(what, params['id']))
             return xbmcplugin.endOfDirectory(int(sys.argv[1]))
     
+    @buggalo.buggalo_try_except({'method': 'scutils.evalSchedules'})
     def evalSchedules(self):
         if not self.scanRunning() and not self.isPlaying():
             notified = False
@@ -357,6 +366,7 @@ class KODISCLib(xbmcprovider.XBMCMultiResolverContentProvider):
         else:
             util.info("[SC] Scan skipped")
 
+    @buggalo.buggalo_try_except({'method': 'scutils.getTVDB'})
     def getTVDB(self, params):
         if 'imdb' in params:
             data = self.provider.get_data_cached('http://thetvdb.com/api/GetSeriesByRemoteID.php?=' +
@@ -371,6 +381,7 @@ class KODISCLib(xbmcprovider.XBMCMultiResolverContentProvider):
             pass
         return None
 
+    @buggalo.buggalo_try_except({'method': 'scutils.normalize_filename'})
     def normalize_filename(self, name, validChars=None):
         validFilenameChars = "-_.() %s%s" % (string.ascii_letters, string.digits)
         if (validChars is not None):
@@ -378,11 +389,13 @@ class KODISCLib(xbmcprovider.XBMCMultiResolverContentProvider):
         cleanedFilename = self.encode(name)
         return ''.join(c for c in cleanedFilename if c in validFilenameChars)
 
+    @buggalo.buggalo_try_except({'method': 'scutils.showNotification'})
     def showNotification(self, title, message, time=1000):
         xbmcgui.Dialog().notification(self.encode(title), self.encode(message), time=time,
                                       icon=xbmc.translatePath(self.addon_dir() + "/icon.png"),
                                       sound=False)
     
+    @buggalo.buggalo_try_except({'method': 'scutils.run_custom'})
     def run_custom(self, params):
         util.debug("RUN CUSTOM: %s" % str(params))
         if 'action' in params:
@@ -513,6 +526,7 @@ class KODISCLib(xbmcprovider.XBMCMultiResolverContentProvider):
         return (xbmc.getCondVisibility('Library.IsScanningVideo') or
                 xbmc.getCondVisibility('Library.IsScanningMusic'))
 
+    @buggalo.buggalo_try_except({'method': 'scutils.setUniq'})
     def setUniq(self, li, stream):
         uniq = {}
         if 'imdb' in stream:
@@ -543,6 +557,7 @@ class KODISCLib(xbmcprovider.XBMCMultiResolverContentProvider):
             util.debug("[SC] uniq err: %s" % str(traceback.format_exc()))
             pass
 
+    @buggalo.buggalo_try_except({'method': 'scutils.list'})
     def list(self, items):
         params = self.params()
         for item in items:
@@ -564,7 +579,8 @@ class KODISCLib(xbmcprovider.XBMCMultiResolverContentProvider):
                 self.render_video(item)
             else:
                 self.render_default(item)
-                
+    
+    @buggalo.buggalo_try_except({'method': 'scutils.play'})
     def play(self, item):
         util.debug("PLAY ITEM: %s" % str(item))
         if 'info' in item and 'force' in item['info'] or 'force' in item:
@@ -635,6 +651,7 @@ class KODISCLib(xbmcprovider.XBMCMultiResolverContentProvider):
         self._parse_settings(itm['items'])
         util.info('SET: ' + self.sett);
 
+    @buggalo.buggalo_try_except({'method': 'scutils._extract_infolabels'})
     def _extract_infolabels(self,item):
         infoLabels = {}
         for label in ['genre', 'year', 'episode', 'season', 'top250', 'tracknumber', 'rating', 'watched', 'playcount', 'overlay', 'cast', 'castandrole', 
@@ -671,6 +688,7 @@ class KODISCLib(xbmcprovider.XBMCMultiResolverContentProvider):
         #infoLabels['overlay'] = 7
         return infoLabels
 
+    @buggalo.buggalo_try_except({'method': 'scutils.render_dir'})
     def render_dir(self,item):
         params = self.params()
         params.update(item)
@@ -718,6 +736,7 @@ class KODISCLib(xbmcprovider.XBMCMultiResolverContentProvider):
                 menuItems[ctxtitle] = value
         self.add_dir(title,params,img,infoLabels=item,menuItems=menuItems)
 
+    @buggalo.buggalo_try_except({'method': 'scutils.add_dir'})
     def add_dir(self, name, params, logo='', infoLabels={}, menuItems={}):
         name = util.decode_html(name)
         if 'title' not in infoLabels:
@@ -761,6 +780,7 @@ class KODISCLib(xbmcprovider.XBMCMultiResolverContentProvider):
         return xbmcplugin.addDirectoryItem(handle=int(sys.argv[1]), url=sctop._create_plugin_url(params),
                                            listitem=liz, isFolder=True)
 
+    @buggalo.buggalo_try_except({'method': 'scutils.render_video'})
     def render_video(self,item):
         #util.debug("_render_video")
         
@@ -796,7 +816,7 @@ class KODISCLib(xbmcprovider.XBMCMultiResolverContentProvider):
                 menuItems=menuItems
                 )
         
-
+    @buggalo.buggalo_try_except({'method': 'scutils.getTaraktLastActitivy'})
     def getTraktLastActivity(self, typ='movie'):
         res = []
         try:
@@ -820,7 +840,8 @@ class KODISCLib(xbmcprovider.XBMCMultiResolverContentProvider):
             pass
         util.debug('[SC] getTraktLastActivity ret: %s' % str(res) )
         return res
-
+    
+    @buggalo.buggalo_try_except({'method': 'scutils.add_video'})
     def add_video(self, name, params={}, logo='', infoLabels={}, menuItems={}):
         util.debug("_add_video")
         #util.debug("[SC] add video info: %s" % str(infoLabels))
@@ -901,6 +922,7 @@ class KODISCLib(xbmcprovider.XBMCMultiResolverContentProvider):
     def sleep(sleep_time):
         sctop.sleep(sleep_time)
 
+    @buggalo.buggalo_try_except({'method': 'scutils.service'})
     def service(self):
         util.info("SC Service Started")
         #dialog = sctop.dialog.textviewer('heading', 'Prosim podporte vyvoj pluginu na adrese: http://stream-cinema.online/')
@@ -914,7 +936,7 @@ class KODISCLib(xbmcprovider.XBMCMultiResolverContentProvider):
 
         util.debug("[SC] start delay: %s" % str(sleep_time))
         self.sleep(sleep_time)
-        util.debug("[SC] sleep end")
+        util.debug("[SC] start sleep end")
 
         try:
             self.last_run = float(self.cache.get("subscription.last_run"))
@@ -936,7 +958,8 @@ class KODISCLib(xbmcprovider.XBMCMultiResolverContentProvider):
                 self.cache.set("subscription.last_run", str(self.last_run))
             self.sleep(self.sleep_time)
         util.info("[SC] Shutdown")
-    
+        
+    @buggalo.buggalo_try_except({'method': 'scutils.findSubtitles'})
     def findSubtitles(self, stream):
         try:
             if not self.getSetting('subtitles') == 'true': 
@@ -1041,6 +1064,7 @@ class KODISCLib(xbmcprovider.XBMCMultiResolverContentProvider):
             util.debug(traceback.format_exc())
             pass
 
+    @buggalo.buggalo_try_except({'method': 'scutils.getSubs'})
     def getSubs(self):
         if self.subs is not None:
             return self.subs
@@ -1055,11 +1079,13 @@ class KODISCLib(xbmcprovider.XBMCMultiResolverContentProvider):
             util.error(e)
             subs = {}
         return subs
-
+    
+    @buggalo.buggalo_try_except({'method': 'scutils.setSubs'})
     def setSubs(self, subs):
         self.subs = subs
         self.cache.set("subscription", repr(subs))
 
+    @buggalo.buggalo_try_except({'method': 'scutils.getResumePoint'})
     def getResumePoint(self):
         data = self.cache.get("resume_point")
         try:
@@ -1071,11 +1097,13 @@ class KODISCLib(xbmcprovider.XBMCMultiResolverContentProvider):
             last = []
         util.debug("[SC] getResumePoints %s" % str(last))
         return last
-        
+    
+    @buggalo.buggalo_try_except({'method': 'scutils.setResumePoint'})
     def setResumePoint(self, data):
         util.debug("[SC] setResumePoint %s" % str(data))
         self.cache.set("resume_point", repr(data))
-        
+    
+    @buggalo.buggalo_try_except({'method': 'scutils.getLast'})
     def getLast(self):
         data = self.cache.get("last")
         try:
@@ -1087,11 +1115,13 @@ class KODISCLib(xbmcprovider.XBMCMultiResolverContentProvider):
             last = []
         util.debug("[SC] getLast %s" % str(last))
         return last
-        
+    
+    @buggalo.buggalo_try_except({'method': 'scutils.setLast'})
     def setLast(self, last):
         util.debug("[SC] setLast %s" % str(last))
         self.cache.set("last", repr(last))
 
+    @buggalo.buggalo_try_except({'method': 'scutils.addLast'})
     def addLast(self, scid):
         last = self.getLast()
         util.debug("[SC] addLast %s -> %s" % (str(scid), str(last)))
@@ -1104,6 +1134,7 @@ class KODISCLib(xbmcprovider.XBMCMultiResolverContentProvider):
                 last.pop()
         self.setLast(last)
 
+    @buggalo.buggalo_try_except({'method': 'scutils.filter_bitrate'})
     def filter_bitrate(self, resolved):
         bt = sctop.getSettingAsInt('bitrate')
         if bt > 0 and sctop.getSettingAsBool('bitratefilter'):
@@ -1120,6 +1151,7 @@ class KODISCLib(xbmcprovider.XBMCMultiResolverContentProvider):
             
         return resolved
     
+    @buggalo.buggalo_try_except({'method': 'scutils._filter_lang'})
     def _filter_lang(self, resolved, lang, prio):
         import re
 
@@ -1141,7 +1173,8 @@ class KODISCLib(xbmcprovider.XBMCMultiResolverContentProvider):
             return tmp
         
         return [] if prio == True else resolved
-        
+    
+    @buggalo.buggalo_try_except({'method': 'scutils.filter_lang'})
     def filter_lang(self, resolved, prio = False):
         if sctop.getSettingAsBool('filter_audio') == False:
             util.debug("[SC] nemame zapnute filtrovanie podla audia")
@@ -1163,6 +1196,7 @@ class KODISCLib(xbmcprovider.XBMCMultiResolverContentProvider):
 
         return resolved
     
+    @buggalo.buggalo_try_except({'method': 'scutils.filter_quality'})
     def filter_quality(self, resolved, prio = False):
         if sctop.getSettingAsBool('filter_video') == False:
             util.debug("[SC] nemame zapnute filtrovanie podla kvality videa")
@@ -1189,6 +1223,7 @@ class KODISCLib(xbmcprovider.XBMCMultiResolverContentProvider):
         
         return resolved
     
+    @buggalo.buggalo_try_except({'method': 'scutils.filter_hevc'})
     def filter_hevc(self, resolved):
         tmp = []
         for i in resolved:
@@ -1196,6 +1231,7 @@ class KODISCLib(xbmcprovider.XBMCMultiResolverContentProvider):
                 tmp.append(i)
         return tmp
     
+    @buggalo.buggalo_try_except({'method': 'scutils.filter_priority'})
     def filter_priority(self, resolved):
         if sctop.getSettingAsBool('filter_enable') == False:
             util.debug("[SC] nemame zapnuty filter streamov, tak nic nefiltrujeme")
@@ -1220,11 +1256,13 @@ class KODISCLib(xbmcprovider.XBMCMultiResolverContentProvider):
         
         return resolved
 
+    @buggalo.buggalo_try_except({'method': 'scutils.filter_resolved'})
     def filter_resolved(self, resolved):
         resolved = self.filter_bitrate(resolved)
         resolved = self.filter_priority(resolved)    
         return resolved
 
+    @buggalo.buggalo_try_except({'method': 'scutils.resolve'})
     def resolve(self, url):
         item = self.provider.video_item()
         item.update({'url': url})

@@ -268,7 +268,8 @@ class MyPlayer(xbmc.Player):
             #util.debug("[SC] changed wtime %s" % str(self.watchedTime))
             scutils.KODISCLib.sleep(900)
             timer += 1
-            if timer >= 60:
+            if timer >= 600:
+                self.waitForChange()
                 timer = 0
                 data = {'scid': self.scid, 'action': 'ping', 'prog': self.timeRatio()}
                 self.action(data)
@@ -371,6 +372,7 @@ class MyPlayer(xbmc.Player):
         url = "%s/Stats" % (sctop.BASE_URL)
         data.update({'est': self.estimateFinishTime})
         data.update({'se': self.se, 'ep': self.ep})
+        data.update({'ver': sctop.addonInfo('version')})
         try:
             data.update({'ws': xbmcgui.Window(10000).getProperty('ws.ident'), 'vip': xbmcgui.Window(10000).getProperty('ws.vip')})
         except:
