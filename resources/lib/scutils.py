@@ -189,7 +189,7 @@ class KODISCLib(xbmcprovider.XBMCMultiResolverContentProvider):
     def movienfo(self, data):
         out = ''
         if 'imdb' in data and data['imdb'] is not None and int(data['imdb']) > 0:
-            out += "http://www.imdb.com/title/tt%08d/\n" % int(data['imdb'])
+            out += "http://www.imdb.com/title/tt%07d/\n" % int(data['imdb'])
         if 'tmdb' in data and data['tmdb'] is not None and int(data['tmdb']) > 0:
             out += "https://www.themoviedb.org/movie/%d/\n" % int(data['tmdb'])
         if 'csfd' in data and data['csfd'] is not None and int(data['csfd']) > 0:
