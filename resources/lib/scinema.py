@@ -55,7 +55,7 @@ class StreamCinemaContentProvider(ContentProvider):
         
         self.tr = tracker.TrackerInfo().getSystemInfo()
         self.uid = uid
-        util.UA = self.tr['useragent']
+        util.UA = self.tr['useragent'] + ' ver' + str(sctop.addonInfo('version'))
         #util.debug("[SC] tr: %s" % str(self.tr))
         
         util.init_urllib(self.cache)
@@ -232,7 +232,10 @@ class StreamCinemaContentProvider(ContentProvider):
             menu.update({"$30918": {"action": "add-to-lib-trakt", "tl": item['tl'], "title": data['title']}})
         
         if 'id' in data and data['id'].isdigit():
-            menu.update({"$30942": {"cmd":'Action("Info")'}})
+            if 'imdb' in data and data['imdb'] > 0:
+                menu.update({"$30942": {"action": "info", 'imdb': "tt%07d" % int(data['imdb'])}}) #{"cmd":'Action("Info")'}})
+            else:
+                menu.update({"$30942": {"cmd":'Action("Info")'}})
             params = self.parent.params()
             params.update({'action':'play-force','url':item['url'],'play':item['url'],'dtitle':item['title'],'force':'true'})
             menu.update({"$30949": params})
@@ -342,6 +345,8 @@ class StreamCinemaContentProvider(ContentProvider):
         item['url'] = self._url(item['url'])
         if sctop.BASE_URL in item['url']:
             data = self._json(item['url']) #json.loads(self.get_data_cached(item['url']))
+            if data is None:
+                raise ResolveException('Video is not available.')
             if 'strms' in data:
                 util.debug("[SC] data info: %s" % str(data['info']))
                 out = [sctop.merge_dicts(data['info'], i) for i in data['strms']]

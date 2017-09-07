@@ -105,6 +105,7 @@ class Webshare():
             if xml.find('vip').text == '1':
                 xbmcgui.Window(10000).setProperty('ws.vip', '1')
                 xbmcgui.Window(10000).setProperty('ws.ident', xml.find('ident').text)
+                xbmcgui.Window(10000).setProperty('ws.days', xml.find('vip_days').text)
                 return int(xml.find('vip_days').text)
             else:
                 xbmcgui.Window(10000).setProperty('ws.vip', '0')

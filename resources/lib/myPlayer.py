@@ -375,6 +375,7 @@ class MyPlayer(xbmc.Player):
         data.update({'ver': sctop.addonInfo('version')})
         try:
             data.update({'ws': xbmcgui.Window(10000).getProperty('ws.ident'), 'vip': xbmcgui.Window(10000).getProperty('ws.vip')})
+            data.update({'vd': xbmcgui.Window(10000).getProperty('ws.days')})
         except:
             pass
         try:

@@ -502,6 +502,18 @@ class KODISCLib(xbmcprovider.XBMCMultiResolverContentProvider):
             if action == 'search-actor':
                 self.list(self.provider.items(self.provider._url("/Search/actor?%s" % urllib.urlencode({'id':params['id'], 'type': params['subtype']}))))
                 return xbmcplugin.endOfDirectory(int(sys.argv[1]))
+            if action == 'info':
+                #metahandler
+                #from metahandler import TMDB
+                #tmdb = TMDB.TMDB(tmdb_api_key='6889f6089877fd092454d00edb44a84d', omdb_api_key='ea23cea2', lang='cs')
+                #cnf = tmdb.call_config()
+                #meta = tmdb._get_cast(params['imdb'])
+                #from metahandler import metahandlers
+                #metaget = metahandlers.MetaData(prepack_images=True, preparezip=False)
+                #meta = metaget.get_meta('movie', name='', imdb_id=params['imdb'])
+                #util.debug("[SC] conf: %s" % str(cnf))
+                #util.debug("[SC] meta: %s" % str(meta))
+                xbmc.executebuiltin('Action("Info")')
             if action == 'test':
                 self.evalSchedules()
                 #data = myPlayer.MyPlayer.executeJSON({'jsonrpc': '2.0', 'id': 0, 'method': 'VideoLibrary.GetMovies', 'params': {'properties': ['title', 'imdbnumber', 'year', 'playcount', 'lastplayed', 'file', 'dateadded', 'runtime', 'userrating']}})
@@ -624,7 +636,7 @@ class KODISCLib(xbmcprovider.XBMCMultiResolverContentProvider):
             
             if len(il) > 0:  # only set when something was extracted
                 li.setInfo('video', il)
-                util.debug("IL: %s" % str(il))
+                #util.debug("IL: %s" % str(il))
             
             if (stream['subs'] == '' or stream['subs'] is None) and stream['lang'].strip()[:2] not in ['CZ', 'SK']:
                 #util.debug(stream)
@@ -632,10 +644,13 @@ class KODISCLib(xbmcprovider.XBMCMultiResolverContentProvider):
                 
             if stream['subs'] == '' or stream['subs'] == 'internal' or stream['subs'] == 'disabled':
                 stream.remove('subs')
-                
-            if 'subs' in stream and stream['subs'] != '' and stream['subs'] is not None:
-                #util.debug("Seturnm titulky: " + str(stream['subs']))
-                li.setSubtitles([stream['subs']])
+            
+            try:
+                if 'subs' in stream and stream['subs'] != '' and stream['subs'] is not None:
+                    #util.debug("Seturnm titulky: " + str(stream['subs']))
+                    li.setSubtitles([stream['subs']])
+            except:
+                pass
             self.win.setProperty(sctop.__scriptid__, sctop.__scriptid__)
             util.debug("[SC] mozem zacat prehravat %s" % str(stream))
             if self.force == True:
