@@ -28,7 +28,7 @@
     <string id="30040">Knižnica</string>
     <string id="30400">Priečinok pre filmy</string>
     <string id="30401">Priečinok pre seriály</string>
-    <string id="30402">Oneskoriť štart služby o (minuty)</string>
+    <string id="30402">Oneskoriť štart služby o (minúty)</string>
     <string id="30403">Predvolený čas pre obnovu seriálu (dni)</string>
     <string id="30404">Automaticky pridávať filmy do knižnice</string>
     
@@ -53,10 +53,10 @@
     <string id="30060">Aut. výber streamu</string>
     <string id="30600">Povoliť automatický výber streamu</string>
     <string id="30601">Priorita výberu</string>
-    <string id="30602">Filtrovať podla audia</string>
+    <string id="30602">Filtrovať podľa audia</string>
     <string id="30603">Primárny jazyk</string>
-    <string id="30604">Sekundarny jazyk</string>
-    <string id="30605">Filtrovať podla kvality</string>
+    <string id="30604">Sekundárny jazyk</string>
+    <string id="30605">Filtrovať podľa kvality</string>
     <string id="30606">Vybraná kvalita</string>
     <string id="30607">Vyradiť HEVC stream</string>
     
@@ -88,8 +88,8 @@
     <string id="30929">Posledné pridané</string>
     <string id="30930">1) Navštívte: [COLOR skyblue]%s[/COLOR]</string>
     <string id="30931">2) Po výzve zadajte [COLOR skyblue]%s[/COLOR]</string>
-    <string id="30932">Účet už je autorizovany.[CR]Chcete sa odhlasit?</string>
-    <string is="30933">Chcete sa odhlasit?</string>
+    <string id="30932">Účet už je autorizovaný.[CR]Chcete sa odhlásiť?</string>
+    <string is="30933">Chcete sa odhlásiť?</string>
     
     <!-- trakt manager -->
     <string id="30934">Pridať do [B]Zbierky[/B]</string>
@@ -160,7 +160,7 @@
     <string id="32368">Rodinný</string>
     <string id="31086">Romantický</string>
     <string id="31100">Sci-Fi</string>
-    <string id="31694">Sportovný</string>
+    <string id="31694">Športový</string>
     <string id="87745">Talk-show</string>
     <string id="45920">Tanečný</string>
     <string id="31004">Thriller</string>
@@ -190,8 +190,8 @@
     <string id="46699">Estonsko</string>
     <string id="37250">Fed. rep. Juhoslávia</string>
     <string id="48468">Filipíny</string>
-    <string id="42879">Finsko</string>
-    <string id="31060">Francúzko</string>
+    <string id="42879">Fínsko</string>
+    <string id="31060">Francúzsko</string>
     <string id="52387">Ghana</string>
     <string id="46700">Gruzínsko</string>
     <string id="31665">Hong Kong</string>
@@ -213,7 +213,7 @@
     <string id="88248">Kambodža</string>
     <string id="31127">Kanada</string>
     <string id="87392">Katar</string>
-    <string id="95010">Kazachstán</string>
+    <string id="95010">Kazachstan</string>
     <string id="36470">Keňa</string>
     <string id="35397">Kolumbia</string>
     <string id="94782">Lichtenštejnsko</string>
@@ -227,7 +227,7 @@
     <string id="31335">Mexiko</string>
     <string id="96308">Monako</string>
     <string id="95011">Mongolsko</string>
-    <string id="52119">Namibia</string>
+    <string id="52119">Namíbia</string>
     <string id="31168">Nemecko</string>
     <string id="85001">Nepál</string>
     <string id="90146">Nigéria</string>
@@ -246,7 +246,7 @@
     <string id="31061">Grécko</string>
     <string id="31151">Rumunsko</string>
     <string id="31062">Rusko</string>
-    <string id="52386">Saúdská Arábia</string>
+    <string id="52386">Saudská Arábia</string>
     <string id="33615">Singapur</string>
     <string id="33623">Slovensko</string>
     <string id="46035">Slovinsko</string>
@@ -256,7 +256,7 @@
     <string id="85931">Srbsko</string>
     <string id="94198">Srbsko a Čierna Hora</string>
     <string id="34708">Švédsko</string>
-    <string id="31152">Švajčarsko</string>
+    <string id="31152">Švajčiarsko</string>
     <string id="54045">Tanzánia</string>
     <string id="49447">Thajsko</string>
     <string id="49640">Tchaj-wan</string>
