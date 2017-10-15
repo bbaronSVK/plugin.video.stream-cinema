@@ -66,37 +66,43 @@ class Webshare():
             self.logout()
             util.info('[SC] Login user=%s, pass=*****' % self.username)
             
-            # get salt
-            headers,req = self._create_request('',{'username_or_email':self.username})
-            data = util.post(self._url('api/salt/'),req,headers=headers)
-            xml = ET.fromstring(data)
-            if not xml.find('status').text == 'OK':
-                util.error('[SC] Server returned error status, response: %s' % data)
-                return False
-            salt = xml.find('salt').text
-            # create hashes
-            password = hashlib.sha1(md5crypt(self.password.encode('utf-8'), salt.encode('utf-8'))).hexdigest()
-            digest = hashlib.md5(self.username + ':Webshare:' + self.password).hexdigest()
-            # login
-            headers,req = self._create_request('',{'username_or_email':self.username,'password':password,'digest':digest,'keep_logged_in':1})
-            data = util.post(self._url('api/login/'),req,headers=headers)
-            xml = ET.fromstring(data)
-            if not xml.find('status').text == 'OK':
-                util.error('[SC] Server returned error status, response: %s' % data)
-                return False
-            self.token = xml.find('token').text
             try:
-                util.cache_cookies(None)
-            except:
-                pass
-            util.info('[SC] Login successfull')
-            return True
+                # get salt
+                headers,req = self._create_request('',{'username_or_email':self.username})
+                data = util.post(self._url('api/salt/'),req,headers=headers)
+                xml = ET.fromstring(data)
+                if not xml.find('status').text == 'OK':
+                    util.error('[SC] Server returned error status, response: %s' % data)
+                    return False
+                salt = xml.find('salt').text
+                # create hashes
+                password = hashlib.sha1(md5crypt(self.password.encode('utf-8'), salt.encode('utf-8'))).hexdigest()
+                digest = hashlib.md5(self.username + ':Webshare:' + self.password).hexdigest()
+                # login
+                headers,req = self._create_request('',{'username_or_email':self.username,'password':password,'digest':digest,'keep_logged_in':1})
+                data = util.post(self._url('api/login/'),req,headers=headers)
+                xml = ET.fromstring(data)
+                if not xml.find('status').text == 'OK':
+                    util.error('[SC] Server returned error status, response: %s' % data)
+                    return False
+                self.token = xml.find('token').text
+                try:
+                    util.cache_cookies(None)
+                except:
+                    pass
+                util.info('[SC] Login successfull')
+                return True
+            except Exception, e:
+                util.info('[SC] Login error %s' % str(e))
         return False
 
     def userData(self, all=False):
         if self.token:
             headers,req = self._create_request('/',{'wst':self.token})
-            data = util.post(self._url('api/user_data/'), req, headers=headers)
+            try:
+                data = util.post(self._url('api/user_data/'), req, headers=headers)
+            except:
+                return False
             xml = ET.fromstring(data)
             if all == True:
                 return xml
@@ -115,8 +121,8 @@ class Webshare():
     def logout(self):
         util.info("[SC] logout")
         headers,req = self._create_request('/',{'wst':self.token})
-        util.post(self._url('api/logout/'), req, headers=headers)
         try:
+            util.post(self._url('api/logout/'), req, headers=headers)
             util.cache_cookies(None)
         except:
             util.debug("[SC] chyba logout")
@@ -126,10 +132,12 @@ class Webshare():
         headers,req = self._create_request('/',{'ident':ident,'wst':self.token})
         util.info(headers)
         util.info(req)
-        data = util.post(self._url('api/file_link/'), req, headers=headers)
-        xml = ET.fromstring(data)
-        if not xml.find('status').text == 'OK':
-            util.error('[SC] Server returned error status, response: %s' % data)
-            raise ResolveException(xml.find('message').text)
-        url = xml.find('link').text
-        return url
+        try:
+            data = util.post(self._url('api/file_link/'), req, headers=headers)
+            xml = ET.fromstring(data)
+            if not xml.find('status').text == 'OK':
+                util.error('[SC] Server returned error status, response: %s' % data)
+                raise ResolveException(xml.find('message').text)
+            return xml.find('link').text
+        except Exception, e:
+            raise ResolveException(e.value)

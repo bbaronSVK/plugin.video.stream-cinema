@@ -9,6 +9,8 @@
     <string id="30105">heslo na webshare nesmie obsahovať diakritiku a špeciálne znaky</string>
     <string id="30106">zaregistrovať sa môžete na webshare.cz</string>
     
+    <string id="30008">Up Next</string>
+    
     <string id="30020">Titulky</string>
     <string id="30201">Povoliť titulky</string>
     <string id="30202">Konvertovať titulky do UTF-8</string>
@@ -31,6 +33,7 @@
     <string id="30402">Oneskoriť štart služby o (minuty)</string>
     <string id="30403">Predvolený čas pre obnovu seriálu (dni)</string>
     <string id="30404">Automaticky pridávať filmy do knižnice</string>
+    <string id="30405">Skontrolovať nové časti</string>
     
     <string id="30050">SpeedTest</string>
     <string id="30500">Spustiť test pripojenia...</string>
@@ -59,6 +62,8 @@
     <string id="30605">Filtrovať podla kvality</string>
     <string id="30606">Vybraná kvalita</string>
     <string id="30607">Vyradiť HEVC stream</string>
+    <string id="30608">Detailný výber streamu</string>
+    <string id="30609">Ponúkať nasledujúcu epizódu</string>
     
     <!-- texty v menu -->
     <string id="30901">Filmy</string>
@@ -118,6 +123,8 @@
     <string id="30953">Vyhľadávanie</string>
     <string id="30954">Nová verzia pluginu</string>
     <string id="30955">Vyšla nová verzia pluginu (%s). Pre správne fungovanie je potrebné plugin aktualizovať. Ak máte automatickú aktualizaciu, tak sa vám plugin sám aktualizuje po kliknuti na OK. Ak sa tak nestane, aktualizujte plugin ručne.</string>
+    <string id="30956">Práve sledované</string>
+    <string id="30957">Príliš veľa požiadaviek, prosím počkajte (1 min) a opakujte akciu.</string>
         
     <!-- dni v tyzdni -->
     <string id="30911">Pondelok</string>

@@ -11,6 +11,7 @@
         <setting id="trakt.user" type="action" label="30104" option="close" action="RunPlugin(plugin://plugin.video.stream-cinema/?action=617574685472616b74)" />
         <setting id="trakt.token" type="text" option="hidden" visible="false" label="" default="" />
         <setting id="trakt.refresh" type="text" option="hidden" visible="false" label="" default="" />
+        <setting label="" id="usecache" type="bool" default="true" visible="false" />
     </category>
     <category label="30050">
         <setting id="speedtest" type="action" label="30500" option="close" action="RunPlugin(plugin://plugin.video.stream-cinema/?action=737065656474657374)" />
@@ -33,6 +34,10 @@
         <setting label="30606" id="filter_quality" subsetting="true" type="select" values="4K|1080p|720p|SD" enable="eq(-1,true) + eq(-9,true)" default="1080p"/>
         <setting type="sep" />
         <setting label="30607" id="filter_hevc" subsetting="true" type="bool" enable="eq(-11,true)" default="false"/>
+        <setting type="sep" />
+        <setting label="30608" id="dialog_details" type="bool" default="false"/>
+        <setting type="sep" />
+        <setting label="30609" id="show_up_next" type="bool" default="false"/>
     </category>
     <category label="30020">
         <setting label="30201" id="subtitles" type="bool" default="true" />
@@ -52,15 +57,19 @@
         <setting label="30303" id="download-notify-every" type="enum" lvalues="30311|30312|30313" default="0" visible="eq(-1,true)" />
     </category>
     <category label="30040">
-        <setting label="30400" id="library-movies" type="folder" default="special://profile/addon_data/plugin.video.stream-cinema/Movies/" />
+        <setting label="30400" id="library-movies" type="folder" default="" />
         <setting type="sep" />
-        <setting label="30401" id="library-tvshows" type="folder" default="special://profile/addon_data/plugin.video.stream-cinema/TVShows/" />
+        <setting label="30401" id="library-tvshows" type="folder" default="" />
         <setting type="sep" />
         <setting label="30402" id="start_sleep_time" type="slider" default="10" range="0,60" option="int" />
         <setting label="30403" id="refresh_time" type="slider" default="1" range="0,60" option="int" />
         <setting type="sep" />
         <setting label="30404" id="download-movies" type="bool" default="false" />
+        <setting type="sep" />
+        <setting type="action" label="30405" option="close" action="RunPlugin(plugin://plugin.video.stream-cinema/?action=73756273)" />
     </category>
+    <setting label="" id="cachemigrate" type="bool" default="false" visible="false" />
     <setting label="" id="uid" type="text" default="" visible="false" />
     <setting label="" id="ver" type="text" default="" visible="false" />
+    
 </settings>

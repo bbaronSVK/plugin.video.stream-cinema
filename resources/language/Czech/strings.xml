@@ -10,6 +10,8 @@
     <string id="30106">zaregistrovat se můžete na webshare.cz</string>
     <string id="30107">Spustit test připojení...</string>
     
+    <string id="30008">Up Next</string>
+    
     <string id="30020">Titulky</string>
     <string id="30201">Povolit titulky</string>
     <string id="30202">Konvertovat titulky do UTF-8</string>
@@ -31,7 +33,8 @@
     <string id="30401">Složka pro seriály</string>
     <string id="30402">Zpozdit start služby o (minuty)</string>
     <string id="30403">Čas pro obnovu seriálu (dni)</string>
-    <string id="30404">Automaticky přidávat filmy do knihovny</string>    
+    <string id="30404">Automaticky přidávat filmy do knihovny</string>
+    <string id="30405">Skontrolovat nové části</string>
     
     <string id="30050">SpeedTest</string>
     <string id="30500">Spustit test připojení...</string>
@@ -60,6 +63,8 @@
     <string id="30605">Filtrování podle kvality</string>
     <string id="30606">Vybraná kvalita</string>
     <string id="30607">Vyradit HEVC stream</string>
+    <string id="30608">Podrobný výběr streamu</string>
+    <string id="30609">Nabídnout následujíci epizodu</string>
 
     <!-- texty v menu -->
     <string id="30901">Filmy</string>
@@ -119,6 +124,8 @@
     <string id="30953">Vyhledávání</string>
     <string id="30954">Nová verze pluginu</string>
     <string id="30955">Byla nahrána nová verze pluginu (%s). Zásuvný modul musí být aktualizován tak, aby fungoval správně. Pokud máte automatickou aktualizaci, můžete se aktualizovat kliknutím na tlačítko OK. Pokud se tak nestane, aktualizujte plugin ručně.</string>
+    <string id="30956">Práve sledované</string>
+    <string id="30957">Příliš mnoho požadavků, prosím počkejte (1 min) a opakujte akci.</string>
     
     <!-- dni v tyzdni -->
     <string id="30911">Pondělí</string>

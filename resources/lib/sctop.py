@@ -18,7 +18,9 @@ __set__ = __addon__.getSetting
 __language__ = __addon__.getLocalizedString
 
 BASE_URL="http://stream-cinema.online/kodi"
+BASE_URL="http://movies.bbaron.sk/kodi"
 API_VERSION="1.2"
+KODI_VERSION = int(xbmc.getInfoLabel("System.BuildVersion").split(".")[0])
 player = None
 uid = None
 traktlistlast = None
@@ -109,8 +111,8 @@ def getMediaType():
 
 def sleep(sleep_time):
     while not xbmc.abortRequested and sleep_time > 0:
-        sleep_time -= 50
-        xbmc.sleep(50)
+        sleep_time -= 100
+        xbmc.sleep(99)
 
 def iso_2_utc(iso_ts):
     if not iso_ts or iso_ts is None: return 0
@@ -159,14 +161,18 @@ def request(url, headers={}, output="content"):
         response = urllib2.urlopen(req)
         data = response.read()
         code = response.code
+        info = response.info()
         response.close()
     except urllib2.HTTPError, error:
         code = error.code
         data = util._solve_http_errors(url, error)
+        info = None
     util.debug('len(data) %s' % len(data))
     
     if (output == "content"):
         return data
+    if (output == "info"):
+        return (data, code, info)
     else:
         return (data, code)
 
@@ -217,6 +223,11 @@ def post_json(url, data, headers={}, output="content"):
 def _create_plugin_url(params, plugin=sys.argv[0]):
     url = []
     for key in params.keys():
+        # "menu", "img", "type", "size", "title"]:
+        if key not in ["dtitle", "url", "action", "list", "cmd", "down", "play", "force",
+                        "search-list", "search", "search-remove", "search-edit", 
+                        "id", "subtype", "title", "name", "imdb", "tvdb", "content"]:
+            continue
         value = str(params[key])
         value = value.encode('utf-8')
         if value.encode('hex') != "": 
@@ -229,12 +240,26 @@ def merge_dicts(*dict_args):
         result.update(dictionary)
     return result
 
+def getCondVisibility(text):
+    '''executes the builtin getCondVisibility'''
+    # temporary solution: check if strings needs to be adjusted for backwards compatability
+    if KODI_VERSION < 17:
+        text = text.replace("Integer.IsGreater", "IntegerGreaterThan")
+        text = text.replace("String.Contains", "SubString")
+        text = text.replace("String.IsEqual", "StringCompare")
+    return xbmc.getCondVisibility(text)
+
 try:
-    import StorageServer
-    cache = StorageServer.StorageServer(__scriptname__)
-except:
-    import storageserverdummy as StorageServer
-    cache = StorageServer.StorageServer(__scriptname__)
+    from storagecache import StorageCache
+    cache = StorageCache()
+except Exception, e:
+    util.debug("[SC] error cache: %s" % str(e) )
+    try:
+        import StorageServer
+        cache = StorageServer.StorageServer(__scriptname__)
+    except:
+        import storageserverdummy as StorageServer
+        cache = StorageServer.StorageServer(__scriptname__)
 
 (v1, v2, v3) = str(xbmcplugin.__version__).split('.')
 if int(v1) == 2 and int(v2) <= 20:
@@ -284,4 +309,55 @@ sortmethod = {
     25:	xbmcplugin.SORT_METHOD_VIDEO_TITLE,
     20:	xbmcplugin.SORT_METHOD_VIDEO_USER_RATING,
     18:	xbmcplugin.SORT_METHOD_VIDEO_YEAR
+}
+
+ALL_VIEW_CODES={
+    'list': {
+        'skin.estuary': 50, # List
+        'skin.confluence': 50, # List
+        'skin.aeon.nox': 50, # List
+        'skin.droid': 50, # List
+        'skin.quartz': 50, # List
+        'skin.re-touched': 50, # List
+    },
+    'thumbnail': {
+        'skin.estuary': 500, # Thumbnail
+        'skin.confluence': 500, # Thumbnail
+        'skin.aeon.nox': 500, # Wall
+        'skin.droid': 51, # Big icons
+        'skin.quartz': 51, # Big icons
+        'skin.re-touched': 500, #Thumbnail
+    },
+    'movies': {
+        'skin.estuary': 500,
+        'skin.confluence': 500, # Thumbnail 515, # Media Info 3
+        'skin.aeon.nox': 500, # Wall
+        'skin.droid': 51, # Big icons
+        'skin.quartz': 52, # Media info
+        'skin.re-touched': 500, #Thumbnail
+    },
+    'tvshows': {
+        'skin.estuary': 501, # Banner
+        'skin.confluence': 505, # Banner 505, Thumbnail 515, # Media Info 3
+        'skin.aeon.nox': 500, # Wall
+        'skin.droid': 51, # Big icons
+        'skin.quartz': 52, # Media info
+        'skin.re-touched': 500, #Thumbnail
+    },
+    'seasons': {
+        'skin.estuary': 50, # List
+        'skin.confluence': 50, # List
+        'skin.aeon.nox': 50, # List
+        'skin.droid': 50, # List
+        'skin.quartz': 52, # Media info
+        'skin.re-touched': 50, # List
+    },
+    'episodes': {
+        'skin.estuary': 54, # Media Info
+        'skin.confluence': 504, # Media Info
+        'skin.aeon.nox': 518, # Infopanel
+        'skin.droid': 50, # List
+        'skin.quartz': 52, # Media info
+        'skin.re-touched': 550, # Wide
+    },
 }

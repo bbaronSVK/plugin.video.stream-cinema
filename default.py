@@ -45,5 +45,7 @@ except:
     pass
 
 params = util.params()
-util.info('[sc] PARAMS: ' + str(params))
-KODISCLib(StreamCinemaContentProvider(username=__set__('wsuser'),password=__set__('wspass'),uid=uid), settings, __addon__).run(params)
+util.info('[SC] PARAMS: ' + str(params))
+k = KODISCLib(StreamCinemaContentProvider(username=__set__('wsuser'),password=__set__('wspass'),uid=uid), settings, __addon__).run(params)
+del k
+util.info('[SC] DONE default.py')

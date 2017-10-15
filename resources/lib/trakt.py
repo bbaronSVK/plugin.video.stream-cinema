@@ -51,7 +51,7 @@ def getTrakt(url, post=None):
             result, code = sctop.post_json(url, post, headers, "extend")
         else:
             result, code = sctop.request(url, headers, "extend")
-        util.debug("[SC] trakt gt result: %s %s" % (str(result), str(code)))
+        #util.debug("[SC] trakt gt result: %s %s" % (str(result), str(code)))
         if not (code == 401 or code == 405): return result
 
         oauth = 'http://api.trakt.tv/oauth/token'
@@ -136,7 +136,7 @@ def authTrakt():
         raise Exception("[SC] ERR koniec")
     except:
         util.debug("ERROR: %s" % str(traceback.format_exc()))
-        sctop.openSettings('4.0')
+        sctop.openSettings('0.0')
 
 
 def getTraktCredentialsInfo():
@@ -183,6 +183,8 @@ def addTraktCollection(info):
 
 def getLists():
     result = getTrakt('/users/me/lists')
+    if not result:
+        return []
     result = json.loads(result)
     
     items = [

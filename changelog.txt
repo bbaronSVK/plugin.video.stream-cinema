@@ -1,3 +1,11 @@
+[B]1.2.8[/B]
+- nova cache
+- cachovanie zoznamov v plugine podla casu, ktory posiela server
+- upNext pri serialoch - ponukne nasledujucu epizodu 30s pred koncom serialu
+- moznost prepnut vyber streamu na detailnejsi - poster + nazov suboru
+- osetrenie chybovych stavov z API
+- moznost spustit odber serialov/filmov z nastavenia
+
 [B]1.2.0[/B]
 - Nova API 1.2
 - nove nastavenia:

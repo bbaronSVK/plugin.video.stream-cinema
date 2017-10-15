@@ -25,21 +25,20 @@ import os
 import sys
 sys.path.append(os.path.join(os.path.dirname(resolver.__file__), 'usage'))
 sys.path.append(os.path.join(os.path.dirname(resolver.__file__), 'contentprovider'))
-import buggalo
+import bug
 import json
 from provider import ContentProvider
 from provider import ResolveException
-from provider import cached
 from urlparse import urlparse, parse_qs, urlunsplit
 import urllib
-from hashlib import md5
 import util
 import xbmcplugin
-import xbmcgui
 import xbmc
 import sctop
 import trakt
 import tracker
+import datetime
+import storagecache
 
 reload(sys)
 sys.setrecursionlimit(10000)
@@ -57,11 +56,12 @@ class StreamCinemaContentProvider(ContentProvider):
         self.uid = uid
         util.UA = self.tr['useragent'] + ' ver' + str(sctop.addonInfo('version'))
         #util.debug("[SC] tr: %s" % str(self.tr))
-        
+        self.cache = sctop.cache
+        util.debug("[SC] init cache %s" % self.cache.__class__.__name__)
         util.init_urllib(self.cache)
         cookies = self.cache.get('cookies')
-        if not cookies or len(cookies) == 0:
-            util.request(self.base_url)
+        #if not cookies or len(cookies) == 0:
+        #    util.request(self._url(self.base_url))
         self.ws = None
         
         
@@ -71,7 +71,7 @@ class StreamCinemaContentProvider(ContentProvider):
     def getSubs(self):
         return self.parent.getSubs()
     
-    @buggalo.buggalo_try_except({'method': 'scinema._url'})
+    @bug.buggalo_try_except({'method': 'scinema._url'})
     def _url(self, url):
         if url.startswith('plugin://'):
             return url
@@ -85,6 +85,7 @@ class StreamCinemaContentProvider(ContentProvider):
             url = sctop.BASE_URL + url
         
         if not url.startswith('http'):
+            util.debug('[SC] nemame http v URL %s' % url)
             o = urlparse(self.base_url)
         else:
             o = urlparse(url)
@@ -98,26 +99,27 @@ class StreamCinemaContentProvider(ContentProvider):
         nurl = urlunsplit(n)
         return nurl
 
-    @buggalo.buggalo_try_except({'method': 'scinema._json'})
+    @bug.buggalo_try_except({'method': 'scinema._json'})
     def _json(self, url, post=False):
         try:
             return json.loads(self.get_data_cached(url, post))
         except Exception, e:
             util.debug("[SC] chybna URL %s" % str(url))
             util.error(e)
+        return None
     
-    @buggalo.buggalo_try_except({'method': 'scinema.items'})
+    @bug.buggalo_try_except({'method': 'scinema.items'})
     def items(self, url=None, data=None):
         self.subs = self.getSubs()
         if data is None and url is not None:
             data = self._json(url)
-        if data is None or isinstance(data, list):
-            self._oldapi()
         result = []
         if data is not None and data.get("menu"):
             for m in data["menu"]:
                 try:
                     #util.debug("MENU: %s" % str(m))
+                    if 'visible' in m and not sctop.getCondVisibility(m['visible']):
+                        continue
                     if m['type'] == 'dir':
                         item = self._dir_item(m)
                     elif m['type'] == 'video':
@@ -135,10 +137,24 @@ class StreamCinemaContentProvider(ContentProvider):
         #util.debug('--------------------- DONE -----------------')
         return result
 
-    @buggalo.buggalo_try_except({'method': 'scinema.system'})
+    @bug.buggalo_try_except({'method': 'scinema.system'})
     def system(self, data):
         if "setContent" in data:
             xbmcplugin.setContent(int(sys.argv[1]), data["setContent"])
+            '''
+            view_mode=data["setContent"].lower()
+            skin_name=xbmc.getSkinDir() # nacitame meno skinu
+            util.debug("[SC] skin_name='"+skin_name+"'")
+            try:
+                util.debug("[SC] view mode is "+view_mode)
+                view_codes=sctop.ALL_VIEW_CODES.get(view_mode)
+                view_code=view_codes.get(skin_name)
+                util.debug("[SC] view code for "+view_mode+" in "+skin_name+" is "+str(view_code))
+                xbmc.executebuiltin("Container.SetViewMode("+str(view_code)+")")
+                #xbmc.executebuiltin("Container.Refresh")
+            except:
+                util.debug("[SC] Unable to find view code for view mode "+str(view_mode)+" and skin "+skin_name)
+            '''
         
         if "setPluginCategory" in data:
             xbmcplugin.setPluginCategory(int(sys.argv[1]), data["setPluginCategory"])
@@ -152,29 +168,34 @@ class StreamCinemaContentProvider(ContentProvider):
         
         if "setPluginFanart" in data:
             xbmcplugin.setPluginFanart(int(sys.argv[1]), data["setPluginFanart"])
-            
+        
         if "version" in data:
             util.info("[SC] kontrola verzie: %s %s" % (str(sctop.addonInfo('version')), data["version"]))
             if sctop.addonInfo('version') != data["version"] and sctop.getSetting('ver') != data['version']:
-                sctop.dialog.ok(sctop.getString(30954), sctop.getString(30955) % data['version'])
+                try:
+                    sctop.dialog.ok(sctop.getString(30954), sctop.getString(30955) % str(data['version']))
+                except:
+                    pass
                 xbmc.executebuiltin('UpdateAddonRepos')
                 sctop.setSetting('ver', data['version'])
+            if sctop.getSettingAsBool('cachemigrate') == '' or sctop.getSettingAsBool('cachemigrate') is False:
+                self.parent.cacheMigrate()
+                pass
             pass
 
-    @buggalo.buggalo_try_except({'method': 'scinema.categories'})
+    @bug.buggalo_try_except({'method': 'scinema.categories'})
     def categories(self):
         return self.list(self._url(''))
     
-    @buggalo.buggalo_try_except({'method': 'scinema.list'})
+    @bug.buggalo_try_except({'method': 'scinema.list'})
     def list(self, url):
-        self.base_url = url
+        self.base_url = self._url(url)
         return self.items(url)
     
     def _oldapi(self):
         xbmc.executebuiltin("Container.Update(plugin://%s)" % (sctop.__scriptid__))
         
-    @buggalo.buggalo_try_except({'method': 'scinema.get_data_cached'})
-    #@cached(ttl=1)
+    @bug.buggalo_try_except({'method': 'scinema.get_data_cached'})
     def get_data_cached(self, url, post=False):
         try:
             url.index('/json/')
@@ -188,21 +209,61 @@ class StreamCinemaContentProvider(ContentProvider):
             'Accept' : 'application/vnd.bbaron.kodi-plugin-v%s+json' % (sctop.API_VERSION),
         }
         url = self._url(url)
+        code = None
         try:
             if post != False:
                 util.debug("POST URL: %s %s" % (url, str(post)))
-                return util.post(url, post, headers)
-            util.debug("GET URL: %s" % url)
-            return util.request(url, headers)
-        except:
-            sctop.dialog.ok("error", url)
-            return None
-        #util.debug("RET: %s" % str(ret))
+                (ret, code) = sctop.post(url, post, headers, "extend")
+                self.handleHttpError(code)
+                return ret
+            util.info("GET x URL: %s" % url)
+            ret = False
+            if sctop.getSettingAsBool('usecache') is not False:
+                util.debug("[SC] skusam cache")
+                ret = self.cache.get(str(url))
+            if not ret:
+                util.debug("[SC] url BEZ cache %s" % str(url))
+                (ret, code, info) = sctop.request(url, headers, "info")
+                util.debug("[SC] code: %s" % str(code))
+                self.handleHttpError(code, data=ret)
+                if code == 200:
+                    ttl = datetime.timedelta(hours=2)
+                    try:
+                        util.debug("[SC] info: %s " % str(info) )
+                        if 'x-ttl' in info:
+                            ttl = datetime.timedelta(seconds=int(info.get('x-ttl')))
+                            util.debug("[SC] mame TTL: %s" % str(ttl))
+                    except:
+                        pass
+                    try:
+                        self.cache.cache.set(str(url), ret, expiration=ttl)
+                    except:
+                        self.cache.set(str(url), ret)
+            else:
+                util.debug("[SC] url z cache %s" % str(url))
+            util.debug("[SC] return data")
+            return ret
+        except Exception, e:
+            util.error('[SC] ERROR URL: ' + str(e))
+            if code is None:
+                sctop.dialog.ok("error", url)
+            return False
     
-    @buggalo.buggalo_try_except({'method': 'scinema._dir_item'})
+    def handleHttpError(self, code, data=None):
+        if int(code) == 200:
+            return
+        if int(code) == 429:
+            sctop.dialog.ok('error', sctop.getString(30957))
+            raise Exception('API call')
+        else:
+            util.debug("[SC] data: %s" % str(data))
+            sctop.dialog.ok('error', 'server error')
+            raise Exception('server error: %s' % str(code))
+    
+    @bug.buggalo_try_except({'method': 'scinema._dir_item'})
     def _dir_item(self, m):
         if 'url' in m:
-            item = self.dir_item(title=m['title'], url=self._url(m['url']))
+            item = self.dir_item(title=m['title'], url=m['url'])
         else:
             item = self.dir_item(title=m['title'])
         for k in m.keys():
@@ -212,16 +273,16 @@ class StreamCinemaContentProvider(ContentProvider):
 
         return item
 
-    @buggalo.buggalo_try_except({'method': 'scinema._video_item'})
+    @bug.buggalo_try_except({'method': 'scinema._video_item'})
     def _video_item(self, m):
-        item = self.video_item(self._url(m['url']), img=m['poster'])
+        item = self.video_item(m['url'], img=m['poster'])
         for k in m.keys():
             if k != 'url':
                 item[k] = m[k]
         item = self.ctx(item, m)
         return item
     
-    @buggalo.buggalo_try_except({'method': 'scinema.ctx'})
+    @bug.buggalo_try_except({'method': 'scinema.ctx'})
     def ctx(self, item, data):
         menu = {}
         #util.debug("CTX ITM: %s" % str(item))
@@ -281,7 +342,7 @@ class StreamCinemaContentProvider(ContentProvider):
         item['menu'] = menu
         return item
     
-    @buggalo.buggalo_try_except({'method': 'scinema.search'})
+    @bug.buggalo_try_except({'method': 'scinema.search'})
     def search(self, keyword, id=None):
         sq = {'search': keyword, 'id': id}
         if str(id).startswith('search-people'):
@@ -289,7 +350,7 @@ class StreamCinemaContentProvider(ContentProvider):
         util.debug("[SC] search %s" % str(sq))
         return self.items(None, self._json(self._url('/Search/'), sq))
 
-    @buggalo.buggalo_try_except({'method': 'scinema._resolve'})
+    @bug.buggalo_try_except({'method': 'scinema._resolve'})
     def _resolve(self, itm):
         if itm is None:
             return None;
@@ -319,8 +380,9 @@ class StreamCinemaContentProvider(ContentProvider):
                         util.debug("[SC] VIP ucet konci")
 
                 itm['url'] = self.ws.resolve(itm.get('params').get('play').get('ident'))
+                itm['headers'] = {'User-Agent': util.UA}
             except:
-                buggalo.onExceptionRaised()
+                bug.onExceptionRaised()
                 pass
                         
         else:
@@ -339,12 +401,14 @@ class StreamCinemaContentProvider(ContentProvider):
         
         return itm
     
-    @buggalo.buggalo_try_except({'method': 'scinema.resolve'})
     def resolve(self, item, captcha_cb=None, select_cb=None):
         #util.debug("ITEM RESOLVE: " + str(item))
         item['url'] = self._url(item['url'])
         if sctop.BASE_URL in item['url']:
-            data = self._json(item['url']) #json.loads(self.get_data_cached(item['url']))
+            try:
+                data = self._json(item['url']) #json.loads(self.get_data_cached(item['url']))
+            except:
+                raise ResolveException('Video is not available.')
             if data is None:
                 raise ResolveException('Video is not available.')
             if 'strms' in data:
@@ -358,7 +422,7 @@ class StreamCinemaContentProvider(ContentProvider):
         else:
             return self._resolve(item)
 
-    @buggalo.buggalo_try_except({'method': 'scinema.keyboard'})
+    @bug.buggalo_try_except({'method': 'scinema.keyboard'})
     def keyboard(self, title, action):
         k = xbmc.Keyboard('', title);
         k.doModal()
@@ -369,4 +433,4 @@ class StreamCinemaContentProvider(ContentProvider):
         url = '%s?action=%s&q=%s' % (sys.argv[0], action, q)
         control.execute('Container.Update(%s)' % url)
         
-buggalo.SUBMIT_URL = sctop.submiturl
+bug.SUBMIT_URL = sctop.submiturl

@@ -32,4 +32,6 @@ if uid == '':
     uid = str(uuid.uuid4())
     __addon__.setSetting('uid', uid)
 
-KODISCLib(StreamCinemaContentProvider(username=__set__('wsuser'),password=__set__('wspass'),uid=uid), settings, __addon__).service()
+k = KODISCLib(StreamCinemaContentProvider(username=__set__('wsuser'),password=__set__('wspass'),uid=uid), settings, __addon__).service()
+del k
+util.info('[SC] DONE service.py')

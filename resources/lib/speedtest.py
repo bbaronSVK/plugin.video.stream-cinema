@@ -78,10 +78,13 @@ class speedTest():
                 thread.start()
                 threads.append(thread)
             for thread in threads:
-                thread.join()
-                total_downloaded += thread.downloaded
-                util.debug('[SC] Run %d for %s finished' %
+                try:
+                    thread.join()
+                    total_downloaded += thread.downloaded
+                    util.debug('[SC] Run %d for %s finished' %
                           (thread.run_number, current_file))
+                except:
+                    pass
         total_ms = (time() - total_start_time) * 1000
         for connection in connections:
             connection.close()

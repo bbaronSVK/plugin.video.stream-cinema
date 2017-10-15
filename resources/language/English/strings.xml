@@ -9,6 +9,8 @@
     <string id="30105">webshare password can't contain accents and special characters</string>
     <string id="30106">You can sign up at webshare.cz</string>
     
+    <string id="30008">Up Next</string>
+    
     <string id="30020">Subtitles</string>
     <string id="30201">Enable subtitles</string>
     <string id="30202">Convert subtitles to UTF-8</string>
@@ -31,6 +33,7 @@
     <string id="30402">Subscription service sleep on start</string>
     <string id="30403">Default show check time (days)</string>
     <string id="30404">Automatically add movies to the library</string>
+    <string id="30405">Check for new episodes</string>
     
     <string id="30050">SpeedTest</string>
     <string id="30500">Run internet speed test...</string>
@@ -59,6 +62,8 @@
     <string id="30605">Filter by quality</string>
     <string id="30606">Quality</string>
     <string id="30607">Remove HEVC stream</string>
+    <string id="30608">Detailed stream selection</string>
+    <string id="30609">Show up next episode</string>
 
     <!-- texty v menu -->
     <string id="30901">Movies</string>
@@ -118,6 +123,8 @@
     <string id="30953">Search</string>
     <string id="30954">New version of plugin</string>
     <string id="30955">New version of plugin (%s) has been uploaded. The plugin needs to be updated to work properly. If you have an automatic update, you can update yourself by clicking OK. If this does not happen, update the plugin manually.</string>
+    <string id="30956">Just watching</string>
+    <string id="30957">Too many requests, please wait (1 min) and try again.</string>
     
     <!-- dni v tyzdni -->
     <string id="30911">Monday</string>
