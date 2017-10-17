@@ -284,34 +284,12 @@ class MyPlayer(xbmc.Player):
         try:
             if 'resume' in self.libItem:
                 util.debug("[SC] resume! %s" % str(self.libItem))
-                self.seekTime(self.libItem['resume'].get('position', 0))
-            '''
-            res = self.parent.getResumePoint()
-            util.debug("[SC] XXXXXXXXXXXXXXX %s" % str(self.libItem))
-            if self.itemDBID in res:
-                util.debug("[SC] resumepoint: %s" % str(res[self.itemDBID]))
-                self.seekTime(res[self.itemDBID])
-                del(res[self.itemDBID])
-                self.parent.setResumePoint(res)
-            '''
+                pos = self.libItem['resume'].get('position', 0)
+                maxPos = self.getTotalTime() * .75
+                if pos > 3 * 60 and pos < maxPos:
+                    self.seekTime(pos)
         except:
             pass
-
-        return
-        util.debug("[SC] start wtime")
-        timer = 0    
-        while True:
-            if xbmc.abortRequested or not self.isPlayingVideo():
-                return
-            self.watchedTime = self.getTime()
-            #util.debug("[SC] stream ratio %s" % str(self.timeRatio()))
-            sctop.sleep(900)
-            timer += 1
-            if timer >= 600:
-                self.waitForChange()
-                timer = 0
-                data = {'scid': self.scid, 'action': 'ping', 'prog': self.timeRatio()}
-                self.action(data)
 
     def onPlayBackEnded(self):
         self.log("[SC] Skoncilo sa prehravat")
@@ -446,19 +424,6 @@ class MyPlayer(xbmc.Player):
                 data = provider._json(url)
                 util.debug("[SC] upNext data: %s" % str(data))
                 #$INFO[Player.TimeRemaining(ss)]
-                '''
-                from pyxbmct import BlankDialogWindow, Label, Button, Image
-                
-                addon = BlankDialogWindow()
-                addon.setGeometry(300, 200, 2, 3)
-                #addon.setBackground()
-                bg = Image('$INFO[Player.Art(fanart)]', aspectRatio=2)
-                addon.placeControl(bg, 0, 0, rowspan=2, columnspan=2)
-                label = Label('$INFO[Player.TimeRemaining(ss)]')
-                addon.placeControl(label, 1, 0)
-                addon.show()
-                '''
-
                 nextUpPage = NextUpInfo("sc-NextUpInfo.xml",
                     sctop.addonInfo('path'), "default", "1080i")
                 
@@ -478,19 +443,11 @@ class MyPlayer(xbmc.Player):
                 self.upNextEnable = False
                 util.debug("[SC] upNext: [%s] [%s] " % (str(shouldPlayDefault), str(shouldPlayNonDefault)))
                 if shouldPlayDefault or shouldPlayNonDefault:
-                    '''ret = xbmc.executeJSONRPC(
-                        '{ "jsonrpc": "2.0", "id": 0, "method": "Player.Stop", '
-                        '"params": { "playerid": 1 } }')'''
                     self.stop()
-                    util.debug("[SC] --------------------------- %s | %s" % (str(data), str(ret)))
                     data.update({'play': data['url'], 'url': data['url']})
                     pu = sctop._create_plugin_url({'play': data['url']}, 'plugin://' + sctop.__scriptid__ + '/')
                     util.debug("[SC] pluginurl: %s" % str(pu))
-                    '''ret = xbmc.executeJSONRPC(
-                        '{ "jsonrpc": "2.0", "id": 0, "method": "Player.Open", '
-                        '"params": { "item": {"file": "' + str(pu) + '"} } }')'''
                     self.play(pu)
-                    util.debug("[SC] JSONRPC ret: %s" % str(ret))
                     pass
                 else:
                     util.debug("[SC] upNExt smola :-(")
