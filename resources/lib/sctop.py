@@ -225,7 +225,7 @@ def _create_plugin_url(params, plugin=sys.argv[0]):
     for key in params.keys():
         # "menu", "img", "type", "size", "title"]:
         if key not in ["dtitle", "url", "action", "list", "cmd", "down", "play", "force",
-                        "search-list", "search", "search-remove", "search-edit", 
+                        "search-list", "search", "search-remove", "search-edit", "tl",
                         "id", "subtype", "title", "name", "imdb", "tvdb", "content"]:
             continue
         value = str(params[key])

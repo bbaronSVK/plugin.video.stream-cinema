@@ -213,7 +213,7 @@ class KODISCLib(xbmcprovider.XBMCMultiResolverContentProvider):
         if trakt.getTraktCredentialsInfo() == True:
             util.debug("[SC] add_item_trakt: %s" % str(params))
             ids = trakt.getList(params['tl'])
-            data = self.provider._json(self.provider._url("/Search/?%s" % urllib.urlencode({'ids': json.dumps(ids)})))
+            data = self.provider._json(self.provider._url("/Search/"), {'ids': json.dumps(ids)})
             if 'menu' in data:
                 error = False
                 new = False
@@ -1151,6 +1151,7 @@ class KODISCLib(xbmcprovider.XBMCMultiResolverContentProvider):
             except: 
                 lang = filter[0]['SubLanguageID']
 
+            util.debug("[SC] subtitles: %s" % str(filter[0]))
             content = [filter[0]['IDSubtitleFile'],]
             content = server.DownloadSubtitles(token, content)
             content = base64.b64decode(content['data'][0]['data'])
