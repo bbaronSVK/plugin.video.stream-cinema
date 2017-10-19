@@ -157,9 +157,18 @@ def request(url, headers={}, output="content"):
     req.add_header('User-Agent', util.UA)
     if util._cookie_jar is not None:
         util._cookie_jar.add_cookie_header(req)
+    data = ''
     try:
         response = urllib2.urlopen(req)
-        data = response.read()
+        while True:
+            try:
+                tmp = response.read()
+            except http.client.IncompleteRead as icread:
+                data = data + icread.partial.decode('utf-8')
+                continue
+            else:
+                data = data + tmp.decode('utf-8')
+                break
         code = response.code
         info = response.info()
         response.close()
