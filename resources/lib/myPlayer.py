@@ -292,6 +292,8 @@ class MyPlayer(xbmc.Player):
             pass
 
     def onPlayBackEnded(self):
+        if self.scid is None:
+            return
         self.log("[SC] Skoncilo sa prehravat")
         self.setWatched()
         data = {'scid': self.scid, 'action': 'end'}
@@ -304,6 +306,8 @@ class MyPlayer(xbmc.Player):
         return
 
     def onPlayBackStopped(self):
+        if self.scid is None:
+            return
         self.log("[SC] Stoplo sa prehravanie")
         data = {'scid': self.scid, 'action': 'stop', 'prog': self.timeRatio()}
         
@@ -340,10 +344,13 @@ class MyPlayer(xbmc.Player):
             util.debug("[SC] timeRatio error")
             util.debug(e)
             pass
-        self.realFinishTime = xbmc.getInfoLabel('Player.FinishTime(hh:mm:ss)')
-        return (self.get_sec(self.estimateFinishTime).seconds - \
-            self.get_sec(self.realFinishTime).seconds) / \
-            math.floor(self.itemDuration)
+        try:
+            self.realFinishTime = xbmc.getInfoLabel('Player.FinishTime(hh:mm:ss)')
+            return (self.get_sec(self.estimateFinishTime).seconds - \
+                self.get_sec(self.realFinishTime).seconds) / \
+                math.floor(self.itemDuration)
+        except:
+            return None
         
     def waitForChange(self):
         scutils.KODISCLib.sleep(200)
@@ -357,6 +364,8 @@ class MyPlayer(xbmc.Player):
             scutils.KODISCLib.sleep(100)
 
     def onPlayBackResumed(self):
+        if self.scid is None:
+            return
         self.log("[SC] Znova sa prehrava")
         self.waitForChange()
         data = {'scid': self.scid, 'action': 'resume', 'prog': self.timeRatio()}
@@ -364,6 +373,8 @@ class MyPlayer(xbmc.Player):
         return;
 
     def onPlayBackSpeedChanged(self, speed):
+        if self.scid is None:
+            return
         self.log("[SC] Zmennila sa rychlost prehravania %s" % speed)
         self.waitForChange()
         data = {'scid': self.scid, 'action': 'speed', 'speed': speed, 'prog': self.timeRatio()}
@@ -371,6 +382,8 @@ class MyPlayer(xbmc.Player):
         return
 
     def onPlayBackSeek(self, time, seekOffset):
+        if self.scid is None:
+            return
         self.log("[SC] Seekujem %s %s" % (time, seekOffset))
         self.waitForChange()
         data = {'scid': self.scid, 'action': 'seek', 'time': time, 'seekOffset': seekOffset, 'prog': self.timeRatio()}
@@ -378,6 +391,8 @@ class MyPlayer(xbmc.Player):
         return
     
     def onPlayBackPaused(self):
+        if self.scid is None:
+            return
         self.log("[SC] Pauza")
         self.waitForChange()
         data = {'scid': self.scid, 'action': 'pause', 'prog': self.timeRatio()}
