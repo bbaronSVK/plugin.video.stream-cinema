@@ -140,4 +140,4 @@ class Webshare():
                 raise ResolveException(xml.find('message').text)
             return xml.find('link').text
         except Exception, e:
-            raise ResolveException(e.value)
+            raise ResolveException(e)

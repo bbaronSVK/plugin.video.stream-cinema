@@ -232,7 +232,7 @@ class MyPlayer(xbmc.Player):
                             pass
                         
                     method = 'VideoLibrary.GetTVShows'
-                    value = showtitle #/Season %s/%sx%s.strm" % (showtitle, season, season, episode)
+                    value = self.parent.normalize_filename(str(showtitle)) #/Season %s/%sx%s.strm" % (showtitle, season, season, episode)
                     field = 'path'
                     res = self.executeJSON({'jsonrpc': '2.0', 'method': method, 
                         'params': {'filter':

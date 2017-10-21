@@ -657,7 +657,7 @@ class KODISCLib(xbmcprovider.XBMCMultiResolverContentProvider):
             self.force = True
         stream = self.resolve(item['url'])
         
-        if stream:
+        if stream and 'id' in stream:
             imdb = stream['imdb'] if 'imdb' in stream else 0
             tvdb = stream['tvdb'] if 'tvdb' in stream else 0
             trakt = stream['trakt'] if 'trakt' in stream else 0
@@ -707,7 +707,6 @@ class KODISCLib(xbmcprovider.XBMCMultiResolverContentProvider):
                 if 'subs' in stream and stream['subs'] != '' and stream['subs'] is not None:
                     #util.debug("Seturnm titulky: " + str(stream['subs']))
                     li.setSubtitles([stream['subs']])
-                li.setProperty("user-agent", "BBaron 1/0")
             except:
                 pass
             self.win.setProperty(sctop.__scriptid__, sctop.__scriptid__)
@@ -716,6 +715,11 @@ class KODISCLib(xbmcprovider.XBMCMultiResolverContentProvider):
                 return xbmc.Player().play(stream['url'], li, False, -1)
             util.debug("[SC] setResolvedUrl")
             xbmcplugin.setResolvedUrl(int(sys.argv[1]), True, li)
+        else:
+            li = xbmcgui.ListItem(path=item['url'])
+            xbmcplugin.setResolvedUrl(int(sys.argv[1]), False, li)
+            util.debug('[SC] ERR play strem %s' % str(stream))
+            pass
         
     def _settings(self):
         return

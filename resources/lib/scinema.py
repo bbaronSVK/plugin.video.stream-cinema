@@ -224,8 +224,8 @@ class StreamCinemaContentProvider(ContentProvider):
             if not ret:
                 util.debug("[SC] url BEZ cache %s" % str(url))
                 (ret, code, info) = sctop.request(url, headers, "info")
-                util.debug("[SC] code: %s" % str(code))
-                self.handleHttpError(code, data=ret)
+                util.debug("[SC] code: %s %s" % (str(code), str(info)))
+                self.handleHttpError(code, data=ret, i=info)
                 if code == 200:
                     ttl = datetime.timedelta(hours=2)
                     try:
@@ -249,16 +249,24 @@ class StreamCinemaContentProvider(ContentProvider):
                 sctop.dialog.ok("error", url)
             return False
     
-    def handleHttpError(self, code, data=None):
+    def handleHttpError(self, code, data=None, i=None):
         if int(code) == 200:
             return
         if int(code) == 429:
+            util.debug("[SC] 429: %s " % str(i))
             sctop.dialog.ok('error', sctop.getString(30957))
+            self.bSleep(50)
             raise Exception('API call')
         else:
             util.debug("[SC] data: %s" % str(data))
             sctop.dialog.ok('error', 'server error')
+            self.bSleep(30)
             raise Exception('server error: %s' % str(code))
+    
+    def bSleep(self, time):
+        xbmc.executebuiltin("ActivateWindow(busydialog)")
+        sctop.sleep(time * 1000)
+        xbmc.executebuiltin("Dialog.Close(busydialog)")
     
     @bug.buggalo_try_except({'method': 'scinema._dir_item'})
     def _dir_item(self, m):
