@@ -4,7 +4,10 @@ import util
 from platform import machine
 
 ACTION_PLAYER_STOP = 13
-OS_MACHINE = machine()
+try:
+    OS_MACHINE = machine()
+except:
+    OS_MACHINE = ''
 
 
 class NextUpInfo(xbmcgui.WindowXMLDialog):
@@ -16,7 +19,13 @@ class NextUpInfo(xbmcgui.WindowXMLDialog):
         if OS_MACHINE[0:5] == 'armv7':
             xbmcgui.WindowXMLDialog.__init__(self)
         else:
-            xbmcgui.WindowXMLDialog.__init__(self, *args, **kwargs)
+            try:
+                xbmcgui.WindowXMLDialog.__init__(self, *args, **kwargs)
+            except:
+                try:
+                    xbmcgui.WindowXMLDialog.__init__(self)
+                except:
+                    pass
 
     def onInit(self):
         self.action_exitkeys_id = [10, 13]

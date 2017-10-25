@@ -32,11 +32,13 @@ from provider import ResolveException
 from urlparse import urlparse, parse_qs, urlunsplit
 import urllib
 import util
+import xbmcgui
 import xbmcplugin
 import xbmc
 import sctop
 import trakt
 import tracker
+import traceback
 import datetime
 import storagecache
 
@@ -131,7 +133,8 @@ class StreamCinemaContentProvider(ContentProvider):
                     pass
             if 'system' in data:
                 #util.debug("SYSTEM!!!!")
-                self.system(data["system"])
+                self.parent.system = data["system"]
+                #self.system(data["system"])
         else:
             result = [{'title': 'i failed', 'url':'failed', 'type':'dir'}]
         #util.debug('--------------------- DONE -----------------')
@@ -155,7 +158,7 @@ class StreamCinemaContentProvider(ContentProvider):
             except:
                 util.debug("[SC] Unable to find view code for view mode "+str(view_mode)+" and skin "+skin_name)
             '''
-        
+                
         if "setPluginCategory" in data:
             xbmcplugin.setPluginCategory(int(sys.argv[1]), data["setPluginCategory"])
         
@@ -182,6 +185,17 @@ class StreamCinemaContentProvider(ContentProvider):
                 self.parent.cacheMigrate()
                 pass
             pass
+        
+        if "focus" in data:
+            try:
+                self.parent.endOfDirectory()
+                util.debug("[SC] nastavujem focus na: %d" % int(data['focus']))
+                xel = xbmcgui.Window(xbmcgui.getCurrentWindowId())
+                xel.getControl(50).selectItem(int(data['focus']))
+            except Exception, e:
+                util.debug("[SC] error focus :-( %s" % str(traceback.format_exc()))
+                pass
+            
 
     @bug.buggalo_try_except({'method': 'scinema.categories'})
     def categories(self):

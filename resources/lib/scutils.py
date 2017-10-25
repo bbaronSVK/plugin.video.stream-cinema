@@ -35,6 +35,7 @@ class KODISCLib(xbmcprovider.XBMCMultiResolverContentProvider):
     subs = None
     mPlayer = None
     force = False
+    system = None
 
     def __init__(self, provider, settings, addon):
         xbmcprovider.XBMCMultiResolverContentProvider.__init__(self, provider, settings, addon)
@@ -67,6 +68,8 @@ class KODISCLib(xbmcprovider.XBMCMultiResolverContentProvider):
             return self.root()
         if 'list' in params.keys() and params['list'] != '':
             self.list(self.provider.list(params['list']))
+            if self.system is not None:
+                self.provider.system(self.system)
             return self.endOfDirectory()
         if 'down' in params.keys():
             self.force = True

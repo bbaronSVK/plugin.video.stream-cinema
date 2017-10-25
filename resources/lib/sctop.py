@@ -18,7 +18,6 @@ __set__ = __addon__.getSetting
 __language__ = __addon__.getLocalizedString
 
 BASE_URL="http://stream-cinema.online/kodi"
-BASE_URL="http://movies.bbaron.sk/kodi"
 API_VERSION="1.2"
 KODI_VERSION = int(xbmc.getInfoLabel("System.BuildVersion").split(".")[0])
 player = None
