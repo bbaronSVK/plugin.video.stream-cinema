@@ -69,7 +69,7 @@ class KODISCLib(xbmcprovider.XBMCMultiResolverContentProvider):
         if 'list' in params.keys() and params['list'] != '':
             self.list(self.provider.list(params['list']))
             if self.system is not None:
-                self.provider.system(self.system)
+                self.provider.system(self.system, True)
             return self.endOfDirectory()
         if 'down' in params.keys():
             self.force = True

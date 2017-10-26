@@ -133,16 +133,17 @@ class StreamCinemaContentProvider(ContentProvider):
                     pass
             if 'system' in data:
                 #util.debug("SYSTEM!!!!")
-                self.parent.system = data["system"]
-                #self.system(data["system"])
+                #self.parent.system = data["system"]
+                self.system(data["system"])
         else:
             result = [{'title': 'i failed', 'url':'failed', 'type':'dir'}]
         #util.debug('--------------------- DONE -----------------')
         return result
 
     @bug.buggalo_try_except({'method': 'scinema.system'})
-    def system(self, data):
-        if "setContent" in data:
+    def system(self, data, cl=False):
+        util.debug("[SC] SYSYEM CL: %s" % str(cl));
+        if cl is False and "setContent" in data:
             xbmcplugin.setContent(int(sys.argv[1]), data["setContent"])
             '''
             view_mode=data["setContent"].lower()
@@ -159,20 +160,20 @@ class StreamCinemaContentProvider(ContentProvider):
                 util.debug("[SC] Unable to find view code for view mode "+str(view_mode)+" and skin "+skin_name)
             '''
                 
-        if "setPluginCategory" in data:
+        if cl is False and "setPluginCategory" in data:
             xbmcplugin.setPluginCategory(int(sys.argv[1]), data["setPluginCategory"])
         
-        if "addSortMethod" in data:
+        if cl is False and "addSortMethod" in data:
             xbmcplugin.addSortMethod(int(sys.argv[1]), sctop.sortmethod[int(data["addSortMethod"])])
 
-        if data.get('addSortMethods'):
+        if cl is False and data.get('addSortMethods'):
             for m in data.get("addSortMethods"):
                 xbmcplugin.addSortMethod(int(sys.argv[1]), sctop.sortmethod[int(m)])
         
-        if "setPluginFanart" in data:
+        if cl is False and "setPluginFanart" in data:
             xbmcplugin.setPluginFanart(int(sys.argv[1]), data["setPluginFanart"])
         
-        if "version" in data:
+        if cl is False and "version" in data:
             util.info("[SC] kontrola verzie: %s %s" % (str(sctop.addonInfo('version')), data["version"]))
             if sctop.addonInfo('version') != data["version"] and sctop.getSetting('ver') != data['version']:
                 try:
@@ -186,12 +187,16 @@ class StreamCinemaContentProvider(ContentProvider):
                 pass
             pass
         
-        if "focus" in data:
+        if cl is False and "focus" in data:
+            self.parent.system = {"focus": data['focus']}
+            
+        if cl is True and "focus" in data:
             try:
                 self.parent.endOfDirectory()
                 util.debug("[SC] nastavujem focus na: %d" % int(data['focus']))
                 xel = xbmcgui.Window(xbmcgui.getCurrentWindowId())
-                xel.getControl(50).selectItem(int(data['focus']))
+                ctr = xel.getControl(xel.getFocusId())
+                ctr.selectItem(int(data['focus']))
             except Exception, e:
                 util.debug("[SC] error focus :-( %s" % str(traceback.format_exc()))
                 pass
