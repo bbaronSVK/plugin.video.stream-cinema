@@ -256,7 +256,7 @@ class KODISCLib(xbmcprovider.XBMCMultiResolverContentProvider):
         data = self.provider._json("%s/Lib/multi" % sctop.BASE_URL, {"ids": json.dumps(ids)})
         if data:
             for i in data:
-                self.add_item({'notifi':1}, data=i)
+                self.add_item({'notifi':1, 'update':True}, data=i)
                     
     @bug.buggalo_try_except({'method': 'scutils.add_item'})
     def add_item(self, params, addToSubscription=False, data=None):
@@ -317,7 +317,8 @@ class KODISCLib(xbmcprovider.XBMCMultiResolverContentProvider):
 
     @bug.buggalo_try_except({'method': 'scutils.canCheck'})
     def canCheck(self, last_run):
-        next_check = last_run + ((sctop.getSettingAsInt('refresh_time') + 3600) * 3600 * 24)
+        next_check = last_run + ((sctop.getSettingAsInt('refresh_time')) * 3600 * 24) + 3600
+        util.debug("[SC] can check: %d %d" % (int(next_check), int(time.time())))
         return next_check < time.time()
     
     @bug.buggalo_try_except({'method': 'scutils.csearch'})
@@ -351,7 +352,7 @@ class KODISCLib(xbmcprovider.XBMCMultiResolverContentProvider):
                     num += 1
                     if force and dialog:
                         perc = 100 * num / total
-                        #util.info("percento: %s %d %d" % (str(perc), int(num), int(total)))
+                        util.info("percento: %s %d %d" % (str(perc), int(num), int(total)))
                         if dialog.iscanceled():
                             self.setSubs(subs)
                             return
@@ -387,7 +388,7 @@ class KODISCLib(xbmcprovider.XBMCMultiResolverContentProvider):
                         data['last_run'] = time.time()
                         subs[iid] = data
                         self.setSubs(subs)
-                        
+                util.debug("[SC] subscription done")        
                 if len(ids) > 0:
                     self.add_item_lastrun(ids)
 
@@ -1203,7 +1204,7 @@ class KODISCLib(xbmcprovider.XBMCMultiResolverContentProvider):
     @bug.buggalo_try_except({'method': 'scutils.setSubs'})
     def setSubs(self, subs):
         self.subs = subs
-        util.debug("[SC] set subs %s" % str(subs))
+        #util.debug("[SC] set subs %s" % str(subs))
         self.cache.set("subscription", repr(subs), expiration=timedelta(days=365))
 
     @bug.buggalo_try_except({'method': 'scutils.getResumePoint'})

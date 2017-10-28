@@ -439,34 +439,34 @@ class MyPlayer(xbmc.Player):
                 util.debug("[SC] upNext URL: %s" % str(url))
                 data = provider._json(url)
                 util.debug("[SC] upNext data: %s" % str(data))
-                #$INFO[Player.TimeRemaining(ss)]
-                nextUpPage = NextUpInfo("sc-NextUpInfo.xml",
-                    sctop.addonInfo('path'), "default", "1080i")
-                
-                nextUpPage.setItem(data)
-                nextUpPage.show()
-                while xbmc.Player().isPlaying() and (totalTime - playTime > 1) and not nextUpPage.isCancel() and not nextUpPage.isWatchNow():
-                    sctop.sleep(100)
-                    try:
-                        playTime = xbmc.Player().getTime()
-                        totalTime = xbmc.Player().getTotalTime()
-                    except:
-                        pass
-                    
-                nextUpPage.close()
-                shouldPlayDefault = not nextUpPage.isCancel()
-                shouldPlayNonDefault = nextUpPage.isWatchNow()
-                self.upNextEnable = False
-                util.debug("[SC] upNext: [%s] [%s] " % (str(shouldPlayDefault), str(shouldPlayNonDefault)))
-                if shouldPlayDefault or shouldPlayNonDefault:
-                    self.stop()
-                    data.update({'play': data['url'], 'url': data['url']})
-                    pu = sctop._create_plugin_url({'play': data['url']}, 'plugin://' + sctop.__scriptid__ + '/')
-                    util.debug("[SC] pluginurl: %s" % str(pu))
-                    self.play(pu)
-                    pass
-                else:
-                    util.debug("[SC] upNExt smola :-(")
+                if data and "url" in data:
+                    #$INFO[Player.TimeRemaining(ss)]
+                    nextUpPage = NextUpInfo("sc-NextUpInfo.xml",
+                        sctop.addonInfo('path'), "default", "1080i")
+
+                    nextUpPage.setItem(data)
+                    nextUpPage.show()
+                    while xbmc.Player().isPlaying() and (totalTime - playTime > 1) and not nextUpPage.isCancel() and not nextUpPage.isWatchNow():
+                        sctop.sleep(100)
+                        try:
+                            playTime = xbmc.Player().getTime()
+                            totalTime = xbmc.Player().getTotalTime()
+                        except:
+                            pass
+
+                    nextUpPage.close()
+                    shouldPlayDefault = not nextUpPage.isCancel()
+                    shouldPlayNonDefault = nextUpPage.isWatchNow()
+                    self.upNextEnable = False
+                    util.debug("[SC] upNext: [%s] [%s] " % (str(shouldPlayDefault), str(shouldPlayNonDefault)))
+                    if shouldPlayDefault or shouldPlayNonDefault:
+                        self.stop()
+                        data.update({'play': data['url'], 'url': data['url']})
+                        pu = sctop._create_plugin_url({'play': data['url']}, 'plugin://' + sctop.__scriptid__ + '/')
+                        util.debug("[SC] pluginurl: %s" % str(pu))
+                        self.play(pu)
+                        return
+                util.debug("[SC] upNExt smola :-(")
                 return
             else:
                 util.debug("[SC] upNext: mame film")

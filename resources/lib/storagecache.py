@@ -62,6 +62,9 @@ class StorageCache:
             ret = ""
         return ret
 
+    def delete(self, name):
+        return self.set(name, None, expiration=timedelta(seconds=1))
+    
     def setMulti(self, name, data):
         '''
         temp = repr({"name": name, "data": data})
