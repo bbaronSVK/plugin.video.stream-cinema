@@ -24,6 +24,7 @@ import xbmcprovider
 import xbmcvfs
 import xmlrpclib
 import zlib
+import random
 from dialogselect import DialogSelect
 from collections import defaultdict
 from provider import ResolveException
