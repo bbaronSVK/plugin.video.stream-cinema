@@ -204,7 +204,7 @@ class KODISCLib(xbmcprovider.XBMCMultiResolverContentProvider):
             out += "http://www.imdb.com/title/tt%07d/\n" % int(data['imdb'])
         if 'tmdb' in data and data['tmdb'] is not None and int(data['tmdb']) > 0:
             out += "https://www.themoviedb.org/movie/%d/\n" % int(data['tmdb'])
-        if 'csfd' in data and data['csfd'] is not None and int(data['csfd']) > 0:
+        if 'csfd' in data and data['csfd'] is not None and int(data['csfd']) > 0 and data['csfd'] < 999999:
             out += "http://www.csfd.cz/film/%d-\n" % int(data['csfd'])
         if 'tvdb' in data and data['tvdb'] is not None and int(data['tvdb']) > 0:
             out += "http://thetvdb.com/index.php?tab=series&id=%d\n" % int(data['tvdb'])

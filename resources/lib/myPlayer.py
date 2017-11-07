@@ -123,6 +123,36 @@ class MyPlayer(xbmc.Player):
             bug.onExceptionRaised({'seconds: ': seconds})
         return
 
+    def tryALang(self, lang):
+        if lang == 'SK':
+            alist = ['slo', 'sk', 'svk']
+        elif lang == 'CZ':
+            alist = ['cze', 'cz']
+        else:
+            util.debug("[SC] iny jazyk")
+            return False
+        
+        util.debug("[SC] zoznam audio: %s" % str(alist))
+        streams = self.getAvailableAudioStreams()
+        for i in alist:
+            if i in streams:
+                util.debug("[SC] mamae audio: %s" % str(i))
+                stream_number = streams.index(i)
+                self.setAudioStream(stream_number)
+                return True
+        return False
+    
+    def selectAudio(self):
+        apri = sctop.getSetting('filter_lang.1')
+        util.debug("[SC] skusam primary %s" % str(apri))
+        if self.tryALang(apri):
+            return
+        
+        asec = sctop.getSetting('filter_lang.2')
+        util.debug("[SC] skusam secondary %s" % str(asec))
+        self.tryALang(asec)
+
+
     def onPlayBackStarted(self):
         if self.scid is not None:
             self.onPlayBackStopped()
@@ -158,6 +188,13 @@ class MyPlayer(xbmc.Player):
         try:
             if not self.isPlayingVideo():
                 return
+            
+            try:
+                if sctop.getSettingAsBool('filter_audio'):
+                    util.debug("[SC] skusam vybrat spravne audio")
+                    self.selectAudio()
+            except:
+                pass
             
             self.itemDuration = self.getTotalTime()
             # plánovaný čas dokončení 100 % přehrání
