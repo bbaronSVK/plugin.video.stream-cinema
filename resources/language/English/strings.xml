@@ -64,6 +64,7 @@
     <string id="30607">Remove HEVC stream</string>
     <string id="30608">Detailed stream selection</string>
     <string id="30609">Show up next episode</string>
+    <string id="30610">Remove 3D stream</string>
 
     <!-- texty v menu -->
     <string id="30901">Movies</string>

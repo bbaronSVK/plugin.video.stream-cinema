@@ -1368,6 +1368,20 @@ class KODISCLib(xbmcprovider.XBMCMultiResolverContentProvider):
         for i in resolved:
             if not ('vinfo' in i and re.search('HEVC', i['vinfo'])):
                 tmp.append(i)
+            else:
+                util.debug("[SC] vyhadzujem HEVC stream")
+                pass
+        return tmp
+    
+    @bug.buggalo_try_except({'method': 'scutils.filter_3d'})
+    def filter_3d(self, resolved):
+        tmp = []
+        for i in resolved:
+            if '3D-SBS' not in i['quality']:
+                tmp.append(i)
+            else:
+                util.debug("[SC] vyhadzujem 3D stream")
+                pass
         return tmp
     
     @bug.buggalo_try_except({'method': 'scutils.filter_priority'})
@@ -1378,6 +1392,9 @@ class KODISCLib(xbmcprovider.XBMCMultiResolverContentProvider):
         
         if sctop.getSettingAsBool('filter_hevc'):
             resolved = self.filter_hevc(resolved)
+        
+        if sctop.getSettingAsBool('filter_3d'):
+            resolved = self.filter_3d(resolved)
         
         if sctop.getSettingAsBool('filter_audio') and not sctop.getSettingAsBool('filter_video'):
             return self.filter_lang(resolved, False)

@@ -33,7 +33,9 @@
         <setting label="30605" id="filter_video" subsetting="true" type="bool" default="false" enable="eq(-8,true)"/>
         <setting label="30606" id="filter_quality" subsetting="true" type="select" values="4K|1080p|720p|SD" enable="eq(-1,true) + eq(-9,true)" default="1080p"/>
         <setting type="sep" />
-        <setting label="30607" id="filter_hevc" subsetting="true" type="bool" enable="eq(-11,true)" default="false"/>
+        <setting label="30610" id="filter_3d" subsetting="true" type="bool" enable="eq(-11,true)" default="false"/>
+        <setting type="sep" />
+        <setting label="30607" id="filter_hevc" subsetting="true" type="bool" enable="eq(-13,true)" default="false"/>
         <setting type="sep" />
         <setting label="30608" id="dialog_details" type="bool" default="false"/>
         <setting type="sep" />
