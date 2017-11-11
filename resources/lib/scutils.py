@@ -1115,7 +1115,7 @@ class KODISCLib(xbmcprovider.XBMCMultiResolverContentProvider):
                 'el': 'cp1253', 'heb': 'cp1255', 'he': 'cp1255', 'sk': 'cp1250', 'tur': 'cp1254', 
                 'tr': 'cp1254', 'rus': 'cp1251', 'ru': 'cp1251'}
 
-            quality = ['bluray', 'hdrip', 'brrip', 'bdrip', 'dvdrip', 'webrip', 'mhd', 'hdtv']
+            quality = ['bluray', 'hdrip', 'brrip', 'bdrip', 'dvdrip', 'webrip', 'mhd', 'hdtv', 'web', 'www']
 
             langs = []
             try:
@@ -1138,19 +1138,29 @@ class KODISCLib(xbmcprovider.XBMCMultiResolverContentProvider):
 
             if season is not None and episode is not None:
                 result = server.SearchSubtitles(token, [{'sublanguageid': sublanguageid, 'imdbid': imdbid, 'season': season, 'episode': episode}])['data']
-                fmt = ['hdtv']
             else:
                 result = server.SearchSubtitles(token, [{'sublanguageid': sublanguageid, 'imdbid': imdbid}])['data']
-                try: vidPath = stream['url']
-                except: vidPath = ''
-                fmt = re.split('\.|\(|\)|\[|\]|\s|\-', vidPath)
-                fmt = [i.lower() for i in fmt]
-                fmt = [i for i in fmt if i in quality]
+
+            try: vidPath = stream['fname'] if 'fname' in stream else stream['url']
+            except: vidPath = ''
+            fmt = re.split('\.|\(|\)|\[|\]|\s|\-', vidPath)
+            fmt = [i.lower() for i in fmt]
+            fmt = [i for i in fmt if i in quality]
 
             filter = []
             result = [i for i in result if i['SubSumCD'] == '1']
 
             for lang in langs:
+                if 'src' in stream and 'grp' in stream:
+                    util.debug("[SC] skusam vybrat podla SRC a GRP")
+                    filter += [i for i in result if i['SubLanguageID'] == lang and stream['src'].lower() in i['MovieReleaseName'].lower() and stream['grp'].lower() in i['MovieReleaseName'].lower()]
+                if 'src' not in stream and 'grp' in stream:
+                    util.debug("[SC] skusam vybrat podla GRP")
+                    filter += [i for i in result if i['SubLanguageID'] == lang and stream['grp'].lower() in i['MovieReleaseName'].lower()]
+                if 'src' in stream and 'grp' not in stream:
+                    util.debug("[SC] skusam vybrat podla SRC")
+                    filter += [i for i in result if i['SubLanguageID'] == lang and stream['src'].lower() in i['MovieReleaseName'].lower()]
+                    
                 filter += [i for i in result if i['SubLanguageID'] == lang and any(x in i['MovieReleaseName'].lower() for x in fmt)]
                 filter += [i for i in result if i['SubLanguageID'] == lang and any(x in i['MovieReleaseName'].lower() for x in quality)]
                 filter += [i for i in result if i['SubLanguageID'] == lang]
