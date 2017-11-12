@@ -339,7 +339,7 @@ class StreamCinemaContentProvider(ContentProvider):
             imdb = 'tt%07d' % int(data['imdb']) if 'imdb' in data else 0
             tvdb = data['tvdb'] if 'tvdb' in data else 0
             menu.update({"Trakt menu": {"action": "traktManager", 'name': data['title'], 'imdb': imdb, 'tvdb': tvdb, 'content':content}})
-            
+
         if 'id' in data and data['id'].isdigit() and 'season' not in data:
             menu.update({"$30918": {"action": "add-to-lib", "id": 'movies/%d' % int(data['id']), "title": data['title']}})
             
@@ -407,6 +407,16 @@ class StreamCinemaContentProvider(ContentProvider):
                         util.debug("[SC] VIP ucet konci")
 
                 itm['url'] = self.ws.resolve(itm.get('params').get('play').get('ident'))
+                try:
+                    if 'subs' in itm and "webshare.cz" in itm['subs']:
+                        from urlparse import urlparse
+                        import re
+                        o = urlparse(itm['subs'])
+                        util.debug("[SC] webshare titulky: %s" % str(o[5]))
+                        g = re.split('/', o[5])
+                        itm['subs'] = self.ws.resolve(g[2])
+                except:
+                    pass
                 itm['headers'] = {'User-Agent': util.UA}
             except:
                 bug.onExceptionRaised()
