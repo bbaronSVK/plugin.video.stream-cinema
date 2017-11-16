@@ -134,14 +134,15 @@ class MyPlayer(xbmc.Player):
             util.debug("[SC] iny jazyk")
             return False
         
-        util.debug("[SC] zoznam audio: %s" % str(alist))
         streams = self.getAvailableAudioStreams()
+        util.debug("[SC] zoznam audio: %s | %s" % (str(alist), str(streams)))
         for i in alist:
             if i in streams:
-                util.debug("[SC] mamae audio: %s pre jazyk %s" % (str(i), str(lang)))
+                util.debug("[SC] mame audio: %s pre jazyk %s" % (str(i), str(lang)))
                 stream_number = streams.index(i)
                 self.setAudioStream(stream_number)
                 return True
+        util.debug("[SC] NEmame audio: pre jazyk %s" % (str(lang)))
         return False
     
     def selectAudio(self):
@@ -188,15 +189,17 @@ class MyPlayer(xbmc.Player):
         self.win.clearProperty('scid')
         self.win.clearProperty('scresume')
         try:
+            if sctop.getSettingAsBool('filter_audio'):
+                util.debug("[SC] skusam vybrat spravne audio")
+                self.selectAudio()
+            else:
+                util.debug("[SC] nemame filter pre audio")
+        except:
+            util.debug("[SC] XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX")
+            pass
+        try:
             if not self.isPlayingVideo():
                 return
-            
-            try:
-                if sctop.getSettingAsBool('filter_audio'):
-                    util.debug("[SC] skusam vybrat spravne audio")
-                    self.selectAudio()
-            except:
-                pass
             
             self.itemDuration = self.getTotalTime()
             # plánovaný čas dokončení 100 % přehrání
@@ -501,8 +504,8 @@ class MyPlayer(xbmc.Player):
                     if shouldPlayDefault or shouldPlayNonDefault:
                         self.stop()
                         data.update({'play': data['url'], 'url': data['url']})
-                        pu = sctop._create_plugin_url({'play': data['url']}, 'plugin://' + sctop.__scriptid__ + '/')
-                        util.debug("[SC] pluginurl: %s" % str(pu))
+                        pu = sctop._create_plugin_url({'dtitle': data['title'], 'play': data['url']}, 'plugin://' + sctop.__scriptid__ + '/')
+                        util.debug("[SC] upNext pluginurl: %s" % str(pu))
                         self.play(pu)
                         return
                 util.debug("[SC] upNExt smola :-(")

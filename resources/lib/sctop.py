@@ -20,6 +20,7 @@ __language__ = __addon__.getLocalizedString
 BASE_URL="http://stream-cinema.online/kodi"
 API_VERSION="1.2"
 KODI_VERSION = int(xbmc.getInfoLabel("System.BuildVersion").split(".")[0])
+KODI_LANG = xbmc.getInfoLabel("System.Language")[:3].lower()
 player = None
 uid = None
 traktlistlast = None
@@ -163,10 +164,10 @@ def request(url, headers={}, output="content"):
             try:
                 tmp = response.read()
             except http.client.IncompleteRead as icread:
-                data = data + icread.partial.decode('utf-8')
+                data = data + icread.partial #.decode('utf-8')
                 continue
             else:
-                data = data + tmp.decode('utf-8')
+                data = data + tmp #.decode('utf-8')
                 break
         code = response.code
         info = response.info()
@@ -178,7 +179,10 @@ def request(url, headers={}, output="content"):
     util.debug('len(data) %s' % len(data))
     
     if (output == "content"):
-        return data
+        try:
+            return data.decode('utf-8')
+        except:
+            return data
     if (output == "info"):
         return (data, code, info)
     else:

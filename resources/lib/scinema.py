@@ -92,7 +92,9 @@ class StreamCinemaContentProvider(ContentProvider):
         else:
             o = urlparse(url)
         q = parse_qs(o.query)
-        q.update({'uid': self.uid, 'ver': sctop.API_VERSION})
+        q.update({'uid': self.uid, 'ver': sctop.API_VERSION, 'lang': sctop.KODI_LANG})
+        if sctop.getSettingAsBool('filter_audio'):
+            q.update({'l' : sctop.getSetting('filter_lang.1')})
         if not url.startswith('http'):
             n = [str(o[0]),str(o[1]),str(o[2]).rstrip('./') + '/' + url.lstrip('./'),str(o[3]), '']
         else:
@@ -412,10 +414,15 @@ class StreamCinemaContentProvider(ContentProvider):
                         from urlparse import urlparse
                         import re
                         o = urlparse(itm['subs'])
-                        util.debug("[SC] webshare titulky: %s" % str(o[5]))
-                        g = re.split('/', o[5])
-                        itm['subs'] = self.ws.resolve(g[2])
-                except:
+                        g = re.split('/', o[2] if o[5] == '' else o[5])
+                        util.debug("[SC] webshare titulky: %s | %s" % (str(g[2]), itm['subs']))
+                        url = self.ws.resolve(g[2])
+                        itm['subs'] = url
+                        content = sctop.request(url)
+                        itm['subs'] = self.parent.saveSubtitle(content, 'cs', False)
+                        util.debug("[SC] posielam URL na titulky: %s" % itm['subs'])
+                except Exception, e:
+                    util.debug("[SC] chyba WS titlkov... %s | %s" % (str(e), str(traceback.format_exc())))
                     pass
                 itm['headers'] = {'User-Agent': util.UA}
             except:

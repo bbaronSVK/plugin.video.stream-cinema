@@ -1111,10 +1111,6 @@ class KODISCLib(xbmcprovider.XBMCMultiResolverContentProvider):
                 'Swahili': 'swa', 'Swedish': 'swe', 'Syriac': 'syr', 'Tagalog': 'tgl', 'Tamil': 'tam', 
                 'Telugu': 'tel', 'Thai': 'tha', 'Turkish': 'tur', 'Ukrainian': 'ukr', 'Urdu': 'urd'}
 
-            codePageDict = {'ara': 'cp1256', 'ar': 'cp1256', 'cs': 'cp1250', 'ell': 'cp1253', 
-                'el': 'cp1253', 'heb': 'cp1255', 'he': 'cp1255', 'sk': 'cp1250', 'tur': 'cp1254', 
-                'tr': 'cp1254', 'rus': 'cp1251', 'ru': 'cp1251'}
-
             quality = ['bluray', 'hdrip', 'brrip', 'bdrip', 'dvdrip', 'webrip', 'mhd', 'hdtv', 'web', 'www']
 
             langs = []
@@ -1152,13 +1148,13 @@ class KODISCLib(xbmcprovider.XBMCMultiResolverContentProvider):
 
             for lang in langs:
                 if 'src' in stream and 'grp' in stream:
-                    util.debug("[SC] skusam vybrat podla SRC a GRP")
+                    util.debug("[SC] skusam vybrat podla SRC %s a GRP %s" % (stream['src'].lower(), stream['grp'].lower()))
                     filter += [i for i in result if i['SubLanguageID'] == lang and stream['src'].lower() in i['MovieReleaseName'].lower() and stream['grp'].lower() in i['MovieReleaseName'].lower()]
-                if 'src' not in stream and 'grp' in stream:
-                    util.debug("[SC] skusam vybrat podla GRP")
+                if 'grp' in stream:
+                    util.debug("[SC] skusam vybrat podla GRP %s" % stream['grp'].lower())
                     filter += [i for i in result if i['SubLanguageID'] == lang and stream['grp'].lower() in i['MovieReleaseName'].lower()]
-                if 'src' in stream and 'grp' not in stream:
-                    util.debug("[SC] skusam vybrat podla SRC")
+                if 'src' in stream:
+                    util.debug("[SC] skusam vybrat podla SRC %s" % stream['src'].lower())
                     filter += [i for i in result if i['SubLanguageID'] == lang and stream['src'].lower() in i['MovieReleaseName'].lower()]
                     
                 filter += [i for i in result if i['SubLanguageID'] == lang and any(x in i['MovieReleaseName'].lower() for x in fmt)]
@@ -1176,26 +1172,34 @@ class KODISCLib(xbmcprovider.XBMCMultiResolverContentProvider):
             content = base64.b64decode(content['data'][0]['data'])
             content = str(zlib.decompressobj(16+zlib.MAX_WBITS).decompress(content))
 
-            subtitle = xbmc.validatePath(xbmc.translatePath('special://temp/'))
-            subtitle = os.path.join(subtitle, 'AutomatickeTitulky.%s.srt' % lang)
-
-            codepage = codePageDict.get(lang, '')
-            if codepage and self.getSetting('subtitles.utf') == 'true':
-                try:
-                    content_encoded = codecs.decode(content, codepage)
-                    content = codecs.encode(content_encoded, 'utf-8')
-                except:
-                    pass
-
-            file = xbmcvfs.File(subtitle, 'w')
-            file.write(str(content))
-            file.close()
-            return subtitle
+            return self.saveSubtitle(content, lang)
         except Exception:
             util.debug("[SC] Neriesim TITULKY")
             util.debug(traceback.format_exc())
             pass
 
+    def saveSubtitle(self, content, lang, convert=True):
+        codePageDict = {'ara': 'cp1256', 'ar': 'cp1256', 'cs': 'cp1250', 'ell': 'cp1253', 
+            'el': 'cp1253', 'heb': 'cp1255', 'he': 'cp1255', 'sk': 'cp1250', 'tur': 'cp1254', 
+            'tr': 'cp1254', 'rus': 'cp1251', 'ru': 'cp1251'}
+
+        subtitle = xbmc.validatePath(xbmc.translatePath('special://temp/'))
+        subtitle = os.path.join(subtitle, 'AutomatickeTitulky.%s.srt' % lang)
+
+        codepage = codePageDict.get(lang, '')
+        if codepage and self.getSetting('subtitles.utf') == 'true':
+            try:
+                content_encoded = codecs.decode(content, codepage)
+                content = codecs.encode(content_encoded, 'utf-8')
+            except Exception, e:
+                util.debug("[SC] chyba ukladania titulkov....")
+                pass
+
+        file = xbmcvfs.File(subtitle, 'w')
+        file.write(str(content))
+        file.close()
+        return subtitle
+        
     @bug.buggalo_try_except({'method': 'scutils.getSubs'})
     def getSubs(self):
         if self.subs is not None:
@@ -1309,7 +1313,20 @@ class KODISCLib(xbmcprovider.XBMCMultiResolverContentProvider):
         for s in resolved:
             if s['quality'] == '3D-SBS':
                 continue
-            if 'lang' in s and s['lang'] != '' and s['lang'] == lang:
+            if 'linfo' in s:
+                if lang == 'SK':
+                    alist = ['slo', 'sk', 'slk']
+                elif lang == 'CZ':
+                    alist = ['cze', 'cz', 'ces']
+                elif lang == 'EN':
+                    alist = ['eng', 'en']
+                else:
+                    break
+                for a in alist:
+                    if a in s['linfo']:
+                        util.debug("[SC] pridavam stream s audio jazykom %s %s" % (str(lang), s['lang']))
+                        tmp.append(s)
+            elif 'lang' in s and s['lang'] != '' and s['lang'] == lang:
                 util.debug("[SC] pridavam stream s jazykom %s" % str(lang))
                 tmp.append(s)
         
