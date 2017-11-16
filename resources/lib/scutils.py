@@ -1299,7 +1299,7 @@ class KODISCLib(xbmcprovider.XBMCMultiResolverContentProvider):
                     tmp.append(s)
                 else:
                     util.debug("[SC] pomaly net pre BT %s" % str(s.get('bitrate', 0)))
-            if len(tmp) > 1:
+            if len(tmp) >= 1:
                 resolved = tmp
             
         return resolved
@@ -1442,6 +1442,7 @@ class KODISCLib(xbmcprovider.XBMCMultiResolverContentProvider):
     @bug.buggalo_try_except({'method': 'scutils.filter_resolved'})
     def filter_resolved(self, resolved):
         resolved = self.filter_bitrate(resolved)
+        util.debug("[SC] filter po bitrate: %s" % str(resolved))
         resolved = self.filter_priority(resolved)    
         return resolved
 
