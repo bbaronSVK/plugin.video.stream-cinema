@@ -25,6 +25,7 @@ player = None
 uid = None
 traktlistlast = None
 submiturl = 'http://movies.bbaron.sk/plugin/submit/'
+win = xbmcgui.Window(10000)
 
 addon = xbmcaddon.Addon
 

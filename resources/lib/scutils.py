@@ -559,7 +559,7 @@ class KODISCLib(xbmcprovider.XBMCMultiResolverContentProvider):
             if action == 'csearch':
                 return self.csearch(params)
             if action == 'search-actor':
-                self.list(self.provider.items(self.provider._url("/Search/actor?%s" % urllib.urlencode({'id':params['id'], 'type': params['subtype']}))))
+                self.list(self.provider.items(None, self.provider._json("/Search/actor/%s/%s" % (params['id'], params['subtype']), {'id':params['id'], 'type': params['subtype']})))
                 return self.endOfDirectory()
             if action == 'info':
                 #metahandler
@@ -1345,6 +1345,9 @@ class KODISCLib(xbmcprovider.XBMCMultiResolverContentProvider):
         if sctop.getSettingAsBool('filter_audio') == False:
             util.debug("[SC] nemame zapnute filtrovanie podla audia")
             return resolved
+        
+        sctop.win.setProperty('lang.1', sctop.getSetting('filter_lang.1'))
+        sctop.win.setProperty('lang.2', sctop.getSetting('filter_lang.2'))
         
         util.debug("[SC] lang.1 %s" % sctop.getSetting('filter_lang.1'))
         tmp = self._filter_lang(resolved, sctop.getSetting('filter_lang.1'), prio)
