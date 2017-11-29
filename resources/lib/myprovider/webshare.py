@@ -20,9 +20,11 @@
 # *
 # */
 from crypto.md5crypt import md5crypt
+from datetime import timedelta
 import elementtree.ElementTree as ET
 import hashlib
 from provider import ResolveException
+import traceback
 import urlparse
 import util
 import xbmcgui
@@ -34,17 +36,16 @@ class Webshare():
         self.username = username
         self.password = password
         self.base_url = 'http://webshare.cz/'
-        self.token = None
+        self.cache = cache
+        self.win = xbmcgui.Window(10000)
+        self.getToken()
         
     def _url(self, url):
-        """
-        Transforms relative to absolute url based on ``base_url`` class property
-        """
         if url.startswith('http'):
             return url
         return self.base_url + url.lstrip('./')
 
-    def _create_request(self,url,base):
+    def _create_request(self, url, base):
         args = dict(urlparse.parse_qsl(url))
         headers = {'X-Requested-With':'XMLHttpRequest','Accept':'text/xml; charset=UTF-8','Referer':self.base_url}
         req = base.copy()
@@ -83,9 +84,10 @@ class Webshare():
                 data = util.post(self._url('api/login/'),req,headers=headers)
                 xml = ET.fromstring(data)
                 if not xml.find('status').text == 'OK':
+                    self.clearToken()
                     util.error('[SC] Server returned error status, response: %s' % data)
                     return False
-                self.token = xml.find('token').text
+                self.saveToken(xml.find('token').text)
                 try:
                     util.cache_cookies(None)
                 except:
@@ -94,14 +96,16 @@ class Webshare():
                 return True
             except Exception, e:
                 util.info('[SC] Login error %s' % str(e))
+        self.clearToken()
         return False
 
     def userData(self, all=False):
-        if self.token:
+        if self.token is not None:
             headers,req = self._create_request('/',{'wst':self.token})
             try:
                 data = util.post(self._url('api/user_data/'), req, headers=headers)
             except:
+                self.clearToken()
                 return False
             xml = ET.fromstring(data)
             if all == True:
@@ -122,12 +126,44 @@ class Webshare():
         util.info("[SC] logout")
         headers,req = self._create_request('/',{'wst':self.token})
         try:
+            self.clearToken()
             util.post(self._url('api/logout/'), req, headers=headers)
             util.cache_cookies(None)
         except:
             util.debug("[SC] chyba logout")
             pass
 
+    def clearToken(self):
+        if self.cache is not None:
+            self.cache.set('ws.token', None)
+        self.win.clearProperty('ws.token')
+        self.token = None
+        pass
+    
+    def getToken(self):
+        try:
+            if self.cache is None:
+                self.w = xbmcgui.Window(10000)
+                token = self.w.getProperty('ws.token')
+            else:
+                token = self.cache.get('ws.token')
+
+            if token is not None and token != '':
+                self.token = token
+            else:
+                self.token = None
+        except:
+            util.info('[SC] token ERR %s' % str(traceback.format_exc()))
+            self.token = None
+    
+    def saveToken(self, token):
+        self.token = str(token)
+        if self.cache is not None:
+            ttl = timedelta(days=7)
+            self.cache.cache.set('ws.token', self.token, ttl)
+        self.win.setProperty('ws.token', self.token)
+        pass
+    
     def resolve(self,ident):
         headers,req = self._create_request('/',{'ident':ident,'wst':self.token})
         util.info(headers)
@@ -136,6 +172,8 @@ class Webshare():
             data = util.post(self._url('api/file_link/'), req, headers=headers)
             xml = ET.fromstring(data)
             if not xml.find('status').text == 'OK':
+                self.win.clearProperty('ws.token')
+                self.token = None
                 util.error('[SC] Server returned error status, response: %s' % data)
                 raise ResolveException(xml.find('message').text)
             return xml.find('link').text

@@ -391,7 +391,7 @@ class StreamCinemaContentProvider(ContentProvider):
                     return None
             try:
                 from myprovider.webshare import Webshare as wx
-                self.ws = wx(sctop.getSetting('wsuser'), sctop.getSetting('wspass'))
+                self.ws = wx(sctop.getSetting('wsuser'), sctop.getSetting('wspass'), self.cache)
                 if not self.ws.login():
                     res = sctop.yesnoDialog(sctop.getString(30945), sctop.getString(30946), "")
                     if res == True:
