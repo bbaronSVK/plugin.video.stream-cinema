@@ -103,14 +103,18 @@ class Webshare():
         if self.token is not None:
             headers,req = self._create_request('/',{'wst':self.token})
             try:
+                util.info('[SC] userData')
                 data = util.post(self._url('api/user_data/'), req, headers=headers)
             except:
                 self.clearToken()
                 return False
+            util.info('[SC] userdata dat: %s' % data)
             xml = ET.fromstring(data)
+            if not xml.find('status').text == 'OK':
+                self.clearToken()
+                return False
             if all == True:
                 return xml
-            xbmcgui.Window(10000).setProperty('ws.ident', xml.find('ident').text)
             util.debug("[SC] userInfo: %s %s" % (xml.find('ident').text, xml.find('vip').text))
             if xml.find('vip').text == '1':
                 xbmcgui.Window(10000).setProperty('ws.vip', '1')
@@ -160,7 +164,7 @@ class Webshare():
         self.token = str(token)
         if self.cache is not None:
             ttl = timedelta(days=7)
-            self.cache.cache.set('ws.token', self.token, ttl)
+            self.cache.set('ws.token', self.token, expiration=ttl)
         self.win.setProperty('ws.token', self.token)
         pass
     
