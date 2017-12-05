@@ -27,6 +27,7 @@ from provider import ResolveException
 import traceback
 import urlparse
 import util
+from resources.lib.sctop import post
 import xbmcgui
 
 
@@ -70,7 +71,7 @@ class Webshare():
             try:
                 # get salt
                 headers,req = self._create_request('',{'username_or_email':self.username})
-                data = util.post(self._url('api/salt/'),req,headers=headers)
+                data = post(self._url('api/salt/'),req,headers=headers)
                 xml = ET.fromstring(data)
                 if not xml.find('status').text == 'OK':
                     util.error('[SC] Server returned error status, response: %s' % data)
@@ -81,7 +82,7 @@ class Webshare():
                 digest = hashlib.md5(self.username + ':Webshare:' + self.password).hexdigest()
                 # login
                 headers,req = self._create_request('',{'username_or_email':self.username,'password':password,'digest':digest,'keep_logged_in':1})
-                data = util.post(self._url('api/login/'),req,headers=headers)
+                data = post(self._url('api/login/'),req,headers=headers)
                 xml = ET.fromstring(data)
                 if not xml.find('status').text == 'OK':
                     self.clearToken()
@@ -104,7 +105,7 @@ class Webshare():
             headers,req = self._create_request('/',{'wst':self.token})
             try:
                 util.info('[SC] userData')
-                data = util.post(self._url('api/user_data/'), req, headers=headers)
+                data = post(self._url('api/user_data/'), req, headers=headers)
             except:
                 self.clearToken()
                 return False
@@ -131,7 +132,7 @@ class Webshare():
         headers,req = self._create_request('/',{'wst':self.token})
         try:
             self.clearToken()
-            util.post(self._url('api/logout/'), req, headers=headers)
+            post(self._url('api/logout/'), req, headers=headers)
             util.cache_cookies(None)
         except:
             util.debug("[SC] chyba logout")
@@ -173,7 +174,7 @@ class Webshare():
         util.info(headers)
         util.info(req)
         try:
-            data = util.post(self._url('api/file_link/'), req, headers=headers)
+            data = post(self._url('api/file_link/'), req, headers=headers)
             xml = ET.fromstring(data)
             if not xml.find('status').text == 'OK':
                 self.win.clearProperty('ws.token')

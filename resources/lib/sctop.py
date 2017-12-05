@@ -198,7 +198,7 @@ def post(url, data, headers={}, output="content"):
     if util._cookie_jar is not None:
         util._cookie_jar.add_cookie_header(req)
     try:
-        response = urllib2.urlopen(req)
+        response = urllib2.urlopen(req, timeout=120)
         data = response.read()
         code = response.code
         response.close()

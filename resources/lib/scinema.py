@@ -410,7 +410,7 @@ class StreamCinemaContentProvider(ContentProvider):
 
                 itm['url'] = self.ws.resolve(itm.get('params').get('play').get('ident'))
                 try:
-                    if 'subs' in itm and "webshare.cz" in itm['subs']:
+                    if itm['subs'] is not None and "webshare.cz" in itm['subs']:
                         from urlparse import urlparse
                         import re
                         o = urlparse(itm['subs'])
