@@ -12,7 +12,7 @@
 				<control type="image">
 					<texture border="5" colordiffuse="ff000000">box.png</texture>
 				</control>
-				<control type="image" description="fanart">
+				<control type="image" description="fanart" id="3005">
 					<width>100%</width>
 					<height>100%</height>
 					<fadetime>350</fadetime>

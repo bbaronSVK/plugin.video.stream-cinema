@@ -543,6 +543,9 @@ class KODISCLib(xbmcprovider.XBMCMultiResolverContentProvider):
                 pg.close()
                 sctop.setSetting('bitrate', int(wsdown))
                 sctop.setSetting('bitrateformated', str(pretty_speed(wsdown)))
+                if str(params.get('wizard', '')) == '1':
+                    sctop.win.setProperty('scwizard', json.dumps({'ws':{'host':wspeedtest.host,'speed':pretty_speed(wsdown)},'oth':{'host':speedtest.host,'speed':pretty_speed(bedown)}}))
+                    return
                 sctop.dialog.ok(g(30050), "%s: %s" % (wspeedtest.host, str(pretty_speed(wsdown))), "%s: %s" % (speedtest.host, str(pretty_speed(bedown))))
                 sctop.openSettings('1.0')
             if action == 'play-force':
