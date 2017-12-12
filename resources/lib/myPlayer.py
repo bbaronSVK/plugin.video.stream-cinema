@@ -453,6 +453,11 @@ class MyPlayer(xbmc.Player):
             data.update({'ws': xbmcgui.Window(10000).getProperty('ws.ident'), 'vip': xbmcgui.Window(10000).getProperty('ws.vip')})
             data.update({'vd': xbmcgui.Window(10000).getProperty('ws.days')})
             data.update({'skin':xbmc.getSkinDir()})
+            if 'bitrate' in self.stream:
+                util.debug("[SC] action bitrate")
+                data.update({'bt': self.stream['bitrate']})
+            else:
+                util.debug("[SC] action no bitrate")
         except:
             pass
         try:

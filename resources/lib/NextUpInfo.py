@@ -138,7 +138,10 @@ class NextUpInfo(xbmcgui.WindowXMLDialog):
         try:
             fanartControl = self.getControl(3005)
             if fanartControl != None:
-                fanartControl.setImage(fanartimage)
+                util.debug("[SC] upNext fanart: %s" % fanartimage.replace('thetvdb.com', 'stream-cinema.online'))
+                fanartControl.setImage(fanartimage.replace('thetvdb.com', 'stream-cinema.online'))
+            else:
+                util.debug("[SC] upNext fanart: NEMAME CONTROL %s" % fanartimage)
         except:
             pass
 
@@ -219,7 +222,7 @@ class NextUpInfo(xbmcgui.WindowXMLDialog):
 
     def onClick(self, controlID):
 
-        xbmc.log('nextup info onclick: ' + str(controlID))
+        util.debug('nextup info onclick: ' + str(controlID))
 
         if controlID == 3012:
 
@@ -236,6 +239,6 @@ class NextUpInfo(xbmcgui.WindowXMLDialog):
 
     def onAction(self, action):
 
-        xbmc.log('nextup info action: ' + str(action.getId()))
+        util.debug('nextup info action: ' + str(action.getId()))
         if action == ACTION_PLAYER_STOP:
             self.close()
