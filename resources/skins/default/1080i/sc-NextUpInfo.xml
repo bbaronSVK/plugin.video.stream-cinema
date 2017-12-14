@@ -58,8 +58,8 @@
                     <height>324</height>
                     <ondown>3013</ondown>
                     <onup>3013</onup>
-                    <texturenofocus>noop.png</texturenofocus>
-                    <texturefocus>noop.png</texturefocus>
+                    <texturenofocus>noop</texturenofocus>
+                    <texturefocus>noop</texturefocus>
                     <textcolor>ff333333</textcolor>
                 </control>
                 <control type="group">
