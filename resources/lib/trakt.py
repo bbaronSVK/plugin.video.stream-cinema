@@ -216,8 +216,13 @@ def getList(slug, content=None):
         result = getTrakt('sync/playback/%s' % content)
     else:
         result = getTrakt('/users/me/lists/%s/items/%s' % (slug, content))
-    result = json.loads(result)
-    ids = [i[i['type']]['ids']['imdb'] for i in result]
+        result = json.loads(result)
+    ids = []
+    for i in result:
+        if 'imdb' in i[i['type']]['ids']:
+            ids.append(i[i['type']]['ids']['imdb'])
+        else:
+            util.debug('LIST: %s' % str(i))
     return ids
     
 def manager(name, imdb, tvdb, content):
