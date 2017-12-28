@@ -278,6 +278,9 @@ class StreamCinemaContentProvider(ContentProvider):
             sctop.dialog.ok('error', sctop.getString(30957))
             self.bSleep(50)
             raise Exception('API call')
+        if int(code) == 503:
+            util.debug("[SC] cloudflare?")
+            pass
         else:
             util.debug("[SC] data: %s" % str(data))
             sctop.dialog.ok('error', 'server error')
