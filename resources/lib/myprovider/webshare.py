@@ -89,10 +89,7 @@ class Webshare():
                     util.error('[SC] Server returned error status, response: %s' % data)
                     return False
                 self.saveToken(xml.find('token').text)
-                try:
-                    util.cache_cookies(None)
-                except:
-                    pass
+                self.cookies()
                 util.info('[SC] Login successfull')
                 return True
             except Exception, e:
@@ -127,20 +124,29 @@ class Webshare():
                 
         return False
     
+    def cookies(self):
+        try:
+            util.cache_cookies(None)
+        except:
+            pass
+    
     def logout(self):
         util.info("[SC] logout")
         headers,req = self._create_request('/',{'wst':self.token})
         try:
             self.clearToken()
             post(self._url('api/logout/'), req, headers=headers)
-            util.cache_cookies(None)
+            self.cookies()
         except:
             util.debug("[SC] chyba logout")
             pass
 
     def clearToken(self):
-        if self.cache is not None:
-            self.cache.set('ws.token', None)
+        try:
+            if self.cache is not None:
+                self.cache.set('ws.token', None)
+        except:
+            pass
         self.win.clearProperty('ws.token')
         self.token = None
         pass
@@ -165,7 +171,10 @@ class Webshare():
         self.token = str(token)
         if self.cache is not None:
             ttl = timedelta(days=7)
-            self.cache.set('ws.token', self.token, expiration=ttl)
+            try:
+                self.cache.set('ws.token', self.token, expiration=ttl)
+            except:
+                pass
         self.win.setProperty('ws.token', self.token)
         pass
     
