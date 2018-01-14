@@ -25,10 +25,15 @@ import xbmcvfs
 import xmlrpclib
 import zlib
 import random
+import requests
 from dialogselect import DialogSelect
 from collections import defaultdict
 from provider import ResolveException
 from datetime import timedelta
+from urllib2 import HTTPError
+from urllib2 import Request
+from urllib2 import URLError
+from urllib2 import urlopen
 
 class KODISCLib(xbmcprovider.XBMCMultiResolverContentProvider):
     last_run = 0
@@ -172,7 +177,11 @@ class KODISCLib(xbmcprovider.XBMCMultiResolverContentProvider):
                     else:
                         if addToSubscription == False or (i['id'] not in subs) \
                            or (i['id'] in subs and self.canCheck(subs[i['id']]['last_run'])):
-                            (e, n) = self.add_item(param, addToSubscription)
+                            try:
+                                (e, n) = self.add_item(param, addToSubscription)
+                            except:
+                                sctop.sleep(6000)
+                                pass
                         
                     error |= e
                     new |= n
@@ -348,10 +357,18 @@ class KODISCLib(xbmcprovider.XBMCMultiResolverContentProvider):
                 if force is True:
                     dialog = sctop.progressDialog
                     dialog.create('Stream Cinema CZ & SK', 'Add all to library')
-                    
+                else:
+                    dialog = None
+                
+                mtime = 99999999999
+                for iid, data in subs.iteritems():
+                    if int(data['last_run']) < mtime:
+                        mtime = int(data['last_run'])
+                sdata = self.provider._json(self.provider._url('/Lib/getLast/%s' % str(mtime)))
+                
                 for iid, data in subs.iteritems():
                     num += 1
-                    if force and dialog:
+                    if force is True and dialog is not None:
                         perc = 100 * num / total
                         util.info("percento: %s %d %d" % (str(perc), int(num), int(total)))
                         if dialog.iscanceled():
@@ -377,21 +394,23 @@ class KODISCLib(xbmcprovider.XBMCMultiResolverContentProvider):
                         util.debug("[SC] movie nepokracujem")
                         continue
                         
-                    if self.canCheck(data['last_run']):
+                    if iid in sdata['data']:
                         if not notified:
                             self.showNotification('Subscription', 'Chcecking')
                             notified = True
                         util.debug("[SC] Refreshing %s" % str(iid))
-                        ids.update({iid:data['last_run']})
+                        ids.update({iid:mtime})
                         if len(ids) >= 20:
                             self.add_item_lastrun(ids)
                             ids = {}
-                        data['last_run'] = time.time()
-                        subs[iid] = data
-                        self.setSubs(subs)
-                util.debug("[SC] subscription done")        
+                    data['last_run'] = sdata['time']
+                    subs[iid] = data
+                    self.setSubs(subs)
+                    
                 if len(ids) > 0:
                     self.add_item_lastrun(ids)
+                    
+                util.debug("[SC] subscription done")        
 
                 if sctop.getSettingAsBool('download-movies'):
                     if 'movie' in subs:
@@ -450,6 +469,96 @@ class KODISCLib(xbmcprovider.XBMCMultiResolverContentProvider):
         xbmcgui.Dialog().notification(self.encode(title), self.encode(message), time=time,
                                       icon=xbmc.translatePath(self.addon_dir() + "/icon.png"),
                                       sound=False)
+
+    def download(self, item):
+        downloads = sctop.getSetting('downloads')
+        if '' == downloads:
+            xbmcgui.Dialog().ok(self.provider.name, xbmcutil.__lang__(30009))
+            return
+        stream = self.resolve(item['url'])
+        if stream:
+            if not 'headers' in stream.keys():
+                stream['headers'] = {}
+            # clean up \ and /
+            name = item['title'].replace('/', '_').replace('\\', '_')
+            if not stream['subs'] == '' and stream['subs'] is not None:
+                xbmcutil.save_to_file(stream['subs'], os.path.join(
+                    downloads, name + '.srt'), stream['headers'])
+            if name.find('.') <= 0:
+                # name does not contain extension, append some
+                name += '.mp4'
+            from threading import Thread
+            util.debug("[SC] mame co stahovat: %s" % str(stream))
+            worker = Thread(target=self._download, args=(stream['url'], downloads, name, stream['headers']))
+            worker.start()
+
+    def _download(self, url, dest, name, headers={}):
+        util.debug("[SC] zacinam stahovat %s" % str(url))
+        try:
+            r = requests.get(url, headers=headers, stream=True)
+            total_length = r.headers.get('content-length')
+            filename = xbmc.validatePath(os.path.join(xbmc.translatePath(dest), name))
+            if total_length is None:
+                chunk = 1024 * 8
+            else:
+                chunk = int(int(total_length) / 100)
+
+            dl = 0
+            util.debug("[SC] info: [%s] [%s]" % (str(filename), str(chunk)))
+            fd = xbmcvfs.File(filename, 'wb')
+            notifyEnabled = sctop.getSetting('download-notify') == 'true'
+            notifyEvery = sctop.getSetting('download-notify-every')
+            notifyPercent = 1
+            if int(notifyEvery) == 0:
+                notifyPercent = 10
+            if int(notifyEvery) == 1:
+                notifyPercent = 5
+            
+            for data in r.iter_content(chunk_size=chunk):
+                fd.write(data)
+                if total_length is not None:
+                    dl += len(data)
+                    done = int(100 * int(dl) / int(total_length))
+                    util.debug("[SC] ... %s%%" % str(done))
+                    if notifyEnabled and done > 0 and (done % notifyPercent) == 0:
+                        sctop.notification(name, "%s%%" % done, 1000)
+                else:
+                    dl += 0
+                    util.debug("[SC] ... %s?" % str(dl))
+            fd.close()
+        except:
+            util.debug('[SC] ERR download: %s' % str(traceback.format_exc()) )
+            pass
+                
+    def __download(self, url, destination, zip=True):
+        destination = os.path.join(xbmc.translatePath(destination), os.path.basename(url))
+        util.debug("[SC] ||||||||||url: %s, dest: %s" % (url, destination))
+        if not xbmcvfs.exists(destination):
+            req = Request(url)
+            try:
+                util.debug("[SC] downloading %s" % str(url))
+                f = urlopen(req)
+                if f.info().get("Content-Encoding") == "gzip":
+                    util.debug("[SC] MAME GZIP")
+                    from StringIO import StringIO
+                    import gzip
+                    buf = StringIO(f.read())
+                    gf = gzip.GzipFile(fileobj=buf)
+                    data = gf.read()
+                else:
+                    util.debug("[SC] NEMAME GZIP")
+                    data = f.read()
+                    
+                local_file = open(destination, "wb")
+                local_file.write(data)
+                local_file.close()
+            except HTTPError, e:
+                util.debug("[SC] HTTP Error: %s %s" % (str(e.code), str(url)))
+                pass
+            except URLError, e:
+                util.debug("[SC] URL Error: %s %s" % (str(e.reason), str(url)))
+                pass
+        return destination
     
     @bug.buggalo_try_except({'method': 'scutils.run_custom'})
     def run_custom(self, params):
@@ -458,6 +567,9 @@ class KODISCLib(xbmcprovider.XBMCMultiResolverContentProvider):
             util.debug("ACTION: %s" % str(params['action']))  
             action = params['action']
             subs = False
+            if action == 'test':
+                ddir = sctop.getSetting('library-movies')
+                util.debug("DIR: [%s]" % ddir)
             if action == 'remove-from-sub':
                 subs = self.getSubs()
                 util.debug("[SC] subs: %s" % str(subs))

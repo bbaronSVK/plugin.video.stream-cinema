@@ -17,7 +17,7 @@ __addon__ = xbmcaddon.Addon(id=__scriptid__)
 __set__ = __addon__.getSetting
 __language__ = __addon__.getLocalizedString
 
-BASE_URL="http://stream-cinema.online/kodi"
+BASE_URL="http%s://stream-cinema.online/kodi" % ('s' if __set__('UseSSL') == 'true' else '')
 API_VERSION="1.2"
 KODI_VERSION = int(xbmc.getInfoLabel("System.BuildVersion").split(".")[0])
 KODI_LANG = xbmc.getInfoLabel("System.Language")[:3].lower()

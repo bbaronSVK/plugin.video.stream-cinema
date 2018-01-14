@@ -24,10 +24,11 @@ import xbmc
 import util
 from resources.lib.scinema import StreamCinemaContentProvider
 from resources.lib.scutils import KODISCLib
-from resources.lib.sctop import __addon__,__set__
+from resources.lib.sctop import __addon__,__set__,BASE_URL
 
 #__scriptid__ = 'plugin.video.stream-cinema'
 #__scriptname__ = 'stream-cinema.online'
+util.debug("[SC] BASE: %s" % BASE_URL)
 
 settings = {'quality': __set__('quality'), 'lang': __set__('language'), 'downloads': xbmc.translatePath(__set__('downloads'))}
 uid = __set__('uid')
