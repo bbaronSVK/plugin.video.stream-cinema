@@ -25,7 +25,6 @@ import xbmcvfs
 import xmlrpclib
 import zlib
 import random
-import requests
 from dialogselect import DialogSelect
 from collections import defaultdict
 from provider import ResolveException
@@ -354,63 +353,64 @@ class KODISCLib(xbmcprovider.XBMCMultiResolverContentProvider):
                 total = len(subs)
                 num = 0
                 
-                if force is True:
-                    dialog = sctop.progressDialog
-                    dialog.create('Stream Cinema CZ & SK', 'Add all to library')
-                else:
-                    dialog = None
-                
-                mtime = 99999999999
-                for iid, data in subs.iteritems():
-                    if int(data['last_run']) < mtime:
-                        mtime = int(data['last_run'])
-                sdata = self.provider._json(self.provider._url('/Lib/getLast/%s' % str(mtime)))
-                
-                for iid, data in subs.iteritems():
-                    num += 1
-                    if force is True and dialog is not None:
-                        perc = 100 * num / total
-                        util.info("percento: %s %d %d" % (str(perc), int(num), int(total)))
-                        if dialog.iscanceled():
-                            self.setSubs(subs)
+                if total > 0:
+                    if force is True:
+                        dialog = sctop.progressDialog
+                        dialog.create('Stream Cinema CZ & SK', 'Add all to library')
+                    else:
+                        dialog = None
+
+                    mtime = 99999999999
+                    for iid, data in subs.iteritems():
+                        if int(data['last_run']) < mtime:
+                            mtime = int(data['last_run'])
+                    sdata = self.provider._json(self.provider._url('/Lib/getLast/%s' % str(mtime)))
+
+                    for iid, data in subs.iteritems():
+                        num += 1
+                        if force is True and dialog is not None:
+                            perc = 100 * num / total
+                            util.info("percento: %s %d %d" % (str(perc), int(num), int(total)))
+                            if dialog.iscanceled():
+                                self.setSubs(subs)
+                                return
+
+                            try:
+                                dialog.update(int(perc))
+                            except Exception:
+                                util.debug('[SC] ERR: %s' % str(traceback.format_exc()) )
+                                pass
+
+                        util.debug("[SC] sub id: %s" % str(iid))
+                        if xbmc.abortRequested:
+                            util.info("[SC] Exiting")
                             return
-                        
-                        try:
-                            dialog.update(int(perc))
-                        except Exception:
-                            util.debug('[SC] ERR: %s' % str(traceback.format_exc()) )
-                            pass
-                        
-                    util.debug("[SC] sub id: %s" % str(iid))
-                    if xbmc.abortRequested:
-                        util.info("[SC] Exiting")
-                        return
-                    
-                    if self.scanRunning() or self.isPlaying():
-                        self.cache.delete("subscription.last_run")
-                        return
-                    
-                    if iid == 'movie':
-                        util.debug("[SC] movie nepokracujem")
-                        continue
-                        
-                    if iid in sdata['data']:
-                        if not notified:
-                            self.showNotification('Subscription', 'Chcecking')
-                            notified = True
-                        util.debug("[SC] Refreshing %s" % str(iid))
-                        ids.update({iid:mtime})
-                        if len(ids) >= 20:
-                            self.add_item_lastrun(ids)
-                            ids = {}
-                    data['last_run'] = sdata['time']
-                    subs[iid] = data
-                    self.setSubs(subs)
-                    
-                if len(ids) > 0:
-                    self.add_item_lastrun(ids)
-                    
-                util.debug("[SC] subscription done")        
+
+                        if self.scanRunning() or self.isPlaying():
+                            self.cache.delete("subscription.last_run")
+                            return
+
+                        if iid == 'movie':
+                            util.debug("[SC] movie nepokracujem")
+                            continue
+
+                        if iid in sdata['data']:
+                            if not notified:
+                                self.showNotification('Subscription', 'Chcecking')
+                                notified = True
+                            util.debug("[SC] Refreshing %s" % str(iid))
+                            ids.update({iid:mtime})
+                            if len(ids) >= 20:
+                                self.add_item_lastrun(ids)
+                                ids = {}
+                        data['last_run'] = sdata['time']
+                        subs[iid] = data
+                        self.setSubs(subs)
+
+                    if len(ids) > 0:
+                        self.add_item_lastrun(ids)
+
+                    util.debug("[SC] subscription done")        
 
                 if sctop.getSettingAsBool('download-movies'):
                     if 'movie' in subs:
@@ -495,8 +495,11 @@ class KODISCLib(xbmcprovider.XBMCMultiResolverContentProvider):
     def _download(self, url, dest, name, headers={}):
         util.debug("[SC] zacinam stahovat %s" % str(url))
         try:
-            r = requests.get(url, headers=headers, stream=True)
-            total_length = r.headers.get('content-length')
+            req = Request(url)
+            for idx, val in headers.items():
+                req.add_header(idx, val)
+            r = urlopen(req)
+            total_length = r.info().get('content-length')
             filename = xbmc.validatePath(os.path.join(xbmc.translatePath(dest), name))
             if total_length is None:
                 chunk = 1024 * 8
@@ -514,7 +517,8 @@ class KODISCLib(xbmcprovider.XBMCMultiResolverContentProvider):
             if int(notifyEvery) == 1:
                 notifyPercent = 5
             
-            for data in r.iter_content(chunk_size=chunk):
+            #for data in r.iter_content(chunk_size=chunk):
+            for data in iter(lambda: r.read(chunk), ''):
                 fd.write(data)
                 if total_length is not None:
                     dl += len(data)
@@ -567,9 +571,15 @@ class KODISCLib(xbmcprovider.XBMCMultiResolverContentProvider):
             util.debug("ACTION: %s" % str(params['action']))  
             action = params['action']
             subs = False
-            if action == 'test':
-                ddir = sctop.getSetting('library-movies')
-                util.debug("DIR: [%s]" % ddir)
+            if action == 'ws-logout':
+                try:
+                    from myprovider.webshare import Webshare
+                    ws = Webshare(None,None)
+                    ws.logout()
+                    sctop.notification('Webshare.cz', sctop.__language__(30112))
+                except:
+                    util.debug('[SC] ERR ws logout: %s' % str(traceback.format_exc()) )
+                    pass
             if action == 'remove-from-sub':
                 subs = self.getSubs()
                 util.debug("[SC] subs: %s" % str(subs))

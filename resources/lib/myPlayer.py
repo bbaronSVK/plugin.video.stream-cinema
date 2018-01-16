@@ -147,9 +147,13 @@ class MyPlayer(xbmc.Player):
     
     def selectAudio(self):
         apri = self.win.getProperty('lang.1') #sctop.getSetting('filter_lang.1')
+        if apri == '':
+            apri = sctop.getSetting('filter_lang.1')
         util.debug("[SC] skusam primary %s" % str(apri))
         if not self.tryALang(apri):
             asec = self.win.getProperty('lang.2') #sctop.getSetting('filter_lang.2')
+            if asec == '':
+                asec = sctop.getSetting('filter_lang.2')
             util.debug("[SC] skusam secondary %s" % str(asec))
             self.tryALang(asec)
         self.win.clearProperty('lang.1')
