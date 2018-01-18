@@ -362,55 +362,56 @@ class KODISCLib(xbmcprovider.XBMCMultiResolverContentProvider):
 
                     mtime = 99999999999
                     for iid, data in subs.iteritems():
-                        if int(data['last_run']) < mtime:
+                        if iid != 'movie' and int(data['last_run']) < mtime:
                             mtime = int(data['last_run'])
                     sdata = self.provider._json(self.provider._url('/Lib/getLast/%s' % str(mtime)))
 
-                    for iid, data in subs.iteritems():
-                        num += 1
-                        if force is True and dialog is not None:
-                            perc = 100 * num / total
-                            util.info("percento: %s %d %d" % (str(perc), int(num), int(total)))
-                            if dialog.iscanceled():
-                                self.setSubs(subs)
+                    if sdata is not None and 'data' in sdata and len(sdata['data']) > 0:
+                        for iid, data in subs.iteritems():
+                            num += 1
+                            if force is True and dialog is not None:
+                                perc = 100 * num / total
+                                util.info("percento: %s %d %d" % (str(perc), int(num), int(total)))
+                                if dialog.iscanceled():
+                                    self.setSubs(subs)
+                                    return
+
+                                try:
+                                    dialog.update(int(perc))
+                                except Exception:
+                                    util.debug('[SC] ERR: %s' % str(traceback.format_exc()) )
+                                    pass
+
+                            util.debug("[SC] sub id: %s" % str(iid))
+                            if xbmc.abortRequested:
+                                util.info("[SC] Exiting")
                                 return
 
-                            try:
-                                dialog.update(int(perc))
-                            except Exception:
-                                util.debug('[SC] ERR: %s' % str(traceback.format_exc()) )
-                                pass
+                            if self.scanRunning() or self.isPlaying():
+                                self.cache.delete("subscription.last_run")
+                                return
 
-                        util.debug("[SC] sub id: %s" % str(iid))
-                        if xbmc.abortRequested:
-                            util.info("[SC] Exiting")
-                            return
+                            if iid == 'movie':
+                                util.debug("[SC] movie nepokracujem")
+                                continue
 
-                        if self.scanRunning() or self.isPlaying():
-                            self.cache.delete("subscription.last_run")
-                            return
+                            if iid in sdata['data']:
+                                if not notified:
+                                    self.showNotification('Subscription', 'Chcecking')
+                                    notified = True
+                                util.debug("[SC] Refreshing %s" % str(iid))
+                                ids.update({iid:mtime})
+                                if len(ids) >= 20:
+                                    self.add_item_lastrun(ids)
+                                    ids = {}
+                            data['last_run'] = sdata['time']
+                            subs[iid] = data
 
-                        if iid == 'movie':
-                            util.debug("[SC] movie nepokracujem")
-                            continue
+                        if len(ids) > 0:
+                            self.add_item_lastrun(ids)
 
-                        if iid in sdata['data']:
-                            if not notified:
-                                self.showNotification('Subscription', 'Chcecking')
-                                notified = True
-                            util.debug("[SC] Refreshing %s" % str(iid))
-                            ids.update({iid:mtime})
-                            if len(ids) >= 20:
-                                self.add_item_lastrun(ids)
-                                ids = {}
-                        data['last_run'] = sdata['time']
-                        subs[iid] = data
                         self.setSubs(subs)
-
-                    if len(ids) > 0:
-                        self.add_item_lastrun(ids)
-
-                    util.debug("[SC] subscription done")        
+                        util.debug("[SC] subscription done")        
 
                 if sctop.getSettingAsBool('download-movies'):
                     if 'movie' in subs:
