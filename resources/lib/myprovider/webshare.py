@@ -27,7 +27,7 @@ from provider import ResolveException
 import traceback
 import urlparse
 import util
-from resources.lib.sctop import post
+from resources.lib.sctop import post,checkSupportHTTPS,getSettingAsBool,setSetting
 import xbmcgui
 
 
@@ -37,6 +37,11 @@ class Webshare():
         self.username = username
         self.password = password
         self.base_url = 'http://webshare.cz/'
+        if getSettingAsBool('wscheckssl') is False:
+            res = checkSupportHTTPS(self.base_url)
+            setSetting('wsusessl', 'true' if res is True else 'false')
+        if getSettingAsBool('wsusessl') is True:
+            self.base_url = self.base_url.replace('http://', 'https://')
         self.cache = cache
         self.win = xbmcgui.Window(10000)
         self.getToken()

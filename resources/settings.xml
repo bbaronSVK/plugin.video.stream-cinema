@@ -15,7 +15,8 @@
         <setting type="sep" />
         <setting type="lsep" label="30109" />
         <setting id="UseSSL" label="https" type="bool" default="true"/>
-        <setting label="30110" id="usecache" type="bool" default="true" visible="false" />
+        <setting id="checkssl" type="bool" default="false" visible="false" />
+        <setting label="Pouzit CACHE" id="usecache" type="bool" default="true" visible="false" />
     </category>
     <category label="30050">
         <setting id="speedtest" type="action" label="30500" option="close" action="RunPlugin(plugin://plugin.video.stream-cinema/?action=737065656474657374)" />

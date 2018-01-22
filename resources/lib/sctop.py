@@ -10,6 +10,9 @@ import xbmcaddon
 import xbmcgui
 import xbmcplugin
 import xbmcutil
+import xbmcvfs
+import traceback
+import os
 
 __scriptid__ = 'plugin.video.stream-cinema'
 __scriptname__ = 'stream-cinema.online'
@@ -261,6 +264,67 @@ def getCondVisibility(text):
         text = text.replace("String.Contains", "SubString")
         text = text.replace("String.IsEqual", "StringCompare")
     return xbmc.getCondVisibility(text)
+
+def isPlaying():
+    return xbmc.Player().isPlaying()
+
+def download(url, dest, name, headers={}):
+    util.debug("[SC] zacinam stahovat %s" % str(url))
+    try:
+        req = urllib2.Request(url)
+        for idx, val in headers.items():
+            req.add_header(idx, val)
+        r = urllib2.urlopen(req)
+        total_length = r.info().get('content-length')
+        filename = xbmc.validatePath(os.path.join(xbmc.translatePath(dest), name))
+        chunk = (1024 * 8) if total_length is None else int(int(total_length) / 100)
+
+        dl = 0
+        util.debug("[SC] info: [%s] [%s]" % (str(filename), str(chunk)))
+        fd = xbmcvfs.File(filename, 'wb')
+        notifyEnabled = getSettingAsBool('download-notify')
+        notifyEvery = getSettingAsInt('download-notify-every')
+        notifyPercent = 10 if notifyEvery == 0 else 5 if notifyEvery == 1 else 1
+
+        for data in iter(lambda: r.read(chunk), ''):
+            fd.write(data)
+            if total_length is not None:
+                dl += len(data)
+                done = int(100 * int(dl) / int(total_length))
+                util.debug("[SC] ... %s%%" % str(done))
+                if notifyEnabled and done > 0 and (done % notifyPercent) == 0:
+                    notification(name, "%s%%" % done, 1000)
+            else:
+                dl += 0
+                util.debug("[SC] ... %s?" % str(dl))
+        fd.close()
+        if isPlaying():
+            notification(xbmcutil.__lang__(20177), filename)
+        else:
+            dialog.ok(xbmcutil.__lang__(20177), filename)
+    except:
+        util.debug('[SC] ERR download: %s' % str(traceback.format_exc()) )
+        pass
+
+def checkSupportHTTPS(url):
+    '''
+    skontroluje ci je zariadnie schopne nacitat url cez https
+    '''
+    try:
+        #url = str(self.provider._url('/')).replace('http://', 'https://')
+        util.debug('[SC] testujem HTTPS%s' % url)
+        req = urllib2.Request(url)
+        r = urllib2.urlopen(req)
+        util.debug('[SC] OK HTTPS')
+        return True
+    except urllib2.URLError:
+        util.debug('[SC] chyba HTTPS %s' % str(traceback.format_exc()))
+        return False
+    except:
+        util.debug('[SC] serverova chyba HTTPS %s' % str(traceback.format_exc()))
+        return True
+    pass
+    return True
 
 try:
     from storagecache import StorageCache

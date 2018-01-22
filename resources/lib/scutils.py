@@ -19,6 +19,7 @@ import urllib
 import util
 import xbmc
 import xbmcgui
+import xbmcutil
 import xbmcplugin
 import xbmcprovider
 import xbmcvfs
@@ -29,10 +30,6 @@ from dialogselect import DialogSelect
 from collections import defaultdict
 from provider import ResolveException
 from datetime import timedelta
-from urllib2 import HTTPError
-from urllib2 import Request
-from urllib2 import URLError
-from urllib2 import urlopen
 
 class KODISCLib(xbmcprovider.XBMCMultiResolverContentProvider):
     last_run = 0
@@ -53,6 +50,19 @@ class KODISCLib(xbmcprovider.XBMCMultiResolverContentProvider):
         self.cache = sctop.cache
         self.provider.cache = self.cache
         self.timer = 0
+        self._checkHTTPS()
+
+    def _checkHTTPS(self):
+        '''
+        skontroluje pri prvom spusteni, ci je zariadnie schopne nacitat stream-cinema cez https
+        '''
+        if sctop.getSettingAsBool('checkssl') == False:
+            sctop.setSetting('checkssl', 'true')
+            url = str(self.provider._url('/')).replace('http://', 'https://')
+            util.debug('[SC] testujem HTTPS na SC %s' % url)
+            s = sctop.checkSupportHTTPS(url)
+            sctop.setSetting('UseSSL', 'true' if s is True else 'false')
+            pass
 
     def _parse_settings(self, itm):
         util.info('--------------------------------------------------------')
@@ -166,27 +176,27 @@ class KODISCLib(xbmcprovider.XBMCMultiResolverContentProvider):
                     util.debug('[SC] ERR: %s' % str(traceback.format_exc()) )
                     pass
                 
-                if 1:
-                    param = copy.deepcopy(params)
-                    util.debug("I: %s" % str(params))
-                    param.update({'id': str(i['id']), 'notify': 1})
-                    
-                    if params['id'] == 'movies':
-                        (e, n) = self.add_item(param, addToSubscription, i)
-                    else:
-                        if addToSubscription == False or (i['id'] not in subs) \
-                           or (i['id'] in subs and self.canCheck(subs[i['id']]['last_run'])):
-                            try:
-                                (e, n) = self.add_item(param, addToSubscription)
-                            except:
-                                sctop.sleep(6000)
-                                pass
-                        
-                    error |= e
-                    new |= n
-                    new_in_page |= n
-                    if new is True and not error:
-                        new_items = True
+                param = copy.deepcopy(params)
+                util.debug("I: %s" % str(params))
+                param.update({'id': str(i['id']), 'notify': 1})
+
+                if params['id'] == 'movies':
+                    (e, n) = self.add_item(param, addToSubscription, i)
+                else:
+                    if addToSubscription == False or (i['id'] not in subs) \
+                       or (i['id'] in subs and self.canCheck(subs[i['id']]['last_run'])):
+                        try:
+                            (e, n) = self.add_item(param, addToSubscription)
+                        except:
+                            e |= True
+                            sctop.sleep(6000)
+                            pass
+
+                error |= e
+                new |= n
+                new_in_page |= n
+                if new is True and not error:
+                    new_items = True
             page += 1
             if params['id'] == 'movies':
                 if 'force' not in params and page > 2 and new_in_page == False:
@@ -265,7 +275,12 @@ class KODISCLib(xbmcprovider.XBMCMultiResolverContentProvider):
         data = self.provider._json("%s/Lib/multi" % sctop.BASE_URL, {"ids": json.dumps(ids)})
         if data:
             for i in data:
-                self.add_item({'notifi':1, 'update':True}, data=i)
+                (e, n) = self.add_item({'notifi':1, 'update':True}, data=i)
+                error |= e
+                new_items |= n
+        else:
+            error = True
+        return (error, new_items)
                     
     @bug.buggalo_try_except({'method': 'scutils.add_item'})
     def add_item(self, params, addToSubscription=False, data=None):
@@ -274,8 +289,8 @@ class KODISCLib(xbmcprovider.XBMCMultiResolverContentProvider):
         if data is None:
             data = self.provider._json("%s/Lib/%s" % (sctop.BASE_URL, params['id']))
         
-        if 'title' not in data:
-            return
+        if data is None or 'title' not in data:
+            return (True, False)
         
         if 'ep' not in data:
             item_dir = self.getSetting('library-movies')
@@ -319,7 +334,10 @@ class KODISCLib(xbmcprovider.XBMCMultiResolverContentProvider):
             self.showNotification(data['title'], 'New content')
             xbmc.executebuiltin('UpdateLibrary(video)')
         elif not error and not ('notify' in params):
-            self.showNotification(data['title'], 'No new content')
+            if new_items is True:
+                self.showNotification(data['title'], 'New content')
+            else:
+                self.showNotification(data['title'], 'No new content')
         if error and not ('notify' in params):
             self.showNotification('Failed, Please check kodi logs', 'Linking')
         return (error, new_items)
@@ -349,6 +367,7 @@ class KODISCLib(xbmcprovider.XBMCMultiResolverContentProvider):
                 subs = self.getSubs()
                 util.debug("[SC] Subs: %s" % str(subs))
                 new_items = False
+                error = False
                 ids = {}
                 total = len(subs)
                 num = 0
@@ -402,15 +421,20 @@ class KODISCLib(xbmcprovider.XBMCMultiResolverContentProvider):
                                 util.debug("[SC] Refreshing %s" % str(iid))
                                 ids.update({iid:mtime})
                                 if len(ids) >= 20:
-                                    self.add_item_lastrun(ids)
+                                    (e, n) = self.add_item_lastrun(ids)
+                                    error |= e
+                                    new_items |= n
                                     ids = {}
                             data['last_run'] = sdata['time']
                             subs[iid] = data
 
                         if len(ids) > 0:
-                            self.add_item_lastrun(ids)
+                            (e, n) = self.add_item_lastrun(ids)
+                            error |= e
+                            new_items |= n
 
-                        self.setSubs(subs)
+                        if error is False:
+                            self.setSubs(subs)
                         util.debug("[SC] subscription done")        
 
                 if sctop.getSettingAsBool('download-movies'):
@@ -433,7 +457,10 @@ class KODISCLib(xbmcprovider.XBMCMultiResolverContentProvider):
                     util.info("[SC] movie library disabled")
 
                 if new_items:
+                    util.debug("[SC] UpdateLibrary")
                     xbmc.executebuiltin('UpdateLibrary(video)')
+                else:
+                    util.debug("[SC] no UpdateLibrary")
                 notified = False
             else:
                 util.info("[SC] Scan skipped")
@@ -474,7 +501,7 @@ class KODISCLib(xbmcprovider.XBMCMultiResolverContentProvider):
     def download(self, item):
         downloads = sctop.getSetting('downloads')
         if '' == downloads:
-            xbmcgui.Dialog().ok(self.provider.name, xbmcutil.__lang__(30009))
+            sctop.dialog.ok(self.provider.name, xbmcutil.__lang__(30009))
             return
         stream = self.resolve(item['url'])
         if stream:
@@ -483,88 +510,15 @@ class KODISCLib(xbmcprovider.XBMCMultiResolverContentProvider):
             # clean up \ and /
             name = item['title'].replace('/', '_').replace('\\', '_')
             if not stream['subs'] == '' and stream['subs'] is not None:
-                xbmcutil.save_to_file(stream['subs'], os.path.join(
-                    downloads, name + '.srt'), stream['headers'])
+                sctop.download(stream['subs'], downloads, name + '.srt', stream['headers'])
             if name.find('.') <= 0:
                 # name does not contain extension, append some
                 name += '.mp4'
             from threading import Thread
             util.debug("[SC] mame co stahovat: %s" % str(stream))
-            worker = Thread(target=self._download, args=(stream['url'], downloads, name, stream['headers']))
+            worker = Thread(target=sctop.download, args=(stream['url'], downloads, name, stream['headers']))
             worker.start()
 
-    def _download(self, url, dest, name, headers={}):
-        util.debug("[SC] zacinam stahovat %s" % str(url))
-        try:
-            req = Request(url)
-            for idx, val in headers.items():
-                req.add_header(idx, val)
-            r = urlopen(req)
-            total_length = r.info().get('content-length')
-            filename = xbmc.validatePath(os.path.join(xbmc.translatePath(dest), name))
-            if total_length is None:
-                chunk = 1024 * 8
-            else:
-                chunk = int(int(total_length) / 100)
-
-            dl = 0
-            util.debug("[SC] info: [%s] [%s]" % (str(filename), str(chunk)))
-            fd = xbmcvfs.File(filename, 'wb')
-            notifyEnabled = sctop.getSetting('download-notify') == 'true'
-            notifyEvery = sctop.getSetting('download-notify-every')
-            notifyPercent = 1
-            if int(notifyEvery) == 0:
-                notifyPercent = 10
-            if int(notifyEvery) == 1:
-                notifyPercent = 5
-            
-            #for data in r.iter_content(chunk_size=chunk):
-            for data in iter(lambda: r.read(chunk), ''):
-                fd.write(data)
-                if total_length is not None:
-                    dl += len(data)
-                    done = int(100 * int(dl) / int(total_length))
-                    util.debug("[SC] ... %s%%" % str(done))
-                    if notifyEnabled and done > 0 and (done % notifyPercent) == 0:
-                        sctop.notification(name, "%s%%" % done, 1000)
-                else:
-                    dl += 0
-                    util.debug("[SC] ... %s?" % str(dl))
-            fd.close()
-        except:
-            util.debug('[SC] ERR download: %s' % str(traceback.format_exc()) )
-            pass
-                
-    def __download(self, url, destination, zip=True):
-        destination = os.path.join(xbmc.translatePath(destination), os.path.basename(url))
-        util.debug("[SC] ||||||||||url: %s, dest: %s" % (url, destination))
-        if not xbmcvfs.exists(destination):
-            req = Request(url)
-            try:
-                util.debug("[SC] downloading %s" % str(url))
-                f = urlopen(req)
-                if f.info().get("Content-Encoding") == "gzip":
-                    util.debug("[SC] MAME GZIP")
-                    from StringIO import StringIO
-                    import gzip
-                    buf = StringIO(f.read())
-                    gf = gzip.GzipFile(fileobj=buf)
-                    data = gf.read()
-                else:
-                    util.debug("[SC] NEMAME GZIP")
-                    data = f.read()
-                    
-                local_file = open(destination, "wb")
-                local_file.write(data)
-                local_file.close()
-            except HTTPError, e:
-                util.debug("[SC] HTTP Error: %s %s" % (str(e.code), str(url)))
-                pass
-            except URLError, e:
-                util.debug("[SC] URL Error: %s %s" % (str(e.reason), str(url)))
-                pass
-        return destination
-    
     @bug.buggalo_try_except({'method': 'scutils.run_custom'})
     def run_custom(self, params):
         util.debug("RUN CUSTOM: %s" % str(params))
@@ -721,7 +675,7 @@ class KODISCLib(xbmcprovider.XBMCMultiResolverContentProvider):
                 pass
     
     def isPlaying(self):
-        return xbmc.Player().isPlaying()
+        return sctop.isPlaying()
 
     def scanRunning(self):
         return (xbmc.getCondVisibility('Library.IsScanningVideo') or
