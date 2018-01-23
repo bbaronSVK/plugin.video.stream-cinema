@@ -30,6 +30,10 @@
     <string id="30311">10%</string>
     <string id="30312">5%</string>
     <string id="30313">1%</string>
+    <string id="30304">Omezení vyrovnávací paměti pro stahování</string>
+    <string id="30314">Stahuju</string>
+    <string id="30315">Hotovo</string>
+    <string id="30316">Chyba</string>
     
     <string id="30040">Knihovna</string>
     <string id="30400">Složka pro filmy</string>

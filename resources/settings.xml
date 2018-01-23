@@ -4,6 +4,8 @@
         <setting type="lsep" label="30100" />
         <setting label="30101" id="wsuser" type="text" default="" />
         <setting label="30102" id="wspass" type="text" default="" option="hidden" />
+        <setting id="ws_usessl" label="webshare.cz https" type="bool" default="true"/>
+        <setting id="ws_checkssl" type="bool" default="false" visible="false" />
         <setting label="30111" type="action" action="RunPlugin(plugin://plugin.video.stream-cinema/?action=77732d6c6f676f7574)" />
         <setting type="lsep" label="30105" />
         <setting type="lsep" label="30106" />
@@ -62,6 +64,7 @@
         <setting type="sep" />
         <setting label="30302" id="download-notify" type="bool" default="true" />
         <setting label="30303" id="download-notify-every" type="enum" lvalues="30311|30312|30313" default="0" visible="eq(-1,true)" />
+        <setting label="30304" id="download-buffer" type="slider" default="4096" range="4,128" />
     </category>
     <category label="30040">
         <setting label="30400" id="library-movies" type="folder" default="" />

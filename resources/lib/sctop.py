@@ -176,10 +176,12 @@ def request(url, headers={}, output="content"):
         code = response.code
         info = response.info()
         response.close()
-    except urllib2.HTTPError, error:
+    except urllib2.HTTPError, error: # odchytava iba HTTP chyby, nie chyby spojenia!
+        util.debug("[SC] inet status: %s" % str(inet))
         code = error.code
         data = util._solve_http_errors(url, error)
         info = None
+        
     util.debug('len(data) %s' % len(data))
     
     if (output == "content"):
@@ -241,13 +243,15 @@ def _create_plugin_url(params, plugin=sys.argv[0]):
     for key in params.keys():
         # "menu", "img", "type", "size", "title"]:
         if key not in ["dtitle", "url", "action", "list", "cmd", "down", "play", "force",
-                        "search-list", "search", "search-remove", "search-edit", "tl",
+                        "search-list", "search", "csearch", "search-remove", "search-edit", "tl",
                         "id", "subtype", "title", "name", "imdb", "tvdb", "content"]:
             continue
-        value = str(params[key])
-        value = value.encode('utf-8')
-        if value.encode('hex') != "": 
-            url.append(key + '=' + value.encode('hex',) + '&')
+        try:
+            value = str(params[key])
+            value = value.encode('utf-8')
+            if value.encode('hex') != "": 
+                url.append(key + '=' + value.encode('hex',) + '&')
+        except: pass
     return plugin + '?' + ''.join(url)
 
 def merge_dicts(*dict_args):
@@ -268,6 +272,8 @@ def getCondVisibility(text):
 def isPlaying():
     return xbmc.Player().isPlaying()
 
+microtime = lambda: float(time.time() * 1000)
+
 def download(url, dest, name, headers={}):
     util.debug("[SC] zacinam stahovat %s" % str(url))
     try:
@@ -277,7 +283,8 @@ def download(url, dest, name, headers={}):
         r = urllib2.urlopen(req)
         total_length = r.info().get('content-length')
         filename = xbmc.validatePath(os.path.join(xbmc.translatePath(dest), name))
-        chunk = (1024 * 8) if total_length is None else int(int(total_length) / 100)
+        chunk = min(getSettingAsInt('download-buffer') * 1024 * 1024, 
+            (1024 * 1024 * 4) if total_length is None else int(int(total_length) / 100))
 
         dl = 0
         util.debug("[SC] info: [%s] [%s]" % (str(filename), str(chunk)))
@@ -285,24 +292,33 @@ def download(url, dest, name, headers={}):
         notifyEnabled = getSettingAsBool('download-notify')
         notifyEvery = getSettingAsInt('download-notify-every')
         notifyPercent = 10 if notifyEvery == 0 else 5 if notifyEvery == 1 else 1
+        lastNotify = None
+        lastTime = microtime()
 
         for data in iter(lambda: r.read(chunk), ''):
-            fd.write(data)
             if total_length is not None:
                 dl += len(data)
-                done = int(100 * int(dl) / int(total_length))
-                util.debug("[SC] ... %s%%" % str(done))
-                if notifyEnabled and done > 0 and (done % notifyPercent) == 0:
-                    notification(name, "%s%%" % done, 1000)
+                t = microtime()
+                if t > lastTime:
+                    kbps = int(float(len(data)) / float((t - lastTime) / 1000) / 1024)
+                    done = int(100 * int(dl) / int(total_length))
+                    util.debug("[SC] ... %s%% [%s]KB/s" % (str(done), str(kbps)))
+                    lastTime = t
+                    if notifyEnabled and lastNotify != done and (done % notifyPercent) == 0:
+                        notification("%s%% - %dKB/s" % (done, kbps), name, 1000)
+                        lastNotify = done
             else:
                 dl += 0
                 util.debug("[SC] ... %s?" % str(dl))
+            fd.write(data)
         fd.close()
+        util.debug("[SC] msg: [%s]" % getString(30315))
         if isPlaying():
-            notification(xbmcutil.__lang__(20177), filename)
+            notification(getString(30315), filename)
         else:
-            dialog.ok(xbmcutil.__lang__(20177), filename)
+            dialog.ok(getString(30315), filename)
     except:
+        dialog.ok(getString(30316), filename)
         util.debug('[SC] ERR download: %s' % str(traceback.format_exc()) )
         pass
 
@@ -311,8 +327,8 @@ def checkSupportHTTPS(url):
     skontroluje ci je zariadnie schopne nacitat url cez https
     '''
     try:
-        #url = str(self.provider._url('/')).replace('http://', 'https://')
-        util.debug('[SC] testujem HTTPS%s' % url)
+        url = str(url).replace('http://', 'https://')
+        util.debug('[SC] testujem HTTPS %s' % url)
         req = urllib2.Request(url)
         r = urllib2.urlopen(req)
         util.debug('[SC] OK HTTPS')

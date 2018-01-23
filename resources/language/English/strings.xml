@@ -30,6 +30,10 @@
     <string id="30311">10%</string>
     <string id="30312">5%</string>
     <string id="30313">1%</string>
+    <string id="30304">Limit download buffer</string>
+    <string id="30314">Downloading</string>
+    <string id="30315">Done</string>
+    <string id="30316">Error</string>
     
     <string id="30040">Subscriptions</string>
     <string id="30400">Movies folder</string>

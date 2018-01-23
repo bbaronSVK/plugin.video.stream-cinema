@@ -348,16 +348,36 @@ class KODISCLib(xbmcprovider.XBMCMultiResolverContentProvider):
         util.debug("[SC] can check: %d %d" % (int(next_check), int(time.time())))
         return next_check < time.time()
     
+    def sinput(self):
+        kb = sctop.keyboard()
+        kb.doModal()
+        what = None
+        if kb.isConfirmed():
+            what = kb.getText()
+            #self.list(self.provider.search(what, params['id']))
+            #return self.endOfDirectory()
+        return what
+    
     @bug.buggalo_try_except({'method': 'scutils.csearch'})
     def csearch(self, params):
         util.debug("[SC] vyhladavanie: %s " % str(params))
-        kb = sctop.keyboard()
-        kb.doModal()
-        if kb.isConfirmed():
-            what = kb.getText()
-            self.list(self.provider.search(what, params['id']))
+        if 'csearch' in params:
+            self.list(self.provider.search(params['csearch'], params['id']))
             return self.endOfDirectory()
-    
+        li = self.getList(params['id'])
+        if len(li) == 0 or params['title'] == '#':
+            what = self.sinput()
+            self.addList(params['id'], what)
+            self.list(self.provider.search(what, params['id']))
+        else:
+            out = [{'title':'#', 'action':'csearch', 'id':params['id'], 'new':1, 'type':'dir'}]
+            for i in li:
+                item = {'title': str(i), 'action': 'csearch', 'csearch': str(i), 'id': str(params['id']), 'type': 'dir'}
+                out.append(item)
+            self.list(out) #self.provider.search(what, params['id']))
+            pass
+        return self.endOfDirectory()
+                
     @bug.buggalo_try_except({'method': 'scutils.evalSchedules'})
     def evalSchedules(self,force=False):
         try:
@@ -1338,7 +1358,19 @@ class KODISCLib(xbmcprovider.XBMCMultiResolverContentProvider):
     
     @bug.buggalo_try_except({'method': 'scutils.getLast'})
     def getLast(self):
-        data = self.cache.get("last")
+        return self.getList('last')
+
+    @bug.buggalo_try_except({'method': 'scutils.setLast'})
+    def setLast(self, last):
+        self.setList('last', last)
+
+    @bug.buggalo_try_except({'method': 'scutils.addLast'})
+    def addLast(self, scid):
+        return self.addList('last', scid)
+
+    @bug.buggalo_try_except({'method': 'scutils.getList'})
+    def getList(self, name):
+        data = self.cache.get(name)
         try:
             if data == '' or data is None:
                 last = []
@@ -1346,26 +1378,27 @@ class KODISCLib(xbmcprovider.XBMCMultiResolverContentProvider):
                 last = eval(data)
         except:
             last = []
-        util.debug("[SC] getLast %s" % str(last))
+        util.debug("[SC] getList %s %s" % (name, str(last)))
         return last
-    
-    @bug.buggalo_try_except({'method': 'scutils.setLast'})
-    def setLast(self, last):
-        util.debug("[SC] setLast %s" % str(last))
-        self.cache.set("last", repr(last), expiration=timedelta(days=365))
 
-    @bug.buggalo_try_except({'method': 'scutils.addLast'})
-    def addLast(self, scid):
-        last = self.getLast()
-        util.debug("[SC] addLast %s -> %s" % (str(scid), str(last)))
+    @bug.buggalo_try_except({'method': 'scutils.setList'})
+    def setList(self, name, last):
+        util.debug("[SC] setList %s %s" % (name, str(last)))
+        self.cache.set(name, repr(last), expiration=timedelta(days=365))
+    
+    @bug.buggalo_try_except({'method': 'scutils.addList'})
+    def addList(self, name, scid, max=20):
+        last = self.getList(name)
+        util.debug("[SC] addList [%s] %s -> %s" % (name, str(scid), str(last)))
         if scid in last:
             last.remove(scid)
+        
         last.insert(0, scid)
-        remove = len(last) - 20
+        remove = len(last) - max
         if remove > 0:
             for i in range(remove):
                 last.pop()
-        self.setLast(last)
+        self.setList(name, last)
 
     @bug.buggalo_try_except({'method': 'scutils.filter_bitrate'})
     def filter_bitrate(self, resolved):

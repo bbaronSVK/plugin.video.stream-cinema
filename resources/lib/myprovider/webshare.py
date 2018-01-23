@@ -37,10 +37,10 @@ class Webshare():
         self.username = username
         self.password = password
         self.base_url = 'http://webshare.cz/'
-        if getSettingAsBool('wscheckssl') is False:
+        if getSettingAsBool('ws_checkssl') is False:
             res = checkSupportHTTPS(self.base_url)
-            setSetting('wsusessl', 'true' if res is True else 'false')
-        if getSettingAsBool('wsusessl') is True:
+            setSetting('ws_usessl', 'true' if res is True else 'false')
+        if getSettingAsBool('ws_usessl') is True:
             self.base_url = self.base_url.replace('http://', 'https://')
         self.cache = cache
         self.win = xbmcgui.Window(10000)

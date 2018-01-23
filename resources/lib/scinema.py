@@ -265,6 +265,13 @@ class StreamCinemaContentProvider(ContentProvider):
             util.debug("[SC] return data")
             return ret
         except Exception, e:
+            inet = sctop.getCondVisibility('System.InternetState')
+            util.debug("[SC] inet scinema status: %s" % str(inet))
+            if inet is False or inet == 0:
+                HANDLE = int(sys.argv[1])
+                xbmcplugin.endOfDirectory(HANDLE, succeeded=False)
+                sctop.dialog.ok("internet", 'Skontrolujte pripojenie na internet')
+                return False
             util.error('[SC] ERROR URL: ' + str(e))
             if code is None:
                 sctop.dialog.ok("error", url)
