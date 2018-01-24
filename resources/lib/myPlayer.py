@@ -159,6 +159,13 @@ class MyPlayer(xbmc.Player):
         self.win.clearProperty('lang.1')
         self.win.clearProperty('lang.2')
 
+    def addLast(self, name, id):
+        if self.parent is not None:
+            try:
+                self.parent.addList(name, id)
+            except Exception, e:
+                util.error(e)
+                pass
 
     def onPlayBackStarted(self):
         if self.scid is not None:
@@ -243,6 +250,7 @@ class MyPlayer(xbmc.Player):
 
             try:
                 if self.itemType == 'movie':
+                    self.addLast('lastm', self.scid)
                     method = 'VideoLibrary.GetMovies'
                     try:
                         if self.ids is not None and trakt.getTraktCredentialsInfo() == True:
@@ -267,15 +275,10 @@ class MyPlayer(xbmc.Player):
                                 self.itemDBID = m['movieid']
                                 break
                 else:
+                    self.addLast('last', self.scid)
                     if self.ids is not None and trakt.getTraktCredentialsInfo() == True:
                         #trakt.addTraktCollection({'shows':[{'ids':self.ids}]})
                         pass
-                    if self.parent is not None:
-                        try:
-                            self.parent.addLast(self.scid)
-                        except Exception, e:
-                            util.error(e)
-                            pass
                         
                     method = 'VideoLibrary.GetTVShows'
                     value = self.parent.normalize_filename(str(showtitle)) #/Season %s/%sx%s.strm" % (showtitle, season, season, episode)

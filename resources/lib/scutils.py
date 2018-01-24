@@ -584,8 +584,8 @@ class KODISCLib(xbmcprovider.XBMCMultiResolverContentProvider):
             if action == 'rsubs':
                 self.setSubs({})
             if action == 'last':
-                self.list(self.provider.items(self.provider._url("/Last/?%s" % urllib.urlencode({'ids': json.dumps(self.getLast())}))))
-                return xbmcplugin.endOfDirectory(int(sys.argv[1]))
+                self.list(self.provider.items(self.provider._url("/Last/?%s" % urllib.urlencode({'ids': json.dumps(self.getList(params['id']))}))))
+                return self.endOfDirectory()
             if action == 'traktManager':
                 if trakt.getTraktCredentialsInfo() == True:
                     trakt.manager(params['name'], params['imdb'], params['tvdb'], params['content'])
