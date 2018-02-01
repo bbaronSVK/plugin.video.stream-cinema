@@ -177,10 +177,11 @@ def request(url, headers={}, output="content"):
         info = response.info()
         response.close()
     except urllib2.HTTPError, error: # odchytava iba HTTP chyby, nie chyby spojenia!
-        util.debug("[SC] inet status: %s" % str(inet))
         code = error.code
         data = util._solve_http_errors(url, error)
         info = None
+    except urllib2.URLError, e:
+        URLError(e)
         
     util.debug('len(data) %s' % len(data))
     
@@ -194,6 +195,14 @@ def request(url, headers={}, output="content"):
     else:
         return (data, code)
 
+
+def URLError(e):
+    dialog.ok('HTTPS problem');
+    try:
+        HANDLE = int(sys.argv[1])
+        xbmcplugin.endOfDirectory(HANDLE, succeeded=False)
+    except:
+        pass
 
 def post(url, data, headers={}, output="content"):
     postdata = urllib.urlencode(data)
@@ -210,12 +219,13 @@ def post(url, data, headers={}, output="content"):
     except urllib2.HTTPError, error:
         data = util._solve_http_errors(url, error)
         code = error.code
+    except urllib2.URLError, e:
+        URLError(e)
 
     if (output == "content"):
         return data
     else:
         return (data, code)
-
 
 def post_json(url, data, headers={}, output="content"):
     postdata = json.dumps(data)
@@ -232,7 +242,9 @@ def post_json(url, data, headers={}, output="content"):
     except urllib2.HTTPError, error:
         data = util._solve_http_errors(url, error)
         code = error.code
-
+    except urllib2.URLError, e:
+        URLError(e)
+        
     if (output == "content"):
         return data
     else:
@@ -276,13 +288,16 @@ microtime = lambda: float(time.time() * 1000)
 
 def download(url, dest, name, headers={}):
     util.debug("[SC] zacinam stahovat %s" % str(url))
+    filename = xbmc.validatePath(os.path.join(xbmc.translatePath(dest), name))
     try:
+        if 'http' not in url:
+            xbmcvfs.copy(url, filename);
+            return
         req = urllib2.Request(url)
         for idx, val in headers.items():
             req.add_header(idx, val)
         r = urllib2.urlopen(req)
         total_length = r.info().get('content-length')
-        filename = xbmc.validatePath(os.path.join(xbmc.translatePath(dest), name))
         chunk = min(getSettingAsInt('download-buffer') * 1024 * 1024, 
             (1024 * 1024 * 4) if total_length is None else int(int(total_length) / 100))
 
@@ -318,7 +333,7 @@ def download(url, dest, name, headers={}):
         else:
             dialog.ok(getString(30315), filename)
     except:
-        dialog.ok(getString(30316), filename)
+        dialog.ok(getString(30316), name)
         util.debug('[SC] ERR download: %s' % str(traceback.format_exc()) )
         pass
 

@@ -1,7 +1,5 @@
 # -*- coding: UTF-8 -*-
 #/*
-# *      Copyright (C) 2013 Libor Zoubek
-# *
 # *
 # *  This Program is free software; you can redistribute it and/or modify
 # *  it under the terms of the GNU General Public License as published by
@@ -38,6 +36,7 @@ class Webshare():
         self.password = password
         self.base_url = 'http://webshare.cz/'
         if getSettingAsBool('ws_checkssl') is False:
+            setSetting('ws_checkssl', 'true')
             res = checkSupportHTTPS(self.base_url)
             setSetting('ws_usessl', 'true' if res is True else 'false')
         if getSettingAsBool('ws_usessl') is True:
@@ -53,7 +52,7 @@ class Webshare():
 
     def _create_request(self, url, base):
         args = dict(urlparse.parse_qsl(url))
-        headers = {'X-Requested-With':'XMLHttpRequest','Accept':'text/xml; charset=UTF-8','Referer':self.base_url}
+        headers = {'X-Requested-With':'XMLHttpRequest','Accept':'text/xml; charset=UTF-8','User-Agent':'Stream-Cinema','Referer':self.base_url}
         req = base.copy()
         for key in req:
             if key in args:
@@ -94,7 +93,6 @@ class Webshare():
                     util.error('[SC] Server returned error status, response: %s' % data)
                     return False
                 self.saveToken(xml.find('token').text)
-                self.cookies()
                 util.info('[SC] Login successfull')
                 return True
             except Exception, e:
@@ -129,30 +127,26 @@ class Webshare():
                 
         return False
     
-    def cookies(self):
-        try:
-            util.cache_cookies(None)
-        except:
-            pass
-    
     def logout(self):
         util.info("[SC] logout")
         headers,req = self._create_request('/',{'wst':self.token})
         try:
-            self.clearToken()
             post(self._url('api/logout/'), req, headers=headers)
-            self.cookies()
         except:
             util.debug("[SC] chyba logout")
             pass
+        self.clearToken()
 
     def clearToken(self):
         try:
             if self.cache is not None:
+                util.debug('[SC] mazem token z cache')
                 self.cache.set('ws.token', None)
         except:
             pass
+        util.debug('[SC] mazem token z Prop')
         self.win.clearProperty('ws.token')
+        util.debug('[SC] mazem self token')
         self.token = None
         pass
     
@@ -160,13 +154,17 @@ class Webshare():
         try:
             if self.cache is None:
                 self.w = xbmcgui.Window(10000)
+                util.debug('[SC] token z Prop')
                 token = self.w.getProperty('ws.token')
             else:
+                util.debug('[SC] token z CACHE')
                 token = self.cache.get('ws.token')
 
             if token is not None and token != '':
+                util.debug('[SC] mame platny token')
                 self.token = token
             else:
+                util.debug('[SC] token je neplatny')
                 self.token = None
         except:
             util.info('[SC] token ERR %s' % str(traceback.format_exc()))
@@ -191,10 +189,10 @@ class Webshare():
             data = post(self._url('api/file_link/'), req, headers=headers)
             xml = ET.fromstring(data)
             if not xml.find('status').text == 'OK':
-                self.win.clearProperty('ws.token')
-                self.token = None
+                self.clearToken();
                 util.error('[SC] Server returned error status, response: %s' % data)
                 raise ResolveException(xml.find('message').text)
             return xml.find('link').text
         except Exception, e:
+            self.clearToken();
             raise ResolveException(e)

@@ -56,8 +56,8 @@ class KODISCLib(xbmcprovider.XBMCMultiResolverContentProvider):
         '''
         skontroluje pri prvom spusteni, ci je zariadnie schopne nacitat stream-cinema cez https
         '''
-        if sctop.getSettingAsBool('checkssl') == False:
-            sctop.setSetting('checkssl', 'true')
+        if sctop.getSettingAsBool('check_ssl') == False:
+            sctop.setSetting('check_ssl', 'true')
             url = str(self.provider._url('/')).replace('http://', 'https://')
             util.debug('[SC] testujem HTTPS na SC %s' % url)
             s = sctop.checkSupportHTTPS(url)
@@ -222,7 +222,7 @@ class KODISCLib(xbmcprovider.XBMCMultiResolverContentProvider):
             out += "http://www.imdb.com/title/tt%07d/\n" % int(data['imdb'])
         if 'tmdb' in data and data['tmdb'] is not None and int(data['tmdb']) > 0:
             out += "https://www.themoviedb.org/movie/%d/\n" % int(data['tmdb'])
-        if 'csfd' in data and data['csfd'] is not None and int(data['csfd']) > 0 and data['csfd'] < 999999:
+        if 'csfd' in data and data['csfd'] is not None and int(data['csfd']) > 0 and int(data['csfd']) < 999999:
             out += "http://www.csfd.cz/film/%d-\n" % int(data['csfd'])
         if 'tvdb' in data and data['tvdb'] is not None and int(data['tvdb']) > 0:
             out += "http://thetvdb.com/index.php?tab=series&id=%d\n" % int(data['tvdb'])
@@ -524,10 +524,8 @@ class KODISCLib(xbmcprovider.XBMCMultiResolverContentProvider):
             sctop.dialog.ok(self.provider.name, xbmcutil.__lang__(30009))
             return
         stream = self.resolve(item['url'])
-        if stream:
-            if not 'headers' in stream.keys():
-                stream['headers'] = {}
-            # clean up \ and /
+        if stream is not None and stream is not False:
+            if not 'headers' in stream.keys(): stream['headers'] = {}
             name = item['title'].replace('/', '_').replace('\\', '_')
             if not stream['subs'] == '' and stream['subs'] is not None:
                 sctop.download(stream['subs'], downloads, name + '.srt', stream['headers'])
@@ -549,7 +547,7 @@ class KODISCLib(xbmcprovider.XBMCMultiResolverContentProvider):
             if action == 'ws-logout':
                 try:
                     from myprovider.webshare import Webshare
-                    ws = Webshare(None,None)
+                    ws = Webshare(None,None,self.cache)
                     ws.logout()
                     sctop.notification('Webshare.cz', sctop.__language__(30112))
                 except:

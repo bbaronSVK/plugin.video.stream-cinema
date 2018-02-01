@@ -266,7 +266,7 @@ class StreamCinemaContentProvider(ContentProvider):
             return ret
         except Exception, e:
             inet = sctop.getCondVisibility('System.InternetState')
-            util.debug("[SC] inet scinema status: %s" % str(inet))
+            util.debug("[SC] inet scinema status: %s | %s" % (str(inet), str(e)))
             if inet is False or inet == 0:
                 HANDLE = int(sys.argv[1])
                 xbmcplugin.endOfDirectory(HANDLE, succeeded=False)
@@ -439,18 +439,6 @@ class StreamCinemaContentProvider(ContentProvider):
                 bug.onExceptionRaised()
                 pass
                         
-        else:
-            try:
-                raise ResolveException('zatial nic...')
-                hmf = urlresolver.HostedMediaFile(url=itm['url'], include_disabled=False,
-                                                  include_universal=False)
-                if hmf.valid_url() is True:
-                    try:
-                        itm['url'] = hmf.resolve()
-                    except:
-                        pass
-            except:
-                pass
         itm['title'] = self.parent.encode(itm['title'])
         
         return itm
@@ -463,7 +451,7 @@ class StreamCinemaContentProvider(ContentProvider):
                 data = self._json(item['url']) #json.loads(self.get_data_cached(item['url']))
             except:
                 raise ResolveException('Video is not available.')
-            if data is None:
+            if data is None or data is False:
                 raise ResolveException('Video is not available.')
             if 'strms' in data:
                 util.debug("[SC] data info: %s" % str(data['info']))

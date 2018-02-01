@@ -474,7 +474,10 @@ class MyPlayer(xbmc.Player):
             pass
         self.log("[SC] action: %s" % str(data))
         url = self.parent.provider._url(url)
-        sctop.post_json(url, data, {'X-UID': sctop.uid})
+        try:
+            sctop.post_json(url, data, {'X-UID': sctop.uid})
+        except:
+            pass
         
     def upNext(self):
         util.debug("[SC] upNext: start")
