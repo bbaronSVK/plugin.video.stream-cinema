@@ -134,7 +134,13 @@
     <string id="30955">Vyšla nová verzia pluginu (%s). Pre správne fungovanie je potrebné plugin aktualizovať. Ak máte automatickú aktualizaciu, tak sa vám plugin sám aktualizuje po kliknuti na OK. Ak sa tak nestane, aktualizujte plugin ručne.</string>
     <string id="30956">Práve sledované</string>
     <string id="30957">Príliš veľa požiadaviek, prosím počkajte (1 min) a opakujte akciu.</string>
-        
+    
+    <string id="30958">História</string>
+    <string id="30959">Ohodnotené filmy</string>
+    <string id="30960">Ohodnotené seriály</string>
+    <string id="30961">Pozreté filmy</string>
+    <string id="30962">Pozreté seriály</string>
+    
     <!-- dni v tyzdni -->
     <string id="30911">Pondelok</string>
     <string id="30912">Utorok</string>    

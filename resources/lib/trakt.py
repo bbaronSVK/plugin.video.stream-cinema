@@ -186,45 +186,97 @@ def getLists():
     if not result:
         return []
     result = json.loads(result)
-    
+
     items = [
         {
-            'type': 'dir', 
-            'title': '$30944', 
+            'type': 'dir',
+            'title': '$30944',
             #'url': 'cmd://Container.Update("%s")' % \
-            'action':'traktShowList', 
+            'action':'traktShowList',
             'id':'watchlist',
             'tl':'watchlist'
         }
         #,
         #{
-        #    'type': 'dir', 
-        #    'title': 'Nedokoncene', 
+        #    'type': 'dir',
+        #    'title': 'Nedokoncene',
         #    'url': 'cmd://Container.Update("%s")' % \
         #        (xbmcutil._create_plugin_url({'action':'traktShowList', 'id':'progress'}))
         #}
         ]
     lists = [{'action':'traktShowList', 'title': i['name'], 'id': i['ids']['slug'], 'type':'dir', 'tl':i['ids']['slug']} for i in result]
     items += lists
+    items += [
+        {
+            'type': 'dir',
+            'title': '$30958',
+            'action': 'traktHistory',
+            'id': 'history',
+            'tl': 'history',
+        }
+    ]
+    return items
+
+def getHistory():
+
+    items = [
+        {
+            'type': 'dir',
+            'title': '$30959',
+            'action': 'traktShowList',
+            'id': 'rated_movies',
+            'tl': 'rated_movies',
+        },
+        {
+            'type': 'dir',
+            'title': '$30960',
+            'action': 'traktShowList',
+            'id': 'rated_shows',
+            'tl': 'rated_shows',
+        },
+        {
+            'type': 'dir',
+            'title': '$30961',
+            'action': 'traktShowList',
+            'id': 'watched_movies',
+            'tl': 'watched_movies'
+        },
+        {
+            'type': 'dir',
+            'title': '$30962',
+            'action': 'traktShowList',
+            'id': 'watched_shows',
+            'tl': 'watched_shows'
+        }
+    ]
     return items
 
 def getList(slug, content=None):
     content = content if content is not None else ''
+    util.debug('[SC] getList slug: %s, content: %s' % (slug, content))
     if slug == 'watchlist':
         result = getTrakt('/users/me/watchlist/%s' % content)
     elif slug == 'progress':
         result = getTrakt('sync/playback/%s' % content)
+    elif slug[0:5] == 'rated':
+        result = getTrakt('/users/me/ratings/%s/' % slug[6:])
+    elif slug[0:7] == 'watched':
+        result = getTrakt('/users/me/watched/%s/' % slug[8:])
+        content = slug[8:-1]
     else:
         result = getTrakt('/users/me/lists/%s/items/%s' % (slug, content))
+
     result = json.loads(result)
     ids = []
     for i in result:
-        if 'imdb' in i[i['type']]['ids']:
+        if 'type' in i and 'imdb' in i[i['type']]['ids']:
             ids.append(i[i['type']]['ids']['imdb'])
+        elif content in i and 'imdb' in i[content]['ids']:
+            ids.append(i[content]['ids']['imdb'])
         else:
             util.debug('LIST: %s' % str(i))
     return ids
-    
+
 def manager(name, imdb, tvdb, content):
     try:
         icon = sctop.infoLabel('ListItem.Icon')
