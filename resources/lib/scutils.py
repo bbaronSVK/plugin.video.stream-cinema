@@ -594,6 +594,12 @@ class KODISCLib(xbmcprovider.XBMCMultiResolverContentProvider):
                 else:
                     self.list([])
                 return self.endOfDirectory()
+            if action == 'traktHistory':
+                if trakt.getTraktCredentialsInfo() == True:
+                    self.list(self.provider.items(data={'menu': trakt.getHistory()}))
+                else:
+                    self.list([])
+                return self.endOfDirectory()
             if action == 'traktShowList':
                 if trakt.getTraktCredentialsInfo() == True:
                     util.debug("[SC] params: %s" % str(params))

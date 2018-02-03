@@ -120,7 +120,7 @@
     
     <string id="30943">My lists</string>
     <string id="30944">Watchlist</string>
-        
+    
     <string id="30945">Failed to sign in to WebShare</string>
     <string id="30946">Do you want to open the settings?</string>
     <string id="30947">You have not an active VIP on WebShare</string>
@@ -134,6 +134,12 @@
     <string id="30955">New version of plugin (%s) has been uploaded. The plugin needs to be updated to work properly. If you have an automatic update, you can update yourself by clicking OK. If this does not happen, update the plugin manually.</string>
     <string id="30956">Just watching</string>
     <string id="30957">Too many requests, please wait (1 min) and try again.</string>
+    
+    <string id="30958">History</string>
+    <string id="30959">Rated Movies</string>
+    <string id="30960">Rated Shows</string>
+    <string id="30961">Watched Movies</string>
+    <string id="30962">Watched Shows</string>
     
     <!-- dni v tyzdni -->
     <string id="30911">Monday</string>
