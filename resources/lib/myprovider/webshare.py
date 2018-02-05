@@ -32,8 +32,8 @@ import xbmcgui
 class Webshare():
 
     def __init__(self,username=None,password=None,cache=None):
-        self.username = username
-        self.password = password
+        self.username = username.encode('utf-8')
+        self.password = password.encode('utf-8')
         self.base_url = 'http://webshare.cz/'
         if getSettingAsBool('ws_checkssl') is False:
             setSetting('ws_checkssl', 'true')
@@ -82,7 +82,7 @@ class Webshare():
                     return False
                 salt = xml.find('salt').text
                 # create hashes
-                password = hashlib.sha1(md5crypt(self.password.encode('utf-8'), salt.encode('utf-8'))).hexdigest()
+                password = hashlib.sha1(md5crypt(self.password, salt.encode('utf-8'))).hexdigest()
                 digest = hashlib.md5(self.username + ':Webshare:' + self.password).hexdigest()
                 # login
                 headers,req = self._create_request('',{'username_or_email':self.username,'password':password,'digest':digest,'keep_logged_in':1})
@@ -95,7 +95,7 @@ class Webshare():
                 self.saveToken(xml.find('token').text)
                 util.info('[SC] Login successfull')
                 return True
-            except Exception, e:
+            except Exception as e:
                 util.info('[SC] Login error %s' % str(e))
         self.clearToken()
         return False
@@ -193,6 +193,6 @@ class Webshare():
                 util.error('[SC] Server returned error status, response: %s' % data)
                 raise ResolveException(xml.find('message').text)
             return xml.find('link').text
-        except Exception, e:
+        except Exception as e:
             self.clearToken();
             raise ResolveException(e)

@@ -107,7 +107,7 @@ class StreamCinemaContentProvider(ContentProvider):
     def _json(self, url, post=False):
         try:
             return json.loads(self.get_data_cached(url, post))
-        except Exception, e:
+        except Exception as e:
             util.debug("[SC] chybna URL %s" % str(url))
             util.error(e)
         return None
@@ -121,7 +121,6 @@ class StreamCinemaContentProvider(ContentProvider):
         if data is not None and data.get("menu"):
             for m in data["menu"]:
                 try:
-                    #util.debug("MENU: %s" % str(m))
                     if 'visible' in m and not sctop.getCondVisibility(m['visible']):
                         continue
                     if m['type'] == 'dir':
@@ -134,11 +133,10 @@ class StreamCinemaContentProvider(ContentProvider):
                 except Exception:
                     pass
             if 'system' in data:
-                #util.debug("SYSTEM!!!!")
-                #self.parent.system = data["system"]
                 self.system(data["system"])
         else:
             result = [{'title': 'i failed', 'url':'failed', 'type':'dir'}]
+            self.parent.endOfDirectory(succeeded=False);
         #util.debug('--------------------- DONE -----------------')
         return result
 
@@ -199,7 +197,7 @@ class StreamCinemaContentProvider(ContentProvider):
                 xel = xbmcgui.Window(xbmcgui.getCurrentWindowId())
                 ctr = xel.getControl(xel.getFocusId())
                 ctr.selectItem(int(data['focus']))
-            except Exception, e:
+            except Exception as e:
                 util.debug("[SC] error focus :-( %s" % str(traceback.format_exc()))
                 pass
             
@@ -264,7 +262,7 @@ class StreamCinemaContentProvider(ContentProvider):
                 util.debug("[SC] url z cache %s" % str(url))
             util.debug("[SC] return data")
             return ret
-        except Exception, e:
+        except Exception as e:
             inet = sctop.getCondVisibility('System.InternetState')
             util.debug("[SC] inet scinema status: %s | %s" % (str(inet), str(e)))
             if inet is False or inet == 0:
@@ -272,7 +270,7 @@ class StreamCinemaContentProvider(ContentProvider):
                 xbmcplugin.endOfDirectory(HANDLE, succeeded=False)
                 sctop.dialog.ok("internet", 'Skontrolujte pripojenie na internet')
                 return False
-            util.error('[SC] ERROR URL: ' + str(e))
+            util.error('[SC] ERROR URL: --------- %s --------' % str(traceback.format_exc()) )
             if code is None:
                 sctop.dialog.ok("error", url)
             return False
@@ -324,10 +322,14 @@ class StreamCinemaContentProvider(ContentProvider):
     @bug.buggalo_try_except({'method': 'scinema.ctx'})
     def ctx(self, item, data):
         menu = {}
-        #util.debug("CTX ITM: %s" % str(item))
+        util.debug("CTX ITM: %s" % str(item))
         #util.debug("CTX DAT: %s" % str(data))
         #if 'dir' in data and data['dir'] == 'tvshows':
-        
+
+        if 'csearch' in item:
+            menu.update({"Edit": {"action": "csearch-edit", "id": item['id'], "title": item['csearch']}})
+            menu.update({"Remove": {"action": "csearch-remove", "id": item['id'], "title": item['csearch']}})
+
         if 'tl' in item:
             menu.update({"$30918": {"action": "add-to-lib-trakt", "tl": item['tl'], "title": data['title']}})
         
@@ -387,7 +389,7 @@ class StreamCinemaContentProvider(ContentProvider):
         if str(id).startswith('search-people'):
             sq.update({'ms':'1'})
         util.debug("[SC] search %s" % str(sq))
-        return self.items(None, self._json(self._url('/Search/'), sq))
+        return self.items(data=self._json(self._url('/Search/%s' % id), sq))
 
     @bug.buggalo_try_except({'method': 'scinema._resolve'})
     def _resolve(self, itm):
@@ -431,7 +433,7 @@ class StreamCinemaContentProvider(ContentProvider):
                         content = sctop.request(url)
                         itm['subs'] = self.parent.saveSubtitle(content, 'cs', False)
                         util.debug("[SC] posielam URL na titulky: %s" % itm['subs'])
-                except Exception, e:
+                except Exception as e:
                     util.debug("[SC] chyba WS titlkov... %s | %s" % (str(e), str(traceback.format_exc())))
                     pass
                 itm['headers'] = {'User-Agent': util.UA}

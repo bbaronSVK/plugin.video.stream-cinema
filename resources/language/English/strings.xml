@@ -74,6 +74,10 @@
     <string id="30609">Show up next episode</string>
     <string id="30610">Remove 3D stream</string>
 
+    <string id="30070">Search</string>
+    <string id="30700">Enable history</string>
+    <string id="30701">Items in history</string>
+
     <!-- texty v menu -->
     <string id="30901">Movies</string>
     <string id="30902">Series</string>

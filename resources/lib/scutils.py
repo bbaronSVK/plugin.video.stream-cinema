@@ -56,12 +56,13 @@ class KODISCLib(xbmcprovider.XBMCMultiResolverContentProvider):
         '''
         skontroluje pri prvom spusteni, ci je zariadnie schopne nacitat stream-cinema cez https
         '''
-        if sctop.getSettingAsBool('check_ssl') == False:
-            sctop.setSetting('check_ssl', 'true')
+        if sctop.getSettingAsBool('check_ssl1') == False:
+            sctop.setSetting('check_ssl1', 'true')
             url = str(self.provider._url('/')).replace('http://', 'https://')
             util.debug('[SC] testujem HTTPS na SC %s' % url)
             s = sctop.checkSupportHTTPS(url)
             sctop.setSetting('UseSSL', 'true' if s is True else 'false')
+            sctop.BASE_URL = "http%s://stream-cinema.online/kodi" % ('s' if s is True else '')
             pass
 
     def _parse_settings(self, itm):
@@ -117,7 +118,7 @@ class KODISCLib(xbmcprovider.XBMCMultiResolverContentProvider):
             if not xbmcvfs.exists(dir):
                 try:
                     xbmcvfs.mkdirs(dir)
-                except Exception:
+                except Exception as e:
                     error = True
                     util.error('[SC] Failed to create directory 1: ' + dir)
 
@@ -127,7 +128,7 @@ class KODISCLib(xbmcprovider.XBMCMultiResolverContentProvider):
                     file_desc.write(str(item_url))
                     file_desc.close()
                     new = True
-                except Exception, e:
+                except Exception as e:
                     util.error('[SC] Failed to create .strm file: ' + item_path + " | " + str(e))
                     error = True
         else:
@@ -348,35 +349,44 @@ class KODISCLib(xbmcprovider.XBMCMultiResolverContentProvider):
         util.debug("[SC] can check: %d %d" % (int(next_check), int(time.time())))
         return next_check < time.time()
     
-    def sinput(self):
-        kb = sctop.keyboard()
+    def sinput(self, edit):
+        edit = '' if edit == '#' or '$' in edit else edit
+        kb = sctop.keyboard(edit)
         kb.doModal()
         what = None
         if kb.isConfirmed():
             what = kb.getText()
+            return what
             #self.list(self.provider.search(what, params['id']))
-            #return self.endOfDirectory()
-        return what
-    
+        self.endOfDirectory(succeeded=False)
+        exit()
+
     @bug.buggalo_try_except({'method': 'scutils.csearch'})
     def csearch(self, params):
         util.debug("[SC] vyhladavanie: %s " % str(params))
+        edit = False
+        if 'action' in params and params['action'] in ['csearch-remove','csearch-edit']:
+            self.addList(params['id'], params['title'], max=sctop.getSettingAsInt("searchHistoryNum"), removeonly=True)
+            if params['action'] =='csearch-remove':
+                xbmc.executebuiltin('Container.Refresh')
+                return
+            edit = True
         if 'csearch' in params:
             self.list(self.provider.search(params['csearch'], params['id']))
-            return self.endOfDirectory()
+            return self.endOfDirectory(cacheToDisc=False)
         li = self.getList(params['id'])
-        if len(li) == 0 or params['title'] == '#':
-            what = self.sinput()
-            self.addList(params['id'], what)
+        if len(li) == 0 or params['title'] == '#' or sctop.getSettingAsBool("searchHistory") is False or edit is True:
+            what = self.sinput(params['title'])
+            self.addList(params['id'], what, max=sctop.getSettingAsInt("searchHistoryNum"))
             self.list(self.provider.search(what, params['id']))
         else:
             out = [{'title':'#', 'action':'csearch', 'id':params['id'], 'new':1, 'type':'dir'}]
             for i in li:
                 item = {'title': str(i), 'action': 'csearch', 'csearch': str(i), 'id': str(params['id']), 'type': 'dir'}
                 out.append(item)
-            self.list(out) #self.provider.search(what, params['id']))
+            self.list(self.provider.items(data={'menu':out})) #self.provider.search(what, params['id']))
             pass
-        return self.endOfDirectory()
+        return self.endOfDirectory(cacheToDisc=False)
                 
     @bug.buggalo_try_except({'method': 'scutils.evalSchedules'})
     def evalSchedules(self,force=False):
@@ -603,8 +613,9 @@ class KODISCLib(xbmcprovider.XBMCMultiResolverContentProvider):
             if action == 'traktShowList':
                 if trakt.getTraktCredentialsInfo() == True:
                     util.debug("[SC] params: %s" % str(params))
-                    ids = trakt.getList(params['id'])
-                    self.list(self.provider.items(None, self.provider._json("/Search/", {'ids': json.dumps(ids)})))
+                    content = None if 'content' not in params else params['content']
+                    ids = trakt.getList(params['id'], content)
+                    self.list(self.provider.items(data=self.provider._json("/Search/", {'ids': json.dumps(ids)})))
                 return self.endOfDirectory()
             if action == 'authTrakt':
                 trakt.authTrakt()
@@ -660,7 +671,7 @@ class KODISCLib(xbmcprovider.XBMCMultiResolverContentProvider):
             if action == 'trakt':
                 movies = self.getTraktLastActivity('series') #trakt.getWatchedActivity()
                 util.debug("[SC] movies: %s" % str(movies))
-            if action == 'csearch':
+            if action in ['csearch', 'csearch-edit', 'csearch-remove']:
                 return self.csearch(params)
             if action == 'search-actor':
                 self.list(self.provider.items(None, self.provider._json("/Search/actor/%s/%s" % (params['id'], params['subtype']), {'id':params['id'], 'type': params['subtype']})))
@@ -1170,7 +1181,7 @@ class KODISCLib(xbmcprovider.XBMCMultiResolverContentProvider):
                 showupnext = sctop.getSettingAsBool("show_up_next")
                 if showupnext and (totalTime - playTime) <= int(notificationtime):
                     sctop.player.upNext()
-        except Exception, e:
+        except Exception as e:
             bug.onExceptionRaised(e)
             util.debug("[SC] _player e: %s" % str(e))
             pass
@@ -1295,7 +1306,7 @@ class KODISCLib(xbmcprovider.XBMCMultiResolverContentProvider):
             try:
                 content_encoded = codecs.decode(content, codepage)
                 content = codecs.encode(content_encoded, 'utf-8')
-            except Exception, e:
+            except Exception as e:
                 util.debug("[SC] chyba ukladania titulkov....")
                 pass
 
@@ -1315,7 +1326,7 @@ class KODISCLib(xbmcprovider.XBMCMultiResolverContentProvider):
             else:
                 subs = eval(data)
             self.subs = subs
-        except Exception, e:
+        except Exception as e:
             util.error(e)
             subs = {}
         return subs
@@ -1356,7 +1367,7 @@ class KODISCLib(xbmcprovider.XBMCMultiResolverContentProvider):
                 util.debug("[SC] cacheMigrate eval")
                 last = eval(data)
                 self.setLast(last)
-        except Exception, e:
+        except Exception as e:
             util.debug("[SC] migrate err: %s" % str(traceback.format_exc()))
             pass
     
@@ -1391,13 +1402,14 @@ class KODISCLib(xbmcprovider.XBMCMultiResolverContentProvider):
         self.cache.set(name, repr(last), expiration=timedelta(days=365))
     
     @bug.buggalo_try_except({'method': 'scutils.addList'})
-    def addList(self, name, scid, max=20):
+    def addList(self, name, scid, max=20, removeonly=False):
         last = self.getList(name)
         util.debug("[SC] addList [%s] %s -> %s" % (name, str(scid), str(last)))
         if scid in last:
             last.remove(scid)
-        
-        last.insert(0, scid)
+
+        if removeonly == False:
+            last.insert(0, scid)
         remove = len(last) - max
         if remove > 0:
             for i in range(remove):
@@ -1615,7 +1627,7 @@ class KODISCLib(xbmcprovider.XBMCMultiResolverContentProvider):
             return resolved[0]
         try:
             return self.provider.resolve(item, select_cb=select_cb)
-        except ResolveException, e:
+        except ResolveException as e:
             self._handle_exc(e)
 
 bug.SUBMIT_URL = sctop.submiturl

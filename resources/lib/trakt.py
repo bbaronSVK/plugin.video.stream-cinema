@@ -74,7 +74,7 @@ def getTrakt(url, post=None):
 
         result = sctop.post_json(url, post, headers)
         return result
-    except Exception, e:
+    except Exception as e:
         util.error(e)
         pass
 
@@ -135,7 +135,7 @@ def authTrakt():
         util.debug("[SC] auth: %s %s %s" % (str(user), str(token), str(refresh)))
         raise Exception("[SC] ERR koniec")
     except:
-        util.debug("ERROR: %s" % str(traceback.format_exc()))
+        util.debug("[SC] trakt ERROR: %s" % str(traceback.format_exc()))
         sctop.openSettings('0.0')
 
 
@@ -190,11 +190,18 @@ def getLists():
     items = [
         {
             'type': 'dir',
-            'title': '$30944',
+            'title': '[B]$30944[/B]',
             #'url': 'cmd://Container.Update("%s")' % \
             'action':'traktShowList',
             'id':'watchlist',
             'tl':'watchlist'
+        },
+        {
+            'type': 'dir',
+            'title': '[B]$30958[/B]',
+            'action': 'traktHistory',
+            'id': 'history',
+            'tl': 'history',
         }
         #,
         #{
@@ -206,15 +213,6 @@ def getLists():
         ]
     lists = [{'action':'traktShowList', 'title': i['name'], 'id': i['ids']['slug'], 'type':'dir', 'tl':i['ids']['slug']} for i in result]
     items += lists
-    items += [
-        {
-            'type': 'dir',
-            'title': '$30958',
-            'action': 'traktHistory',
-            'id': 'history',
-            'tl': 'history',
-        }
-    ]
     return items
 
 def getHistory():
@@ -247,7 +245,25 @@ def getHistory():
             'action': 'traktShowList',
             'id': 'watched_shows',
             'tl': 'watched_shows'
+        },
+        '''
+        {
+            'type': 'dir',
+            'title': '$30963',
+            'action': 'traktShowList',
+            'id': 'progress',
+            'tl': 'progress',
+            'content': 'movies'
+        },
+        {
+            'type': 'dir',
+            'title': '$30964',
+            'action': 'traktShowList',
+            'id': 'progress',
+            'tl': 'progress',
+            'content': 'episodes'
         }
+        '''
     ]
     return items
 
@@ -274,7 +290,7 @@ def getList(slug, content=None):
         elif content in i and 'imdb' in i[content]['ids']:
             ids.append(i[content]['ids']['imdb'])
         else:
-            util.debug('LIST: %s' % str(i))
+            util.debug('[SC] trakt LIST: %s' % str(i))
     return ids
 
 def manager(name, imdb, tvdb, content):
@@ -323,7 +339,7 @@ def manager(name, imdb, tvdb, content):
         icon = icon if not result == None else 'ERROR'
 
         sctop.infoDialog(sctop.getString(30941).encode('utf-8'), heading=str(name), sound=True, icon=icon)
-    except Exception, e:
+    except Exception as e:
         util.debug("[SC] trakt error: %s" % str(traceback.format_exc()))
         return
 

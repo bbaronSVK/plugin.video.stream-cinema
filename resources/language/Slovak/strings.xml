@@ -74,6 +74,10 @@
     <string id="30609">Ponúkať nasledujúcu epizódu</string>
     <string id="30610">Vyradiť 3D stream</string>
     
+    <string id="30070">Vyľadávanie</string>
+    <string id="30700">Povoliť históriu</string>
+    <string id="30701">Počet položiek v historií</string>
+
     <!-- texty v menu -->
     <string id="30901">Filmy</string>
     <string id="30902">Seriály</string>
