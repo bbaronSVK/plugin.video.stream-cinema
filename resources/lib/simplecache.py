@@ -1,6 +1,5 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
-
 '''provides a simple stateless caching system for Kodi addons and plugins'''
 
 import xbmcvfs
@@ -67,7 +66,11 @@ class SimpleCache(object):
 
         return result
 
-    def set(self, endpoint, data, checksum="", expiration=datetime.timedelta(days=30)):
+    def set(self,
+            endpoint,
+            data,
+            checksum="",
+            expiration=datetime.timedelta(days=30)):
         '''
             set data in cache
         '''
@@ -92,7 +95,8 @@ class SimpleCache(object):
         cur_time = datetime.datetime.now()
         lastexecuted = self._win.getProperty("simplecache.clean.lastexecuted")
         if not lastexecuted:
-            self._win.setProperty("simplecache.clean.lastexecuted", repr(cur_time))
+            self._win.setProperty("simplecache.clean.lastexecuted",
+                                  repr(cur_time))
         elif (eval(lastexecuted) + self._auto_clean_interval) < cur_time:
             # cleanup needed...
             self._do_cleanup()
@@ -124,7 +128,7 @@ class SimpleCache(object):
         '''get cache data from sqllite _database'''
         result = None
         query = "SELECT expires, data, checksum FROM simplecache WHERE id = ?"
-        cache_data = self._execute_sql(query, (endpoint,))
+        cache_data = self._execute_sql(query, (endpoint, ))
         if cache_data:
             cache_data = cache_data.fetchone()
             if cache_data and cache_data[0] > cur_time:
@@ -132,7 +136,8 @@ class SimpleCache(object):
                     result = eval(cache_data[1])
                     # also set result in memory cache for further access
                     if self.enable_mem_cache:
-                        self._set_mem_cache(endpoint, checksum, cache_data[0], result)
+                        self._set_mem_cache(endpoint, checksum, cache_data[0],
+                                            result)
         return result
 
     def _set_db_cache(self, endpoint, checksum, expires, data):
@@ -164,7 +169,7 @@ class SimpleCache(object):
             # clean up db cache object only if expired
             if cache_expires < cur_timestamp:
                 query = 'DELETE FROM simplecache WHERE id = ?'
-                self._execute_sql(query, (cache_id,))
+                self._execute_sql(query, (cache_id, ))
                 self._log_msg("delete from db %s" % cache_id)
 
         # compact db
@@ -180,12 +185,14 @@ class SimpleCache(object):
         '''get reference to our sqllite _database - performs basic integrity check'''
         addon = xbmcaddon.Addon(ADDON_ID)
         dbpath = addon.getAddonInfo('profile')
-        dbfile = xbmc.translatePath("%s/simplecache.db" % dbpath).decode('utf-8')
+        dbfile = xbmc.translatePath(
+            "%s/simplecache.db" % dbpath).decode('utf-8')
         if not xbmcvfs.exists(dbpath):
             xbmcvfs.mkdirs(dbpath)
         del addon
         try:
-            connection = sqlite3.connect(dbfile, timeout=30, isolation_level=None)
+            connection = sqlite3.connect(
+                dbfile, timeout=30, isolation_level=None)
             connection.execute('SELECT * FROM simplecache LIMIT 1')
             return connection
         except Exception as error:
@@ -193,13 +200,16 @@ class SimpleCache(object):
             if xbmcvfs.exists(dbfile):
                 xbmcvfs.delete(dbfile)
             try:
-                connection = sqlite3.connect(dbfile, timeout=30, isolation_level=None)
-                connection.execute(
-                    """CREATE TABLE IF NOT EXISTS simplecache(
-                    id TEXT UNIQUE, expires INTEGER, data TEXT, checksum INTEGER)""")
+                connection = sqlite3.connect(
+                    dbfile, timeout=30, isolation_level=None)
+                connection.execute("""CREATE TABLE IF NOT EXISTS simplecache(
+                    id TEXT UNIQUE, expires INTEGER, data TEXT, checksum INTEGER)"""
+                                   )
                 return connection
             except Exception as error:
-                self._log_msg("Exception while initializing _database: %s" % str(error), xbmc.LOGWARNING)
+                self._log_msg(
+                    "Exception while initializing _database: %s" % str(error),
+                    xbmc.LOGWARNING)
                 self.close()
                 return None
 
@@ -230,7 +240,8 @@ class SimpleCache(object):
                         break
                 except Exception as error:
                     break
-            self._log_msg("_database ERROR ! -- %s" % str(error), xbmc.LOGWARNING)
+            self._log_msg("_database ERROR ! -- %s" % str(error),
+                          xbmc.LOGWARNING)
         return None
 
     @staticmethod
@@ -250,7 +261,7 @@ class SimpleCache(object):
         if not stringinput and not self.global_checksum:
             return 0
         if self.global_checksum:
-            stringinput = "%s-%s" %(self.global_checksum, stringinput)
+            stringinput = "%s-%s" % (self.global_checksum, stringinput)
         else:
             stringinput = str(stringinput)
         return reduce(lambda x, y: x + y, map(ord, stringinput))
@@ -263,8 +274,10 @@ def use_cache(cache_days=14):
         Any method that needs caching just add @use_cache as decorator
         NOTE: use unnamed arguments for calling the method and named arguments for optional settings
     '''
+
     def decorator(func):
         '''our decorator'''
+
         def decorated(*args, **kwargs):
             '''process the original method and apply caching of the results'''
             method_class = args[0]
@@ -281,11 +294,17 @@ def use_cache(cache_days=14):
                 global_cache_ignore = method_class.ignore_cache
             except Exception:
                 pass
-            if cachedata is not None and not kwargs.get("ignore_cache", False) and not global_cache_ignore:
+            if cachedata is not None and not kwargs.get(
+                    "ignore_cache", False) and not global_cache_ignore:
                 return cachedata
             else:
                 result = func(*args, **kwargs)
-                method_class.cache.set(cache_str, result, expiration=datetime.timedelta(days=cache_days))
+                method_class.cache.set(
+                    cache_str,
+                    result,
+                    expiration=datetime.timedelta(days=cache_days))
                 return result
+
         return decorated
+
     return decorator

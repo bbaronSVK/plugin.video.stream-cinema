@@ -20,7 +20,8 @@ __addon__ = xbmcaddon.Addon(id=__scriptid__)
 __set__ = __addon__.getSetting
 __language__ = __addon__.getLocalizedString
 
-BASE_URL = "http%s://stream-cinema.online/kodi" % ('s' if __set__('UseSSL') == 'true' else '')
+BASE_URL = "http%s://stream-cinema.online/kodi" % (
+    's' if __set__('UseSSL') == 'true' else '')
 API_VERSION = "1.2"
 KODI_VERSION = int(xbmc.getInfoLabel("System.BuildVersion").split(".")[0])
 KODI_LANG = xbmc.getInfoLabel("System.Language")[:3].lower()
@@ -78,11 +79,20 @@ def getString(string_id):
     return __addon__.getLocalizedString(string_id).encode('utf-8', 'ignore')
 
 
-def notification(header, message, time=5000, icon=__addon__.getAddonInfo('icon')):
-    xbmc.executebuiltin("XBMC.Notification(%s,%s,%i,%s)" % (header, message, time, icon))
+def notification(header,
+                 message,
+                 time=5000,
+                 icon=__addon__.getAddonInfo('icon')):
+    xbmc.executebuiltin("XBMC.Notification(%s,%s,%i,%s)" % (header, message,
+                                                            time, icon))
 
 
-def yesnoDialog(line1, line2, line3, heading=addonInfo('name'), nolabel='', yeslabel=''):
+def yesnoDialog(line1,
+                line2,
+                line3,
+                heading=addonInfo('name'),
+                nolabel='',
+                yeslabel=''):
     return dialog.yesno(heading, line1, line2, line3, nolabel, yeslabel)
 
 
@@ -90,7 +100,11 @@ def selectDialog(list, heading=addonInfo('name')):
     return dialog.select(heading, list)
 
 
-def infoDialog(message, heading=addonInfo('name'), icon='', time=3000, sound=False):
+def infoDialog(message,
+               heading=addonInfo('name'),
+               icon='',
+               time=3000,
+               sound=False):
     if icon == '':
         icon = icon = __addon__.getAddonInfo('icon')
     elif icon == 'INFO':
@@ -221,7 +235,7 @@ def request(url, headers={}, output="content"):
 
 
 def URLError(e):
-    dialog.ok('HTTPS problem', str(e));
+    dialog.ok('HTTPS problem', str(e))
     try:
         HANDLE = int(sys.argv[1])
         xbmcplugin.endOfDirectory(HANDLE, succeeded=False)
@@ -281,9 +295,12 @@ def _create_plugin_url(params, plugin=sys.argv[0]):
     url = []
     for key in params.keys():
         # "menu", "img", "type", "size", "title"]:
-        if key not in ["dtitle", "url", "action", "list", "cmd", "down", "play", "force",
-                       "search-list", "search", "csearch", "search-remove", "search-edit", "tl",
-                       "id", "subtype", "title", "name", "imdb", "tvdb", "csfd", "trakt", "content"]:
+        if key not in [
+                "dtitle", "url", "action", "list", "cmd", "down", "play",
+                "force", "search-list", "search", "csearch", "search-remove",
+                "search-edit", "tl", "id", "subtype", "title", "name", "imdb",
+                "tvdb", "csfd", "trakt", "content"
+        ]:
             continue
         try:
             value = str(params[key])
@@ -315,22 +332,25 @@ def getCondVisibility(text):
 def isPlaying():
     return xbmc.Player().isPlaying()
 
+
 microtime = lambda: float(time.time() * 1000)
+
 
 def download(url, dest, name, headers={}):
     util.debug("[SC] zacinam stahovat %s" % str(url))
     filename = xbmc.validatePath(os.path.join(xbmc.translatePath(dest), name))
     try:
         if 'http' not in url:
-            xbmcvfs.copy(url, filename);
+            xbmcvfs.copy(url, filename)
             return
         req = urllib2.Request(url)
         for idx, val in headers.items():
             req.add_header(idx, val)
         r = urllib2.urlopen(req)
         total_length = r.info().get('content-length')
-        chunk = min(getSettingAsInt('download-buffer') * 1024 * 1024,
-                    (1024 * 1024 * 4) if total_length is None else int(int(total_length) / 100))
+        chunk = min(
+            getSettingAsInt('download-buffer') * 1024 * 1024, (1024 * 1024 * 4)
+            if total_length is None else int(int(total_length) / 100))
 
         dl = 0
         util.debug("[SC] info: [%s] [%s]" % (str(filename), str(chunk)))
@@ -346,12 +366,16 @@ def download(url, dest, name, headers={}):
                 dl += len(data)
                 t = microtime()
                 if t > lastTime:
-                    kbps = int(float(len(data)) / float((t - lastTime) / 1000) / 1024)
+                    kbps = int(
+                        float(len(data)) / float((t - lastTime) / 1000) / 1024)
                     done = int(100 * int(dl) / int(total_length))
-                    util.debug("[SC] ... %s%% [%s]KB/s" % (str(done), str(kbps)))
+                    util.debug("[SC] ... %s%% [%s]KB/s" % (str(done),
+                                                           str(kbps)))
                     lastTime = t
-                    if notifyEnabled and lastNotify != done and (done % notifyPercent) == 0:
-                        notification("%s%% - %dKB/s" % (done, kbps), name, 1000)
+                    if notifyEnabled and lastNotify != done and (
+                            done % notifyPercent) == 0:
+                        notification("%s%% - %dKB/s" % (done, kbps), name,
+                                     1000)
                         lastNotify = done
             else:
                 dl += 0
@@ -381,7 +405,8 @@ def checkSupportHTTPS(url):
         util.debug('[SC] OK HTTPS')
         return True
     except urllib2.HTTPError:
-        util.debug('[SC] serverova chyba HTTPS %s' % str(traceback.format_exc()))
+        util.debug(
+            '[SC] serverova chyba HTTPS %s' % str(traceback.format_exc()))
         return True
     except Exception:
         util.debug('[SC] chyba HTTPS %s' % str(traceback.format_exc()))

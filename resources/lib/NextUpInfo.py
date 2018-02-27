@@ -99,14 +99,14 @@ class NextUpInfo(xbmcgui.WindowXMLDialog):
         overview = self.item['plot']
         tvshowtitle = self.item['tvshowtitle']
         name = self.item['title']
-        playcount = 0 #self.item['playcount']
+        playcount = 0  #self.item['playcount']
 
         season = self.item['season']
         episodeNum = self.item['episode']
         episodeInfo = str(season) + 'x' + str(episodeNum) + '.'
 
         if 'rating' in self.item:
-            rating = str(round(float(self.item['rating']),1))
+            rating = str(round(float(self.item['rating']), 1))
         year = self.item.get('year', '')
         info = year
 
@@ -138,10 +138,13 @@ class NextUpInfo(xbmcgui.WindowXMLDialog):
         try:
             fanartControl = self.getControl(3005)
             if fanartControl != None:
-                util.debug("[SC] upNext fanart: %s" % fanartimage.replace('thetvdb.com', 'stream-cinema.online'))
-                fanartControl.setImage(fanartimage.replace('thetvdb.com', 'stream-cinema.online'))
+                util.debug("[SC] upNext fanart: %s" % fanartimage.replace(
+                    'thetvdb.com', 'stream-cinema.online'))
+                fanartControl.setImage(
+                    fanartimage.replace('thetvdb.com', 'stream-cinema.online'))
             else:
-                util.debug("[SC] upNext fanart: NEMAME CONTROL %s" % fanartimage)
+                util.debug(
+                    "[SC] upNext fanart: NEMAME CONTROL %s" % fanartimage)
         except:
             pass
 
