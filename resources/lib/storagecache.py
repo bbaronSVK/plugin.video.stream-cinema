@@ -2,8 +2,10 @@ import simplecache
 import util
 from datetime import timedelta
 
+
 class StorageCache:
     cache = None
+
     def __init__(self):
         self.cache = simplecache.SimpleCache()
         self.ttl = timedelta(hours=1)
@@ -16,8 +18,8 @@ class StorageCache:
             data = eval(data)
             return data
         except:
-            return "" 
-        
+            return ""
+
     def _generateKey(self, funct, *args):
         name = repr(funct)
         if name.find(" of ") > -1:
@@ -41,8 +43,8 @@ class StorageCache:
 
         name += "|" + keyhash.hexdigest() + "|"
 
-        return name 
-    
+        return name
+
     def cacheFunction(self, funct=False, *args):
         key = self._generateKey(funct, *args)
         ret = self.get(key)
@@ -64,7 +66,7 @@ class StorageCache:
 
     def delete(self, name):
         return self.set(name, None, expiration=timedelta(seconds=1))
-    
+
     def setMulti(self, name, data):
         '''
         temp = repr({"name": name, "data": data})
@@ -82,7 +84,7 @@ class StorageCache:
                 else:
                     return res
         '''
-        return ""         
+        return ""
 
     def lock(self, name):
         if self.get(name) == 'lock':

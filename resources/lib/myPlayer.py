@@ -14,8 +14,8 @@ import trakt
 import scutils
 from NextUpInfo import NextUpInfo
 
-class MyPlayer(xbmc.Player):
 
+class MyPlayer(xbmc.Player):
     def __init__(self, *args, **kwargs):
         try:
             self.log("[SC] player 1")
@@ -66,33 +66,45 @@ class MyPlayer(xbmc.Player):
     @staticmethod
     def log(text):
         xbmc.log(str([text]), xbmc.LOGDEBUG)
-        
+
     def setWatched(self):
         if self.ids is not None and trakt.getTraktCredentialsInfo() == True \
             and trakt.getTraktAddonMovieInfo() == False:
-            util.debug("[SC] nemame instalovany trakt.tv, tak oznacime film/serial za videny")
-            if self.se is not None and self.se.isdigit() and self.ep is not None and self.ep.isdigit():
-                util.debug("[SC] serial [%s]x[%s]" % (str(self.se), str(self.ep)))
+            util.debug(
+                "[SC] nemame instalovany trakt.tv, tak oznacime film/serial za videny"
+            )
+            if self.se is not None and self.se.isdigit(
+            ) and self.ep is not None and self.ep.isdigit():
+                util.debug("[SC] serial [%s]x[%s]" % (str(self.se),
+                                                      str(self.ep)))
                 trakt.markEpisodeAsWatchedT(self.ids, self.se, self.ep)
             else:
                 util.debug("[SC] film")
                 trakt.markMovieAsWatchedT(self.ids)
-            
+
         if self.itemDBID == None:
             return
         if self.itemType == 'episode':
-            metaReq = {"jsonrpc": "2.0",
-                       "method": "VideoLibrary.SetEpisodeDetails",
-                       "params": {"episodeid": self.itemDBID,
-                                  "playcount": 1},
-                       "id": 1}
+            metaReq = {
+                "jsonrpc": "2.0",
+                "method": "VideoLibrary.SetEpisodeDetails",
+                "params": {
+                    "episodeid": self.itemDBID,
+                    "playcount": 1
+                },
+                "id": 1
+            }
             self.executeJSON(metaReq)
         elif self.itemType == 'movie':
-            metaReq = {"jsonrpc": "2.0",
-                       "method": "VideoLibrary.SetMovieDetails",
-                       "params": {"movieid": self.itemDBID,
-                                  "playcount": 1},
-                       "id": 1}
+            metaReq = {
+                "jsonrpc": "2.0",
+                "method": "VideoLibrary.SetMovieDetails",
+                "params": {
+                    "movieid": self.itemDBID,
+                    "playcount": 1
+                },
+                "id": 1
+            }
             self.executeJSON(metaReq)
 
     def createResumePoint(self, seconds, total):
@@ -101,21 +113,37 @@ class MyPlayer(xbmc.Player):
             if pomer < 0.05:
                 return
             if self.itemType == 'episode':
-                metaReq = {"jsonrpc": "2.0",
-                           "method": "VideoLibrary.SetEpisodeDetails",
-                           "params": {"episodeid": self.itemDBID,
-                                      "resume": {"position": seconds, "total": total}},
-                           "id": 1}
+                metaReq = {
+                    "jsonrpc": "2.0",
+                    "method": "VideoLibrary.SetEpisodeDetails",
+                    "params": {
+                        "episodeid": self.itemDBID,
+                        "resume": {
+                            "position": seconds,
+                            "total": total
+                        }
+                    },
+                    "id": 1
+                }
                 ret = self.executeJSON(metaReq)
-                util.debug("[SC] resumepoint: %s %s" % (str(metaReq), str(ret)))
+                util.debug("[SC] resumepoint: %s %s" % (str(metaReq),
+                                                        str(ret)))
             elif self.itemType == 'movie':
-                metaReq = {"jsonrpc": "2.0",
-                           "method": "VideoLibrary.SetMovieDetails",
-                           "params": {"movieid": self.itemDBID,
-                                      "resume": {"position": seconds, "total": total}},
-                           "id": 1}
+                metaReq = {
+                    "jsonrpc": "2.0",
+                    "method": "VideoLibrary.SetMovieDetails",
+                    "params": {
+                        "movieid": self.itemDBID,
+                        "resume": {
+                            "position": seconds,
+                            "total": total
+                        }
+                    },
+                    "id": 1
+                }
                 ret = self.executeJSON(metaReq)
-                util.debug("[SC] resumepoint: %s %s" % (str(metaReq), str(ret)))
+                util.debug("[SC] resumepoint: %s %s" % (str(metaReq),
+                                                        str(ret)))
             '''resume = self.parent.getResumePoint()
             resume.update({self.itemDBID: seconds})
             self.parent.setResumePoint(resume)'''
@@ -133,25 +161,28 @@ class MyPlayer(xbmc.Player):
         else:
             util.debug("[SC] iny jazyk")
             return False
-        
+
         streams = self.getAvailableAudioStreams()
         util.debug("[SC] zoznam audio: %s | %s" % (str(alist), str(streams)))
         for i in alist:
             if i in streams:
-                util.debug("[SC] mame audio: %s pre jazyk %s" % (str(i), str(lang)))
+                util.debug("[SC] mame audio: %s pre jazyk %s" % (str(i),
+                                                                 str(lang)))
                 stream_number = streams.index(i)
                 self.setAudioStream(stream_number)
                 return True
         util.debug("[SC] NEmame audio: pre jazyk %s" % (str(lang)))
         return False
-    
+
     def selectAudio(self):
-        apri = self.win.getProperty('lang.1') #sctop.getSetting('filter_lang.1')
+        apri = self.win.getProperty(
+            'lang.1')  #sctop.getSetting('filter_lang.1')
         if apri == '':
             apri = sctop.getSetting('filter_lang.1')
         util.debug("[SC] skusam primary %s" % str(apri))
         if not self.tryALang(apri):
-            asec = self.win.getProperty('lang.2') #sctop.getSetting('filter_lang.2')
+            asec = self.win.getProperty(
+                'lang.2')  #sctop.getSetting('filter_lang.2')
             if asec == '':
                 asec = sctop.getSetting('filter_lang.2')
             util.debug("[SC] skusam secondary %s" % str(asec))
@@ -179,18 +210,20 @@ class MyPlayer(xbmc.Player):
         mojPlugin = self.win.getProperty(sctop.__scriptid__)
         if sctop.__scriptid__ not in mojPlugin:
             util.debug("[SC] Nieje to moj plugin ... ")
-            return;
+            return
         util.debug("[SC] JE to moj plugin ... %s" % str(mojPlugin))
         self.scid = self.win.getProperty('scid')
-        try: 
-            self.ids = json.loads(self.win.getProperty('%s.ids' % sctop.__scriptid__))
-        except: 
+        try:
+            self.ids = json.loads(
+                self.win.getProperty('%s.ids' % sctop.__scriptid__))
+        except:
             self.ids = {}
             pass
-        try: 
-            stream = json.loads(self.win.getProperty('%s.stream' % sctop.__scriptid__))
+        try:
+            stream = json.loads(
+                self.win.getProperty('%s.stream' % sctop.__scriptid__))
             util.debug("[SC] stream %s" % str(stream))
-        except: 
+        except:
             stream = {}
             pass
         self.stream = stream
@@ -206,12 +239,14 @@ class MyPlayer(xbmc.Player):
             else:
                 util.debug("[SC] nemame filter pre audio")
         except:
-            util.debug("[SC] XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX")
+            util.debug(
+                "[SC] XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"
+            )
             pass
         try:
             if not self.isPlayingVideo():
                 return
-            
+
             self.itemDuration = self.getTotalTime()
             # plánovaný čas dokončení 100 % přehrání
             self.estimateFinishTime = xbmc.getInfoLabel(
@@ -225,7 +260,9 @@ class MyPlayer(xbmc.Player):
                     showtitle = None
                 year = stream.get('year')
                 title = stream.get('originaltitle')
-                try: imdb = 'tt%07d' % int(stream.get('imdb')) if stream.get('imdb').isdigit() else None
+                try:
+                    imdb = 'tt%07d' % int(stream.get('imdb')) if stream.get(
+                        'imdb').isdigit() else None
                 except:
                     imdb = None
                     util.debug("[SC] imdb %s" % str(traceback.format_exc()))
@@ -239,13 +276,14 @@ class MyPlayer(xbmc.Player):
                 showtitle = xbmc.getInfoLabel('VideoPlayer.TVShowTitle')
                 year = xbmc.getInfoLabel('VideoPlayer.Year')
                 title = xbmc.getInfoLabel('VideoPlayer.Title')
-                imdb = xbmc.getInfoLabel("VideoPlayer.IMDBNumber") #"ListItem.IMDBNumber")
+                imdb = xbmc.getInfoLabel(
+                    "VideoPlayer.IMDBNumber")  #"ListItem.IMDBNumber")
 
             if episode is not None:
-                util.debug("[SC] Serial");
+                util.debug("[SC] Serial")
                 self.itemType = 'episode'
             else:
-                util.debug("[SC] Film");
+                util.debug("[SC] Film")
                 self.itemType = 'movie'
 
             try:
@@ -253,19 +291,31 @@ class MyPlayer(xbmc.Player):
                     self.addLast('lastm', self.scid)
                     method = 'VideoLibrary.GetMovies'
                     try:
-                        if self.ids is not None and trakt.getTraktCredentialsInfo() == True:
+                        if self.ids is not None and trakt.getTraktCredentialsInfo(
+                        ) == True:
                             #trakt.addTraktCollection({'movies':[{'ids':self.ids}]})
                             pass
                     except:
-                        self.log("[SC] trakt.tv error - nepodarilo sa pridat film do kolekcie: %s" % str(traceback.format_exc()))
+                        self.log(
+                            "[SC] trakt.tv error - nepodarilo sa pridat film do kolekcie: %s"
+                            % str(traceback.format_exc()))
                         pass
-                    value = "%s (%s).strm" % (self.parent.normalize_filename(str(title)), str(year))
+                    value = "%s (%s).strm" % (
+                        self.parent.normalize_filename(str(title)), str(year))
                     field = 'filename'
-                    res = self.executeJSON({'jsonrpc': '2.0', 'method': method, 
-                        'params': {'filter':
-                            {'operator': 'contains', 'field': field, 'value': value},
-                            'properties': ['file', 'resume'], 
-                        }, 'id': 1})
+                    res = self.executeJSON({
+                        'jsonrpc': '2.0',
+                        'method': method,
+                        'params': {
+                            'filter': {
+                                'operator': 'contains',
+                                'field': field,
+                                'value': value
+                            },
+                            'properties': ['file', 'resume'],
+                        },
+                        'id': 1
+                    })
 
                     if 'result' in res and 'movies' in res['result']:
                         for m in res['result']['movies']:
@@ -276,28 +326,52 @@ class MyPlayer(xbmc.Player):
                                 break
                 else:
                     self.addLast('last', self.scid)
-                    if self.ids is not None and trakt.getTraktCredentialsInfo() == True:
+                    if self.ids is not None and trakt.getTraktCredentialsInfo(
+                    ) == True:
                         #trakt.addTraktCollection({'shows':[{'ids':self.ids}]})
                         pass
-                        
+
                     method = 'VideoLibrary.GetTVShows'
-                    value = self.parent.normalize_filename(str(showtitle)) #/Season %s/%sx%s.strm" % (showtitle, season, season, episode)
+                    value = self.parent.normalize_filename(
+                        str(showtitle)
+                    )  #/Season %s/%sx%s.strm" % (showtitle, season, season, episode)
                     field = 'path'
-                    res = self.executeJSON({'jsonrpc': '2.0', 'method': method, 
-                        'params': {'filter':
-                            {'operator': 'contains', 'field': field, 'value': value}
-                        }, 'id': 1})
+                    res = self.executeJSON({
+                        'jsonrpc': '2.0',
+                        'method': method,
+                        'params': {
+                            'filter': {
+                                'operator': 'contains',
+                                'field': field,
+                                'value': value
+                            }
+                        },
+                        'id': 1
+                    })
 
                     if 'result' in res:
                         for m in res['result']['tvshows']:
                             if 'tvshowid' in m:
                                 self.itemDBID = int(m['tvshowid'])
-                                res = self.executeJSON({'jsonrpc': '2.0', 
-                                    'method': 'VideoLibrary.GetEpisodes', 'params': {
-                                        'tvshowid': int(m['tvshowid']), 'season': int(season), 
-                                        'properties': ['episode', 'file', 'resume'], 
-                                        'sort': {'method': 'episode'}
-                                        }, 'id': 1})
+                                res = self.executeJSON({
+                                    'jsonrpc':
+                                    '2.0',
+                                    'method':
+                                    'VideoLibrary.GetEpisodes',
+                                    'params': {
+                                        'tvshowid':
+                                        int(m['tvshowid']),
+                                        'season':
+                                        int(season),
+                                        'properties':
+                                        ['episode', 'file', 'resume'],
+                                        'sort': {
+                                            'method': 'episode'
+                                        }
+                                    },
+                                    'id':
+                                    1
+                                })
                                 util.info("[SC] tvshow json: %s" % str(res))
                                 for e in res['result']['episodes']:
                                     if int(e['episode']) == int(episode):
@@ -307,29 +381,48 @@ class MyPlayer(xbmc.Player):
                                 break
 
             except Exception:
-                self.log("[SC] Chyba JSONRPC: %s" % str(traceback.format_exc()))
+                self.log(
+                    "[SC] Chyba JSONRPC: %s" % str(traceback.format_exc()))
                 pass
-                        
-            res = self.executeJSON({'jsonrpc': '2.0', 'method': 'Player.GetItem', 
-                'params': {'playerid': 1}, 'id': 1})
+
+            res = self.executeJSON({
+                'jsonrpc': '2.0',
+                'method': 'Player.GetItem',
+                'params': {
+                    'playerid': 1
+                },
+                'id': 1
+            })
             if res:
                 _filename = None
                 try:
                     _filename = os.path.basename(self.getPlayingFile())
                 except:
-                    util.debug("[SC] onPlayBackStarted() - Exception trying to get playing filename, player suddenly stopped.")
+                    util.debug(
+                        "[SC] onPlayBackStarted() - Exception trying to get playing filename, player suddenly stopped."
+                    )
                     return
-                util.debug("[SC] Zacalo sa prehravat: DBID: [%s], SCID: [%s] imdb: %s dur: %s est: %s fi: [%s] | %sx%s - title: %s (year: %s) showtitle: %s" % (str(self.itemDBID), str(self.scid), str(imdb), str(self.itemDuration), self.estimateFinishTime, _filename, str(season), str(episode), str(title), str(year), str(showtitle)))
-                data = {'scid': self.scid, 'action': 'start', 'ep': episode, 'se': season}
+                util.debug(
+                    "[SC] Zacalo sa prehravat: DBID: [%s], SCID: [%s] imdb: %s dur: %s est: %s fi: [%s] | %sx%s - title: %s (year: %s) showtitle: %s"
+                    % (str(self.itemDBID), str(self.scid), str(imdb),
+                       str(self.itemDuration), self.estimateFinishTime,
+                       _filename, str(season), str(episode), str(title),
+                       str(year), str(showtitle)))
+                data = {
+                    'scid': self.scid,
+                    'action': 'start',
+                    'ep': episode,
+                    'se': season
+                }
                 util.debug("[SC] prehravanie %s" % str(res))
-                    
+
                 self.action(data)
                 if 'item' in res and 'id' not in res['item']:
                     util.debug("[SC] prehravanie mimo kniznice")
         except Exception:
             self.log("[SC] Chyba MyPlayer: %s" % str(traceback.format_exc()))
             pass
-        
+
         try:
             if 'resume' in self.libItem:
                 util.debug("[SC] resume! %s" % str(self.libItem))
@@ -359,7 +452,7 @@ class MyPlayer(xbmc.Player):
             return
         self.log("[SC] Stoplo sa prehravanie")
         data = {'scid': self.scid, 'action': 'stop', 'prog': self.timeRatio()}
-        
+
         self.log("[SC] DATA: %s" % str(data))
         self.action(data)
         try:
@@ -387,20 +480,23 @@ class MyPlayer(xbmc.Player):
             self.watchedTime = self.getTime()
             self.itemDuration = self.getTotalTime()
         try:
-            util.debug("[SC] watched %f duration %f" % (self.watchedTime, self.itemDuration))
-            return float("%.3f" % (self.watchedTime / math.floor(self.itemDuration)))
+            util.debug("[SC] watched %f duration %f" % (self.watchedTime,
+                                                        self.itemDuration))
+            return float("%.3f" %
+                         (self.watchedTime / math.floor(self.itemDuration)))
         except Exception, e:
             util.debug("[SC] timeRatio error")
             util.debug(e)
             pass
         try:
-            self.realFinishTime = xbmc.getInfoLabel('Player.FinishTime(hh:mm:ss)')
+            self.realFinishTime = xbmc.getInfoLabel(
+                'Player.FinishTime(hh:mm:ss)')
             return (self.get_sec(self.estimateFinishTime).seconds - \
                 self.get_sec(self.realFinishTime).seconds) / \
                 math.floor(self.itemDuration)
         except:
             return None
-        
+
     def waitForChange(self):
         scutils.KODISCLib.sleep(200)
         while True:
@@ -417,16 +513,25 @@ class MyPlayer(xbmc.Player):
             return
         self.log("[SC] Znova sa prehrava")
         self.waitForChange()
-        data = {'scid': self.scid, 'action': 'resume', 'prog': self.timeRatio()}
+        data = {
+            'scid': self.scid,
+            'action': 'resume',
+            'prog': self.timeRatio()
+        }
         self.action(data)
-        return;
+        return
 
     def onPlayBackSpeedChanged(self, speed):
         if self.scid is None:
             return
         self.log("[SC] Zmennila sa rychlost prehravania %s" % speed)
         self.waitForChange()
-        data = {'scid': self.scid, 'action': 'speed', 'speed': speed, 'prog': self.timeRatio()}
+        data = {
+            'scid': self.scid,
+            'action': 'speed',
+            'speed': speed,
+            'prog': self.timeRatio()
+        }
         self.action(data)
         return
 
@@ -435,10 +540,16 @@ class MyPlayer(xbmc.Player):
             return
         self.log("[SC] Seekujem %s %s" % (time, seekOffset))
         self.waitForChange()
-        data = {'scid': self.scid, 'action': 'seek', 'time': time, 'seekOffset': seekOffset, 'prog': self.timeRatio()}
+        data = {
+            'scid': self.scid,
+            'action': 'seek',
+            'time': time,
+            'seekOffset': seekOffset,
+            'prog': self.timeRatio()
+        }
         self.action(data)
         return
-    
+
     def onPlayBackPaused(self):
         if self.scid is None:
             return
@@ -447,7 +558,7 @@ class MyPlayer(xbmc.Player):
         data = {'scid': self.scid, 'action': 'pause', 'prog': self.timeRatio()}
         self.action(data)
         return
-    
+
     def action(self, data):
         if self.scid is None:
             return
@@ -456,10 +567,15 @@ class MyPlayer(xbmc.Player):
         data.update({'se': self.se, 'ep': self.ep})
         data.update({'ver': sctop.addonInfo('version')})
         try:
-            data.update({'state': bool(xbmc.getCondVisibility("!Player.Paused"))})
-            data.update({'ws': xbmcgui.Window(10000).getProperty('ws.ident'), 'vip': xbmcgui.Window(10000).getProperty('ws.vip')})
+            data.update({
+                'state': bool(xbmc.getCondVisibility("!Player.Paused"))
+            })
+            data.update({
+                'ws': xbmcgui.Window(10000).getProperty('ws.ident'),
+                'vip': xbmcgui.Window(10000).getProperty('ws.vip')
+            })
             data.update({'vd': xbmcgui.Window(10000).getProperty('ws.days')})
-            data.update({'skin':xbmc.getSkinDir()})
+            data.update({'skin': xbmc.getSkinDir()})
             if 'bitrate' in self.stream:
                 util.debug("[SC] action bitrate")
                 data.update({'bt': self.stream['bitrate']})
@@ -478,32 +594,39 @@ class MyPlayer(xbmc.Player):
             sctop.post_json(url, data, {'X-UID': sctop.uid})
         except:
             pass
-        
+
     def upNext(self):
         util.debug("[SC] upNext: start")
         try:
             if self.scid is None or self.upNextEnable == False:
                 util.debug("[SC] upNext: nieje nas plugin")
                 return
-            
+
             playTime = xbmc.Player().getTime()
             totalTime = xbmc.Player().getTotalTime()
-            
+
             if self.itemType == 'episode':
-                util.debug("[SC] upNext: mame serial %sx%s" % (str(self.se), str(self.ep)))
+                util.debug("[SC] upNext: mame serial %sx%s" % (str(self.se),
+                                                               str(self.ep)))
                 provider = self.parent.provider
-                url = provider._url('/upNext/%s/%s/%s' % (str(self.scid), str(self.se), str(self.ep)))
+                url = provider._url('/upNext/%s/%s/%s' % (str(self.scid),
+                                                          str(self.se),
+                                                          str(self.ep)))
                 util.debug("[SC] upNext URL: %s" % str(url))
                 data = provider._json(url)
                 util.debug("[SC] upNext data: %s" % str(data))
                 if data and "url" in data:
                     #$INFO[Player.TimeRemaining(ss)]
                     nextUpPage = NextUpInfo("sc-NextUpInfo.xml",
-                        sctop.addonInfo('path'), "default", "1080i")
+                                            sctop.addonInfo('path'), "default",
+                                            "1080i")
 
                     nextUpPage.setItem(data)
                     nextUpPage.show()
-                    while xbmc.Player().isPlaying() and (totalTime - playTime > 1) and not nextUpPage.isCancel() and not nextUpPage.isWatchNow():
+                    while xbmc.Player().isPlaying() and (
+                            totalTime - playTime >
+                            1) and not nextUpPage.isCancel(
+                            ) and not nextUpPage.isWatchNow():
                         sctop.sleep(100)
                         try:
                             playTime = xbmc.Player().getTime()
@@ -515,11 +638,16 @@ class MyPlayer(xbmc.Player):
                     shouldPlayDefault = not nextUpPage.isCancel()
                     shouldPlayNonDefault = nextUpPage.isWatchNow()
                     self.upNextEnable = False
-                    util.debug("[SC] upNext: [%s] [%s] " % (str(shouldPlayDefault), str(shouldPlayNonDefault)))
+                    util.debug("[SC] upNext: [%s] [%s] " %
+                               (str(shouldPlayDefault),
+                                str(shouldPlayNonDefault)))
                     if shouldPlayDefault or shouldPlayNonDefault:
                         self.stop()
                         data.update({'play': data['url'], 'url': data['url']})
-                        pu = sctop._create_plugin_url({'dtitle': data['title'], 'play': data['url']}, 'plugin://' + sctop.__scriptid__ + '/')
+                        pu = sctop._create_plugin_url({
+                            'dtitle': data['title'],
+                            'play': data['url']
+                        }, 'plugin://' + sctop.__scriptid__ + '/')
                         util.debug("[SC] upNext pluginurl: %s" % str(pu))
                         self.play(pu)
                         return
@@ -531,4 +659,6 @@ class MyPlayer(xbmc.Player):
         except Exception, e:
             util.error('[SC] upNext err: %s' % str(e))
             pass
+
+
 bug.SUBMIT_URL = sctop.submiturl

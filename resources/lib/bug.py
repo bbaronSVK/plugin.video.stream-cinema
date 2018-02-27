@@ -24,7 +24,7 @@ import random
 
 import xbmcaddon
 import xbmcplugin
-import xbmc 
+import xbmc
 from xbmcvfs import File as F
 
 import buggalo_client as client
@@ -61,20 +61,23 @@ def getLocalizedString(id):
     return buggaloAddon.getLocalizedString(id)
 
 
-def buggalo_try_except(extraData = None):
+def buggalo_try_except(extraData=None):
     """
     @buggalo_try_except function decorator wraps a function in a try..except clause and invokes onExceptionRaised()
     in case an exception is raised. Provide extraData to specific function specific extraData.
 
     @param extraData: str or dict
     """
+
     def decorator(fn):
         def wrap_in_try_except(*args, **kwargs):
             try:
                 return fn(*args, **kwargs)
             except Exception:
                 onExceptionRaised(extraData)
+
         return wrap_in_try_except
+
     return decorator
 
 
@@ -100,7 +103,10 @@ def onExceptionRaised(extraData=None):
         except Exception:
             pass
         try:
-            f = F(xbmc.translatePath('special://userdata/addon_data/plugin.video.stream-cinema/settings.xml'))
+            f = F(
+                xbmc.translatePath(
+                    'special://userdata/addon_data/plugin.video.stream-cinema/settings.xml'
+                ))
             sett = f.read(8129 * 10)
             f.close()
         except:
@@ -115,4 +121,4 @@ def onExceptionRaised(extraData=None):
 
     d = gui.BuggaloDialog(SUBMIT_URL, GMAIL_RECIPIENT, heading, data)
     d.doModal()
-    del d 
+    del d

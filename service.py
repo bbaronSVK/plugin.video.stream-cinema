@@ -24,9 +24,12 @@ import xbmc
 import util
 from resources.lib.scinema import StreamCinemaContentProvider
 from resources.lib.scutils import KODISCLib
-from resources.lib.sctop import __addon__,__set__
+from resources.lib.sctop import __addon__, __set__
 
-settings = {'quality': __set__('quality'), 'downloads': xbmc.translatePath(__set__('downloads'))}
+settings = {
+    'quality': __set__('quality'),
+    'downloads': xbmc.translatePath(__set__('downloads'))
+}
 uid = __set__('uid')
 try:
     import uuid
@@ -37,10 +40,15 @@ except:
     if uid == '':
         import random
         import string
-        uid = ''.join(random.choice(string.ascii_uppercase + string.digits) for _ in range(32))
+        uid = ''.join(
+            random.choice(string.ascii_uppercase + string.digits)
+            for _ in range(32))
         __addon__.setSetting('uid', uid)
     pass
 
-k = KODISCLib(StreamCinemaContentProvider(username=__set__('wsuser'),password=__set__('wspass'),uid=uid), settings, __addon__).service()
+k = KODISCLib(
+    StreamCinemaContentProvider(
+        username=__set__('wsuser'), password=__set__('wspass'), uid=uid),
+    settings, __addon__).service()
 del k
 util.info('[SC] DONE service.py')
