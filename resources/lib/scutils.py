@@ -639,13 +639,15 @@ class KODISCLib(xbmcprovider.XBMCMultiResolverContentProvider):
         stream = self.resolve(item['url'])
         if stream is not None and stream is not False:
             if not 'headers' in stream.keys(): stream['headers'] = {}
-            name = item['title'].replace('/', '_').replace('\\', '_')
+            name = stream['fname']
+            if (stream['subs'] == '' or stream['subs'] is None)\
+                    and stream['lang'].strip()[:2] not in ['CZ', 'SK']:
+                stream['subs'] = self.findSubtitles(stream)
+            if stream['subs'] == '' or stream['subs'] == 'internal' or stream['subs'] == 'disabled':
+                stream.remove('subs')
             if not stream['subs'] == '' and stream['subs'] is not None:
                 sctop.download(stream['subs'], downloads, name + '.srt',
                                stream['headers'])
-            if name.find('.') <= 0:
-                # name does not contain extension, append some
-                name += '.mp4'
             from threading import Thread
             util.debug("[SC] mame co stahovat: %s" % str(stream))
             worker = Thread(
@@ -884,23 +886,24 @@ class KODISCLib(xbmcprovider.XBMCMultiResolverContentProvider):
     @bug.buggalo_try_except({'method': 'scutils.setUniq'})
     def setUniq(self, li, stream):
         uniq = {}
-        if 'imdb' in stream and stream['imdb'] == 0:
+        if 'imdb' in stream and int(stream['imdb']) != 0:
             #util.debug("[SC] uniq imdb %s" % stream['imdb'])
-            uniq.update({'imdb': stream['imdb']})
+            imdb = "tt%07d" % int(stream['imdb'])
+            uniq.update({'imdb': imdb})
             li.setProperty('IMDBNumber', stream['imdb'])
-        if 'tmdb' in stream and stream['tmdb'] == 0:
+        if 'tmdb' in stream and int(stream['tmdb']) != 0:
             #util.debug("[SC] uniq tmdb %s" % stream['tmdb'])
             uniq.update({'tmdb': stream['tmdb']})
             li.setProperty('TMDBNumber', stream['tmdb'])
-        if 'tvdb' in stream and stream['tvdb'] == 0:
+        if 'tvdb' in stream and int(stream['tvdb']) != 0:
             #util.debug("[SC] uniq tvdb %s" % stream['tvdb'])
             uniq.update({'tvdb': stream['tvdb']})
             li.setProperty('TVDBNumber', stream['tvdb'])
-        if 'csfd' in stream:
+        if 'csfd' in stream and int(stream['csfd']) < 1000000:
             #util.debug("[SC] uniq csfd %s" % stream['csfd'])
             uniq.update({'csfd': stream['csfd']})
             li.setProperty('CSFDNumber', stream['csfd'])
-        if 'trakt' in stream and stream['trakt'] == 0:
+        if 'trakt' in stream and int(stream['trakt']) != 0:
             #util.debug("[SC] uniq trakt %s" % stream['trakt'])
             uniq.update({'trakt': stream['trakt']})
             li.setProperty('TRAKTNumber', stream['trakt'])
@@ -1004,6 +1007,13 @@ class KODISCLib(xbmcprovider.XBMCMultiResolverContentProvider):
                     #util.debug("Seturnm titulky: " + str(stream['subs']))
                     li.setSubtitles([stream['subs']])
             except:
+                pass
+
+            try:
+                li.setContentLookup(False);
+                li.setMimeType('application/octet-stream')
+            except Exception as e:
+                util.debug("[SC] err content lookup %s" % str(traceback.format_exc()))
                 pass
             self.win.setProperty(sctop.__scriptid__, sctop.__scriptid__)
             util.debug("[SC] mozem zacat prehravat %s" % str(stream))
@@ -1348,7 +1358,6 @@ class KODISCLib(xbmcprovider.XBMCMultiResolverContentProvider):
     @bug.buggalo_try_except({'method': 'scutils.service'})
     def service(self):
         util.info("SC Service Started")
-        #dialog = sctop.dialog.textviewer('heading', 'Prosim podporte vyvoj pluginu na adrese: http://stream-cinema.online/')
         if sctop.player is None:
             sctop.player = myPlayer.MyPlayer(parent=self)
         try:
@@ -1998,7 +2007,7 @@ class KODISCLib(xbmcprovider.XBMCMultiResolverContentProvider):
                 util.debug("[SC] dialog ret: %s" % str(ret))
                 if ret is not False:
                     util.debug("[SC] dialog resolved url: %s" % str(
-                        resolved[ret]['params']))
+                        resolved[ret]['url']))
                     return resolved[ret]
                 else:
                     util.debug('[SC] None.........')

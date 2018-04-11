@@ -360,7 +360,7 @@ class StreamCinemaContentProvider(ContentProvider):
     @bug.buggalo_try_except({'method': 'scinema.ctx'})
     def ctx(self, item, data):
         menu = {}
-        util.debug("CTX ITM: %s" % str(item))
+        #util.debug("CTX ITM: %s" % str(item))
         #util.debug("CTX DAT: %s" % str(data))
         #if 'dir' in data and data['dir'] == 'tvshows':
 
@@ -513,10 +513,10 @@ class StreamCinemaContentProvider(ContentProvider):
 
     @bug.buggalo_try_except({'method': 'scinema._resolve'})
     def _resolve(self, itm):
+        util.debug("[SC] _resolve")
         if itm is None:
             return None
-        if itm.get('provider') == 'plugin.video.online-files' and itm.get(
-                'params').get('cp') == 'webshare.cz':
+        if itm.get('provider') == 'plugin.video.online-files':
             if sctop.getSetting('wsuser') == "":
                 res = sctop.yesnoDialog(
                     sctop.getString(30945), sctop.getString(30946), "")
@@ -548,8 +548,13 @@ class StreamCinemaContentProvider(ContentProvider):
                             icon="WARNING")
                         util.debug("[SC] VIP ucet konci")
 
-                itm['url'] = self.ws.resolve(
-                    itm.get('params').get('play').get('ident'))
+                try:
+                    util.debug('[SC] ideme pre ident ')
+                    ident = self._json(self._url(itm['url']))['ident']
+                except:
+                    ident = '6d8359zW1u'
+                    pass
+                itm['url'] = self.ws.resolve(ident)
                 try:
                     if itm['subs'] is not None and "webshare.cz" in itm['subs']:
                         from urlparse import urlparse
@@ -570,7 +575,8 @@ class StreamCinemaContentProvider(ContentProvider):
                                (str(e), str(traceback.format_exc())))
                     pass
                 itm['headers'] = {'User-Agent': util.UA}
-            except:
+            except Exception as e:
+                util.debug("[SC] chyba.... %s %s" % (str(e), str(traceback.format_exc())))
                 bug.onExceptionRaised()
                 pass
 
@@ -579,12 +585,16 @@ class StreamCinemaContentProvider(ContentProvider):
         return itm
 
     def resolve(self, item, captcha_cb=None, select_cb=None):
-        #util.debug("ITEM RESOLVE: " + str(item))
+        #util.debug("[SC] ITEM RESOLVE: " + str(item))
+        #util.debug("[SC] RESOLVE argv: [%s] " % str(sys.argv))
+        sctop.win.setProperty('sc.resume', 'true')
+        addparams = sys.argv[3] if 3 in sys.argv else None
+        if addparams is not None and re.search('resume:false', sys.argv.get(3)):
+            sctop.win.setProperty('sc.resume', 'false')
         item['url'] = self._url(item['url'])
         if sctop.BASE_URL in item['url']:
             try:
-                data = self._json(item[
-                    'url'])  #json.loads(self.get_data_cached(item['url']))
+                data = self._json(item['url'])
             except:
                 raise ResolveException('Video is not available.')
             if data is None or data is False:

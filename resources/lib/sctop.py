@@ -22,7 +22,7 @@ __language__ = __addon__.getLocalizedString
 
 BASE_URL = "http%s://stream-cinema.online/kodi" % (
     's' if __set__('UseSSL') == 'true' else '')
-API_VERSION = "1.2"
+API_VERSION = "1.3"
 KODI_VERSION = int(xbmc.getInfoLabel("System.BuildVersion").split(".")[0])
 KODI_LANG = xbmc.getInfoLabel("System.Language")[:3].lower()
 player = None

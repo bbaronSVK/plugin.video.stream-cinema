@@ -37,7 +37,7 @@ class MyPlayer(xbmc.Player):
             self.upNextEnable = True
             self.libItem = None
         except Exception:
-            self.log("SC Chyba MyPlayer: %s" % str(traceback.format_exc()))
+            self.log("[SC] Chyba MyPlayer: %s" % str(traceback.format_exc()))
 
     @staticmethod
     def executeJSON(request):
@@ -194,7 +194,7 @@ class MyPlayer(xbmc.Player):
         if self.parent is not None:
             try:
                 self.parent.addList(name, id)
-            except Exception, e:
+            except Exception as e:
                 util.error(e)
                 pass
 
@@ -424,7 +424,7 @@ class MyPlayer(xbmc.Player):
             pass
 
         try:
-            if 'resume' in self.libItem:
+            if 'resume' in self.libItem and sctop.win.getProperty('sc.resume') == 'true':
                 util.debug("[SC] resume! %s" % str(self.libItem))
                 pos = self.libItem['resume'].get('position', 0)
                 maxPos = self.getTotalTime() * .75
@@ -464,7 +464,7 @@ class MyPlayer(xbmc.Player):
             else:
                 util.debug("[SC] vytvorit pokracovanie %s" % str(timeRatio))
                 self.createResumePoint(self.watchedTime, self.itemDuration)
-        except Exception, e:
+        except Exception as e:
             util.debug(e)
             pass
 
@@ -484,7 +484,7 @@ class MyPlayer(xbmc.Player):
                                                         self.itemDuration))
             return float("%.3f" %
                          (self.watchedTime / math.floor(self.itemDuration)))
-        except Exception, e:
+        except Exception as e:
             util.debug("[SC] timeRatio error")
             util.debug(e)
             pass
@@ -624,8 +624,8 @@ class MyPlayer(xbmc.Player):
                     nextUpPage.setItem(data)
                     nextUpPage.show()
                     while xbmc.Player().isPlaying() and (
-                            totalTime - playTime >
-                            1) and not nextUpPage.isCancel(
+                            totalTime - playTime > 1
+                            ) and not nextUpPage.isCancel(
                             ) and not nextUpPage.isWatchNow():
                         sctop.sleep(100)
                         try:
@@ -656,7 +656,7 @@ class MyPlayer(xbmc.Player):
             else:
                 util.debug("[SC] upNext: mame film")
                 return
-        except Exception, e:
+        except Exception as e:
             util.error('[SC] upNext err: %s' % str(e))
             pass
 
