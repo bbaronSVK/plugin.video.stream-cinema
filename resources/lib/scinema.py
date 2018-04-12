@@ -576,7 +576,8 @@ class StreamCinemaContentProvider(ContentProvider):
                     pass
                 itm['headers'] = {'User-Agent': util.UA}
             except Exception as e:
-                util.debug("[SC] chyba.... %s %s" % (str(e), str(traceback.format_exc())))
+                util.debug("[SC] chyba.... %s %s" %
+                           (str(e), str(traceback.format_exc())))
                 bug.onExceptionRaised()
                 pass
 
@@ -589,7 +590,8 @@ class StreamCinemaContentProvider(ContentProvider):
         #util.debug("[SC] RESOLVE argv: [%s] " % str(sys.argv))
         sctop.win.setProperty('sc.resume', 'true')
         addparams = sys.argv[3] if 3 in sys.argv else None
-        if addparams is not None and re.search('resume:false', sys.argv.get(3)):
+        if addparams is not None and re.search('resume:false',
+                                               sys.argv.get(3)):
             sctop.win.setProperty('sc.resume', 'false')
         item['url'] = self._url(item['url'])
         if sctop.BASE_URL in item['url']:

@@ -269,9 +269,7 @@ class KODISCLib(xbmcprovider.XBMCMultiResolverContentProvider):
             util.debug("[SC] add_item_trakt: %s" % str(params))
             ids = trakt.getList(params['tl'])
             data = self.provider._json(
-                self.provider._url("/Search/"), {
-                    'ids': json.dumps(ids)
-                })
+                self.provider._url("/Search/"), {'ids': json.dumps(ids)})
             if 'menu' in data:
                 error = False
                 new = False
@@ -314,9 +312,8 @@ class KODISCLib(xbmcprovider.XBMCMultiResolverContentProvider):
     def add_item_lastrun(self, ids):
         error = False
         new_items = False
-        data = self.provider._json("%s/Lib/multi" % sctop.BASE_URL, {
-            "ids": json.dumps(ids)
-        })
+        data = self.provider._json("%s/Lib/multi" % sctop.BASE_URL,
+                                   {"ids": json.dumps(ids)})
         if data:
             for i in data:
                 (e, n) = self.add_item({'notifi': 1, 'update': True}, data=i)
@@ -464,9 +461,8 @@ class KODISCLib(xbmcprovider.XBMCMultiResolverContentProvider):
                     'type': 'dir'
                 }
                 out.append(item)
-            self.list(self.provider.items(data={
-                'menu': out
-            }))  #self.provider.search(what, params['id']))
+            self.list(self.provider.items(data={'menu': out})
+                      )  #self.provider.search(what, params['id']))
             pass
         return self.endOfDirectory(cacheToDisc=False)
 
@@ -719,18 +715,14 @@ class KODISCLib(xbmcprovider.XBMCMultiResolverContentProvider):
             if action == 'traktWatchlist':
                 if trakt.getTraktCredentialsInfo() == True:
                     self.list(
-                        self.provider.items(data={
-                            'menu': trakt.getLists()
-                        }))
+                        self.provider.items(data={'menu': trakt.getLists()}))
                 else:
                     self.list([])
                 return self.endOfDirectory()
             if action == 'traktHistory':
                 if trakt.getTraktCredentialsInfo() == True:
                     self.list(
-                        self.provider.items(data={
-                            'menu': trakt.getHistory()
-                        }))
+                        self.provider.items(data={'menu': trakt.getHistory()}))
                 else:
                     self.list([])
                 return self.endOfDirectory()
@@ -742,9 +734,8 @@ class KODISCLib(xbmcprovider.XBMCMultiResolverContentProvider):
                     ids = trakt.getList(params['id'], content)
                     self.list(
                         self.provider.items(
-                            data=self.provider._json("/Search/", {
-                                'ids': json.dumps(ids)
-                            })))
+                            data=self.provider._json(
+                                "/Search/", {'ids': json.dumps(ids)})))
                 return self.endOfDirectory()
             if action == 'authTrakt':
                 trakt.authTrakt()
@@ -1010,10 +1001,11 @@ class KODISCLib(xbmcprovider.XBMCMultiResolverContentProvider):
                 pass
 
             try:
-                li.setContentLookup(False);
+                li.setContentLookup(False)
                 li.setMimeType('application/octet-stream')
             except Exception as e:
-                util.debug("[SC] err content lookup %s" % str(traceback.format_exc()))
+                util.debug(
+                    "[SC] err content lookup %s" % str(traceback.format_exc()))
                 pass
             self.win.setProperty(sctop.__scriptid__, sctop.__scriptid__)
             util.debug("[SC] mozem zacat prehravat %s" % str(stream))
@@ -1608,13 +1600,11 @@ class KODISCLib(xbmcprovider.XBMCMultiResolverContentProvider):
                     ]
 
                 filter += [
-                    i for i in result
-                    if i['SubLanguageID'] == lang and any(
+                    i for i in result if i['SubLanguageID'] == lang and any(
                         x in i['MovieReleaseName'].lower() for x in fmt)
                 ]
                 filter += [
-                    i for i in result
-                    if i['SubLanguageID'] == lang and any(
+                    i for i in result if i['SubLanguageID'] == lang and any(
                         x in i['MovieReleaseName'].lower() for x in quality)
                 ]
                 filter += [i for i in result if i['SubLanguageID'] == lang]
