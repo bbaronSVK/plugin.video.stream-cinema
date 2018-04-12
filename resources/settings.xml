@@ -85,11 +85,4 @@
         <setting type="sep" />
         <setting type="action" label="30405" option="close" action="RunPlugin(plugin://plugin.video.stream-cinema/?action=73756273)" />
     </category>
-    <category label="Parents Guide">
-        <setting label="zapnut" id="parents.enable" type="bool" default="false"/>
-        <setting label="certifikacia" id="parents.age" type="select" values="0|6|12|15|18" enable="eq(-1,true)" default="12" />
-        <setting label="zapnut" id="parents.enable.pin" type="bool" default="false"/>
-        <setting label="pin" type="action" enable="eq(-1,true)" option="close" action="RunPlugin(plugin://plugin.video.stream-cinema/?action=70696e)" />
-        <setting label="pin" id="parents.pin" type="text" visible="false" default=""/>
-    </category>
 </settings>
