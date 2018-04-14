@@ -18,7 +18,8 @@
         <setting type="lsep" label="30109" />
         <setting id="UseSSL" label="https" type="bool" default="true"/>
         <setting id="check_ssl1" type="bool" default="false" visible="false" />
-        <setting label="Pouzit CACHE" id="usecache" type="bool" default="true" visible="true" />
+        <setting label="Pouzit CACHE" id="usecache" type="bool" default="true" visible="false" />
+        <setting type="action" label="30113" action="RunPlugin(plugin://plugin.video.stream-cinema/?action=726566726573687265706f)" />
         <setting label="" id="cachemigrate" type="bool" default="false" visible="false" />
         <setting label="" id="uid" type="text" default="" visible="false" />
         <setting label="" id="ver" type="text" default="" visible="false" />

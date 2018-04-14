@@ -859,6 +859,9 @@ class KODISCLib(xbmcprovider.XBMCMultiResolverContentProvider):
                     'default', '1080p')
                 dialog.doModal()
                 del dialog
+            if action == 'refreshrepo':
+                xbmc.executebuiltin("UpdateAddonRepos()")
+                xbmc.executebuiltin("UpdateLocalAddons()")
             if action == 'test':
                 self.evalSchedules()
                 #data = myPlayer.MyPlayer.executeJSON({'jsonrpc': '2.0', 'id': 0, 'method': 'VideoLibrary.GetMovies', 'params': {'properties': ['title', 'imdbnumber', 'year', 'playcount', 'lastplayed', 'file', 'dateadded', 'runtime', 'userrating']}})
@@ -1419,7 +1422,7 @@ class KODISCLib(xbmcprovider.XBMCMultiResolverContentProvider):
                     "[SC] upNext [%s] " %
                     str((totalTime - playTime) <= int(notificationtime)))
                 showupnext = sctop.getSettingAsBool("show_up_next")
-                if showupnext and (
+                if showupnext and totalTime > 0 and (
                         totalTime - playTime) <= int(notificationtime):
                     sctop.player.upNext()
         except Exception as e:

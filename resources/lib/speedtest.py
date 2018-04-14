@@ -141,36 +141,39 @@ class speedTest():
         util.info('[SC] Your IP: %s' % location[0])
         util.info('[SC] Your latitude: %s' % location[1])
         util.info('[SC] Your longitude: %s' % location[2])
-        connection.request('GET', '/speedtest-servers.php?x=%d' % now, None,
-                           extra_headers)
-        response = connection.getresponse()
-        reply = response.read().decode('utf-8')
-        server_list = re.findall(
-            r'<server url="([^"]*)" lat="([^"]*)" lon="([^"]*)"', reply)
-        my_lat = float(location[1])
-        my_lon = float(location[2])
-        sorted_server_list = []
-        for server in server_list:
-            s_lat = float(server[1])
-            s_lon = float(server[2])
-            distance = sqrt(pow(s_lat - my_lat, 2) + pow(s_lon - my_lon, 2))
-            bisect.insort_left(sorted_server_list, (distance, server[0]))
-        best_server = (999999, '')
-        for server in sorted_server_list[:10]:
-            util.debug('[SC] server: %s' % server[1])
-            match = re.search(r'http://([^/]+)/speedtest/upload\.php',
-                              server[1])
-            if match is None:
-                continue
-            server_host = match.groups()[0]
-            latency = self.ping(server_host)
-            if latency < best_server[0]:
-                best_server = (latency, server_host)
-        if not best_server[1]:
-            raise Exception('Cannot find a test server')
-        util.debug('[SC] Best server: %s' % best_server[1])
-        return best_server[1]
-
+        try:
+            connection.request('GET', '/speedtest-servers.php?x=%d' % now, None,
+                               extra_headers)
+            response = connection.getresponse()
+            reply = response.read().decode('utf-8')
+            server_list = re.findall(
+                r'<server url="([^"]*)" lat="([^"]*)" lon="([^"]*)"', reply)
+            my_lat = float(location[1])
+            my_lon = float(location[2])
+            sorted_server_list = []
+            for server in server_list:
+                s_lat = float(server[1])
+                s_lon = float(server[2])
+                distance = sqrt(pow(s_lat - my_lat, 2) + pow(s_lon - my_lon, 2))
+                bisect.insort_left(sorted_server_list, (distance, server[0]))
+            best_server = (999999, '')
+            for server in sorted_server_list[:10]:
+                util.debug('[SC] server: %s' % server[1])
+                match = re.search(r'http://([^/]+)/speedtest/upload\.php',
+                                  server[1])
+                if match is None:
+                    continue
+                server_host = match.groups()[0]
+                latency = self.ping(server_host)
+                if latency < best_server[0]:
+                    best_server = (latency, server_host)
+            if not best_server[1]:
+                raise Exception('Cannot find a test server')
+            util.debug('[SC] Best server: %s' % best_server[1])
+            return best_server[1]
+        except Exception as e:
+            pass
+        raise Exception('Cannot find a test server')
 
 def pretty_speed(speed):
     units = ['bps', 'Kbps', 'Mbps', 'Gbps']

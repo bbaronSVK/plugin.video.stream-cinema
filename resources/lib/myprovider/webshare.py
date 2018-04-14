@@ -129,7 +129,7 @@ class Webshare():
             except:
                 self.clearToken()
                 return False
-            util.info('[SC] userdata dat: %s' % data)
+            #util.info('[SC] userdata dat: %s' % data)
             xml = ET.fromstring(data)
             if not xml.find('status').text == 'OK':
                 self.clearToken()
