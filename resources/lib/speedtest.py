@@ -141,8 +141,8 @@ class speedTest():
         util.info('[SC] Your latitude: %s' % location[1])
         util.info('[SC] Your longitude: %s' % location[2])
         try:
-            connection.request('GET', '/speedtest-servers.php?x=%d' % now, None,
-                               extra_headers)
+            connection.request('GET', '/speedtest-servers.php?x=%d' % now,
+                               None, extra_headers)
             response = connection.getresponse()
             reply = response.read().decode('utf-8')
             server_list = re.findall(
@@ -153,7 +153,8 @@ class speedTest():
             for server in server_list:
                 s_lat = float(server[1])
                 s_lon = float(server[2])
-                distance = sqrt(pow(s_lat - my_lat, 2) + pow(s_lon - my_lon, 2))
+                distance = sqrt(
+                    pow(s_lat - my_lat, 2) + pow(s_lon - my_lon, 2))
                 bisect.insort_left(sorted_server_list, (distance, server[0]))
             best_server = (999999, '')
             for server in sorted_server_list[:10]:
@@ -173,6 +174,7 @@ class speedTest():
         except Exception as e:
             pass
         raise Exception('Cannot find a test server')
+
 
 def pretty_speed(speed):
     units = ['bps', 'Kbps', 'Mbps', 'Gbps']

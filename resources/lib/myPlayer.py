@@ -248,7 +248,9 @@ class MyPlayer(xbmc.Player):
 
         try:
             if not sctop.isPlaying():
-                util.debug('[SC] NEPREHRAVA, TAK KONCIM!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!')
+                util.debug(
+                    '[SC] NEPREHRAVA, TAK KONCIM!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!'
+                )
                 return
 
             self.itemDuration = self.getTotalTime()
