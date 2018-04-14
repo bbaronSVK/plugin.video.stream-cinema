@@ -517,13 +517,12 @@ def markMovieAsWatchedT(trakt):
 
 def markMovieAsNotWatched(imdb):
     if not imdb.startswith('tt'): imdb = 'tt' + imdb
-    return getTrakt('/sync/history/remove', {
-        "movies": [{
-            "ids": {
-                "imdb": imdb
-            }
-        }]
-    })
+    return getTrakt('/sync/history/remove',
+                    {"movies": [{
+                        "ids": {
+                            "imdb": imdb
+                        }
+                    }]})
 
 
 def markTVShowAsWatched(tvdb):
@@ -531,13 +530,12 @@ def markTVShowAsWatched(tvdb):
 
 
 def markTVShowAsNotWatched(tvdb):
-    return getTrakt('/sync/history/remove', {
-        "shows": [{
-            "ids": {
-                "tvdb": tvdb
-            }
-        }]
-    })
+    return getTrakt('/sync/history/remove',
+                    {"shows": [{
+                        "ids": {
+                            "tvdb": tvdb
+                        }
+                    }]})
 
 
 def markEpisodeAsWatched(tvdb, season, episode):

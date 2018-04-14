@@ -80,9 +80,7 @@ class Webshare():
             try:
                 # get salt
                 headers, req = self._create_request(
-                    '', {
-                        'username_or_email': self.username
-                    })
+                    '', {'username_or_email': self.username})
                 data = post(self._url('api/salt/'), req, headers=headers)
                 xml = ET.fromstring(data)
                 if not xml.find('status').text == 'OK':

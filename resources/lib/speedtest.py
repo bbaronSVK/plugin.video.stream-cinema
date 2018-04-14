@@ -102,10 +102,9 @@ class speedTest():
         worst = 0
         for _ in range(5):
             total_start_time = time()
-            connection.request(
-                'GET', '/speedtest/latency.txt?x=%d' % randint(), None, {
-                    'Connection': 'Keep-Alive'
-                })
+            connection.request('GET',
+                               '/speedtest/latency.txt?x=%d' % randint(), None,
+                               {'Connection': 'Keep-Alive'})
             response = connection.getresponse()
             response.read()
             total_ms = time() - total_start_time

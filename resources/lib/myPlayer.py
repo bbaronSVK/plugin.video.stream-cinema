@@ -428,7 +428,8 @@ class MyPlayer(xbmc.Player):
             pass
 
         try:
-            if 'resume' in self.libItem and sctop.win.getProperty('sc.resume') == 'true':
+            if 'resume' in self.libItem and sctop.win.getProperty(
+                    'sc.resume') == 'true':
                 util.debug("[SC] resume! %s" % str(self.libItem))
                 pos = self.libItem['resume'].get('position', 0)
                 maxPos = self.getTotalTime() * .75
@@ -628,8 +629,8 @@ class MyPlayer(xbmc.Player):
                     nextUpPage.setItem(data)
                     nextUpPage.show()
                     while xbmc.Player().isPlaying() and (
-                            totalTime - playTime > 1
-                            ) and not nextUpPage.isCancel(
+                            totalTime - playTime >
+                            1) and not nextUpPage.isCancel(
                             ) and not nextUpPage.isWatchNow():
                         sctop.sleep(100)
                         try:
