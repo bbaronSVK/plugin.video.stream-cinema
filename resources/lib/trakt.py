@@ -223,8 +223,8 @@ def addTraktCollection(info):
     return ret
 
 
-def getLists():
-    result = getTrakt('/users/me/lists')
+def getLists(user='me'):
+    result = getTrakt('/users/%s/lists' % user)
     if not result:
         return []
     result = json.loads(result)
@@ -236,14 +236,15 @@ def getLists():
             #'url': 'cmd://Container.Update("%s")' % \
             'action': 'traktShowList',
             'id': 'watchlist',
-            'tl': 'watchlist'
+            'tl': 'watchlist',
+            'tu': user
         },
         {
             'type': 'dir',
             'title': '[B]$30958[/B]',
             'action': 'traktHistory',
             'id': 'history',
-            'tl': 'history',
+            'tu': user
         }
         #,
         #{
@@ -258,38 +259,69 @@ def getLists():
         'title': i['name'],
         'id': i['ids']['slug'],
         'type': 'dir',
-        'tl': i['ids']['slug']
+        'tl': i['ids']['slug'],
+        'tu': user
     } for i in result]
     items += lists
+
+    if user == "me":
+        items.append({
+            'action': 'traktFollowing',
+            'title': '[B]$30963[/B]',
+            'id': 'following',
+            'type': 'dir'
+        })
     return items
 
 
-def getHistory():
+def getFollowing():
+    following = (json.loads(getTrakt("/users/me/friends")),
+                 json.loads(getTrakt("/users/me/following")))
 
+    friends = [ u['user']['ids']['slug'] for u in following[0] ]
+    items = []
+    for key, users in enumerate(following):
+        for i in sorted(users, key = lambda u: u['user']['name'] if u['user']['name'] != '' else u['user']['username']):
+            if key == 1 and i['user']['ids']['slug'] in friends: continue
+            items.append({
+                'action': 'traktWatchlist',
+                'title': ("[B]%s[/B]" if key == 0 else "%s")
+                         % (i['user']['name'] if i['user']['name'] != '' else i['user']['username']),
+                'type': 'dir',
+                'tu': i['user']['ids']['slug']
+            })
+
+    return items
+
+def getHistory(user='me'):
     items = [{
         'type': 'dir',
         'title': '$30959',
         'action': 'traktShowList',
         'id': 'rated_movies',
         'tl': 'rated_movies',
+        'tu': user
     }, {
         'type': 'dir',
         'title': '$30960',
         'action': 'traktShowList',
         'id': 'rated_shows',
         'tl': 'rated_shows',
+        'tu': user
     }, {
         'type': 'dir',
         'title': '$30961',
         'action': 'traktShowList',
         'id': 'watched_movies',
-        'tl': 'watched_movies'
+        'tl': 'watched_movies',
+        'tu': user
     }, {
         'type': 'dir',
         'title': '$30962',
         'action': 'traktShowList',
         'id': 'watched_shows',
-        'tl': 'watched_shows'
+        'tl': 'watched_shows',
+        'tu': user
     }, '''
         {
             'type': 'dir',
@@ -311,31 +343,34 @@ def getHistory():
     return items
 
 
-def getList(slug, content=None):
+def getList(slug, content=None, user='me'):
     content = content if content is not None else ''
-    util.debug('[SC] getList slug: %s, content: %s' % (slug, content))
+    util.debug('[SC] getList slug: %s, content: %s, user: %s' % (slug, content, user))
     if slug == 'watchlist':
-        result = getTrakt('/users/me/watchlist/%s' % content)
+        result = getTrakt('/users/%s/watchlist/%s' % (user, content))
     elif slug == 'progress':
         result = getTrakt('sync/playback/%s' % content)
     elif slug[0:5] == 'rated':
-        result = getTrakt('/users/me/ratings/%s/' % slug[6:])
+        result = getTrakt('/users/%s/ratings/%s/' % (user, slug[6:]))
     elif slug[0:7] == 'watched':
-        result = getTrakt('/users/me/watched/%s/' % slug[8:])
+        result = getTrakt('/users/%s/watched/%s/' % (user, slug[8:]))
         content = slug[8:-1]
     else:
-        result = getTrakt('/users/me/lists/%s/items/%s' % (slug, content))
+        result = getTrakt('/users/%s/lists/%s/items/%s' % (user, slug, content))
 
     result = json.loads(result)
     ids = []
+    content_type = 'movies'
     for i in result:
+        if 'type' in i and i['type'] == 'show':
+            content_type = 'videos'
         if 'type' in i and 'imdb' in i[i['type']]['ids']:
             ids.append(i[i['type']]['ids']['imdb'])
         elif content in i and 'imdb' in i[content]['ids']:
             ids.append(i[content]['ids']['imdb'])
         else:
             util.debug('[SC] trakt LIST: %s' % str(i))
-    return ids
+    return (content_type, ids)
 
 
 def manager(name, imdb, tvdb, content):

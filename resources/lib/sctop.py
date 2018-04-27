@@ -299,7 +299,7 @@ def _create_plugin_url(params, plugin=sys.argv[0]):
                 "dtitle", "url", "action", "list", "cmd", "down", "play",
                 "force", "search-list", "search", "csearch", "search-remove",
                 "search-edit", "tl", "id", "subtype", "title", "name", "imdb",
-                "tvdb", "csfd", "trakt", "content"
+                "tvdb", "csfd", "trakt", "content", "tu"
         ]:
             continue
         try:

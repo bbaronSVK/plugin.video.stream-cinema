@@ -654,6 +654,7 @@ class KODISCLib(xbmcprovider.XBMCMultiResolverContentProvider):
     @bug.buggalo_try_except({'method': 'scutils.run_custom'})
     def run_custom(self, params):
         util.debug("RUN CUSTOM: %s" % str(params))
+        trakt_user = params['tu'] if 'tu' in params else 'me'
         if 'action' in params:
             util.debug("ACTION: %s" % str(params['action']))
             action = params['action']
@@ -715,14 +716,21 @@ class KODISCLib(xbmcprovider.XBMCMultiResolverContentProvider):
             if action == 'traktWatchlist':
                 if trakt.getTraktCredentialsInfo() == True:
                     self.list(
-                        self.provider.items(data={'menu': trakt.getLists()}))
+                        self.provider.items(data={'menu': trakt.getLists(trakt_user)}))
                 else:
                     self.list([])
                 return self.endOfDirectory()
             if action == 'traktHistory':
                 if trakt.getTraktCredentialsInfo() == True:
                     self.list(
-                        self.provider.items(data={'menu': trakt.getHistory()}))
+                        self.provider.items(data={'menu': trakt.getHistory(trakt_user)}))
+                else:
+                    self.list([])
+                return self.endOfDirectory()
+            if action == 'traktFollowing':
+                if trakt.getTraktCredentialsInfo() == True:
+                    self.list(
+                        self.provider.items(data={'menu': trakt.getFollowing()}))
                 else:
                     self.list([])
                 return self.endOfDirectory()
@@ -731,11 +739,15 @@ class KODISCLib(xbmcprovider.XBMCMultiResolverContentProvider):
                     util.debug("[SC] params: %s" % str(params))
                     content = None if 'content' not in params else params[
                         'content']
-                    ids = trakt.getList(params['id'], content)
-                    self.list(
-                        self.provider.items(
-                            data=self.provider._json(
-                                "/Search/", {'ids': json.dumps(ids)})))
+                    content_type, ids = trakt.getList(params['id'], content, user=trakt_user)
+                    if len(ids) > 0:
+                        data = self.provider._json("/Search/", {'ids': json.dumps(ids)})
+                        data['system']['setContent'] = content_type
+                        self.list(
+                            self.provider.items(
+                                data=data))
+                    else:
+                        self.list([])
                 return self.endOfDirectory()
             if action == 'authTrakt':
                 trakt.authTrakt()
