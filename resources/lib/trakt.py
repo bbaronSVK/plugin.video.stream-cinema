@@ -278,15 +278,19 @@ def getFollowing():
     following = (json.loads(getTrakt("/users/me/friends")),
                  json.loads(getTrakt("/users/me/following")))
 
-    friends = [ u['user']['ids']['slug'] for u in following[0] ]
+    friends = [u['user']['ids']['slug'] for u in following[0]]
     items = []
     for key, users in enumerate(following):
-        for i in sorted(users, key = lambda u: u['user']['name'] if u['user']['name'] != '' else u['user']['username']):
+        for i in sorted(
+                users,
+                key=
+                lambda u: (u['user']['name'] if u['user']['name'] else u['user']['username']).lower()
+        ):
             if key == 1 and i['user']['ids']['slug'] in friends: continue
             items.append({
                 'action': 'traktWatchlist',
-                'title': ("[B]%s[/B]" if key == 0 else "%s")
-                         % (i['user']['name'] if i['user']['name'] != '' else i['user']['username']),
+                'title': ("[B]%s[/B]" if key == 0 else "%s") % 
+                         (i['user']['name'] if i['user']['name'] else i['user']['username']),
                 'type': 'dir',
                 'tu': i['user']['ids']['slug']
             })
