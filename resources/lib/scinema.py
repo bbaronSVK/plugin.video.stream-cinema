@@ -345,7 +345,6 @@ class StreamCinemaContentProvider(ContentProvider):
             if k != 'url':
                 item[k] = m[k]
         item = self.ctx(item, m)
-
         return item
 
     @bug.buggalo_try_except({'method': 'scinema._video_item'})
@@ -385,7 +384,52 @@ class StreamCinemaContentProvider(ContentProvider):
                 "$30918": {
                     "action": "add-to-lib-trakt",
                     "tl": item['tl'],
-                    "title": data['title']
+                    "title": data['title'],
+                    'tu': item['tu'] if 'tu' in item else 'me'
+                }
+            })
+
+        if 'list' in item and item['list'] == 'liked':
+            menu.update({
+                "$30977": {
+                    "action": "traktListUnlike",
+                    "title": item['title'],
+                    "tu": item['tu'],
+                    "id": item['id']
+                }
+            })
+        elif 'list' in item and item['tu'] != 'me':
+            menu.update({
+                "$30978": {
+                    "action": "traktListLike",
+                    "title": data['title'],
+                    "tu": item['tu'],
+                    "id": item['id']
+                }
+            })
+
+        if 'list' in item and item['list'] == 'user' and item['tu'] == 'me':
+            menu.update({
+                "$30979": {
+                    'action': 'traktListCustomRemove',
+                    'title': data['title'],
+                    'id': item['id'],
+                    }
+            })
+        elif 'list' in item:
+            menu.update({
+                "$30980": {
+                    'action': 'traktListClone',
+                    'title': data['title'],
+                    'id': item['id'],
+                    'tu': item['tu']
+                }
+            })
+            menu.update({
+                "$30981": {
+                    'action': 'traktListAppendToCustom',
+                    'id': item['id'],
+                    'tu': item['tu']
                 }
             })
 
