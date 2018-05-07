@@ -737,10 +737,17 @@ class KODISCLib(xbmcprovider.XBMCMultiResolverContentProvider):
                     util.debug("[SC] params: %s" % str(params))
                     content = None if 'content' not in params else params[
                         'content']
-                    content_type, ids = trakt.getList(params['id'], content, user=trakt_user)
+                    content_type, ids, ratings = trakt.getList(params['id'], content, user=trakt_user)
                     if len(ids) > 0:
                         data = self.provider._json("/Search/", {'ids': json.dumps(ids)})
-                        data['system']['setContent'] = content_type
+                        try:
+                            data['system']['setContent'] = content_type
+                        except:
+                            pass
+                        if ratings != False:
+                            for i, item in enumerate(data['menu']):
+                                data['menu'][i]['rating'] = ratings[int(item['trakt'])]
+
                         self.list(
                             self.provider.items(
                                 data=data))

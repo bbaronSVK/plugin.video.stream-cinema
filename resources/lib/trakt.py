@@ -378,12 +378,14 @@ def getHistory(user='me'):
 def getList(slug, content=None, user='me'):
     content = content if content is not None else ''
     util.debug('[SC] getList slug: %s, content: %s, user: %s' % (slug, content, user))
+    ratings = False
     if slug == 'watchlist':
         result = getTrakt('/users/%s/watchlist/%s' % (user, content))
     elif slug == 'progress':
         result = getTrakt('sync/playback/%s' % content)
     elif slug[0:5] == 'rated':
         result = getTrakt('/users/%s/ratings/%s/' % (user, slug[6:]))
+        ratings = {}
     elif slug[0:7] == 'watched':
         result = getTrakt('/users/%s/watched/%s/' % (user, slug[8:]))
         content = slug[8:-1]
@@ -398,11 +400,15 @@ def getList(slug, content=None, user='me'):
             content_type = 'videos'
         if 'type' in i and 'imdb' in i[i['type']]['ids']:
             ids.append(i[i['type']]['ids']['imdb'])
+            if ratings != False and 'rating' in i:
+                ratings[i[i['type']]['ids']['imdb']] = i['rating']
         elif content in i and 'imdb' in i[content]['ids']:
             ids.append(i[content]['ids']['imdb'])
+            if ratings != False and 'rating' in i:
+                ratings[i[content]['ids']['imdb']] = i['rating']
         else:
             util.debug('[SC] trakt LIST: %s' % str(i))
-    return (content_type, ids)
+    return (content_type, ids, ratings)
 
 
 def getSpecialLists(slug, page=1):
@@ -413,7 +419,7 @@ def getSpecialLists(slug, page=1):
     elif slug == 'trending_lists':
         url = '/lists/trending?page=%s&limit=200'
 
-    result, code, info = getTrakt(url % str(page), output='info')
+    result, __, info = getTrakt(url % str(page), output='info')
     result = json.loads(result)
 
     items = [{
