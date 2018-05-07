@@ -358,7 +358,11 @@ class StreamCinemaContentProvider(ContentProvider):
 
     @bug.buggalo_try_except({'method': 'scinema.ctx'})
     def ctx(self, item, data):
-        menu = {}
+        try:
+            from collections import OrderedDict
+            menu = OrderedDict()
+        except ImportError as e:
+            menu = {}
         #util.debug("CTX ITM: %s" % str(item))
         #util.debug("CTX DAT: %s" % str(data))
         #if 'dir' in data and data['dir'] == 'tvshows':
