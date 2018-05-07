@@ -739,7 +739,7 @@ class KODISCLib(xbmcprovider.XBMCMultiResolverContentProvider):
                         'content']
                     content_type, ids, ratings = trakt.getList(params['id'], content, user=trakt_user)
                     if len(ids) > 0:
-                        data = self.provider._json("/Search/", {'ids': json.dumps(ids)})
+                        data = self.provider._json("/Search/getTrakt", {'ids': json.dumps(ids)})
                         try:
                             data['system']['setContent'] = content_type
                         except:
