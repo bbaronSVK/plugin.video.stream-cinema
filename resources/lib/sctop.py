@@ -48,7 +48,6 @@ execute = xbmc.executebuiltin
 trCL = 'bb21f3665cf0fa07f2a1a420ec6990317c49dee91af8e012cb836d66674e75c4'
 trSC = 'fcc25d240d560326147cfb32fc0554868333dc954dc150ea2519f0a2a259f6e2'
 
-
 def getSetting(setting):
     return __addon__.getSetting(setting).strip().decode('utf-8')
 
@@ -193,13 +192,15 @@ def iso_2_utc(iso_ts):
     return seconds
 
 
-def request(url, headers={}, output="content"):
+def request(url, headers={}, output="content", method=None):
     util.debug('request: %s' % url)
     req = urllib2.Request(url, headers=headers)
     req.add_header('User-Agent', util.UA)
     if util._cookie_jar is not None:
         util._cookie_jar.add_cookie_header(req)
     data = ''
+    if method:
+            req.get_method = lambda: method
     try:
         response = urllib2.urlopen(req)
         while True:
@@ -299,7 +300,7 @@ def _create_plugin_url(params, plugin=sys.argv[0]):
                 "dtitle", "url", "action", "list", "cmd", "down", "play",
                 "force", "search-list", "search", "csearch", "search-remove",
                 "search-edit", "tl", "id", "subtype", "title", "name", "imdb",
-                "tvdb", "csfd", "trakt", "content"
+                "tvdb", "csfd", "trakt", "content", "tu", "page", "list"
         ]:
             continue
         try:

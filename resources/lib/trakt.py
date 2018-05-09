@@ -29,9 +29,10 @@ import util
 import xbmcutil
 
 
-def getTrakt(url, post=None):
+def getTrakt(url, post=None, output='content', method=None):
     try:
-        url = urlparse.urljoin('http://api.trakt.tv', url)
+        use_ssl = sctop.getSettingAsBool('UseSSL')
+        url = urlparse.urljoin('http%s://api.trakt.tv' % 's' if use_ssl else '', url)
 
         headers = {'trakt-api-key': sctop.trCL, 'trakt-api-version': '2'}
 
@@ -50,12 +51,17 @@ def getTrakt(url, post=None):
 
         if post is not None:
             result, code = sctop.post_json(url, post, headers, "extend")
+            info = None
         else:
-            result, code = sctop.request(url, headers, "extend")
+            result, code, info = sctop.request(url, headers, "info", method=method)
         #util.debug("[SC] trakt gt result: %s %s" % (str(result), str(code)))
-        if not (code == 401 or code == 405): return result
+        if not (code == 401 or code == 405):
+            if output == "content":
+                return result
+            else:
+                return (result, code, info)
 
-        oauth = 'http://api.trakt.tv/oauth/token'
+        oauth = 'http%s://api.trakt.tv/oauth/token' % 's' if use_ssl else ''
         opost = {
             'client_id': sctop.trCL,
             'client_secret': sctop.trSC,
@@ -72,8 +78,8 @@ def getTrakt(url, post=None):
 
         token, refresh = result['access_token'], result['refresh_token']
 
-        sctop.setSetting(id='trakt.token', value=token)
-        sctop.setSetting(id='trakt.refresh', value=refresh)
+        sctop.setSetting(setting='trakt.token', value=token)
+        sctop.setSetting(setting='trakt.refresh', value=refresh)
 
         headers['Authorization'] = 'Bearer %s' % token
 
@@ -223,8 +229,8 @@ def addTraktCollection(info):
     return ret
 
 
-def getLists():
-    result = getTrakt('/users/me/lists')
+def getLists(user='me'):
+    result = getTrakt('/users/%s/lists' % user)
     if not result:
         return []
     result = json.loads(result)
@@ -236,14 +242,15 @@ def getLists():
             #'url': 'cmd://Container.Update("%s")' % \
             'action': 'traktShowList',
             'id': 'watchlist',
-            'tl': 'watchlist'
+            'tl': 'watchlist',
+            'tu': user
         },
         {
             'type': 'dir',
             'title': '[B]$30958[/B]',
             'action': 'traktHistory',
             'id': 'history',
-            'tl': 'history',
+            'tu': user
         }
         #,
         #{
@@ -258,38 +265,95 @@ def getLists():
         'title': i['name'],
         'id': i['ids']['slug'],
         'type': 'dir',
-        'tl': i['ids']['slug']
+        'tl': i['ids']['slug'],
+        'tu': user,
+        'list': 'user'
     } for i in result]
     items += lists
+
+    if user == "me":
+        items += [
+            {
+                'action': 'traktFollowing',
+                'title': '[B]$30963[/B]',
+                'id': 'following',
+                'type': 'dir'
+            },
+            {
+                'action': 'traktSpecialLists',
+                'title': '[B]$30964[/B]',
+                'id': 'liked_lists',
+                'type': 'dir',
+            },
+            {
+                'action': 'traktSpecialLists',
+                'title': '[B]$30965[/B]',
+                'id': 'popular_lists',
+                'type': 'dir',
+                'page': '1'
+            },
+            {
+                'action': 'traktSpecialLists',
+                'title': '[B]$30966[/B]',
+                'id': 'trending_lists',
+                'type': 'dir',
+                'page': '1'
+            },
+        ]
     return items
 
 
-def getHistory():
+def getFollowing():
+    following = (json.loads(getTrakt("/users/me/friends")),
+                 json.loads(getTrakt("/users/me/following")))
 
+    friends = [u['user']['ids']['slug'] for u in following[0]]
+    items = []
+    for key, users in enumerate(following):
+        for i in sorted(
+                users,
+                key=
+                lambda u: _getUserName(u['user']).lower()
+        ):
+            if key == 1 and i['user']['ids']['slug'] in friends: continue
+            items.append({
+                'action': 'traktWatchlist',
+                'title': ("[B]%s[/B]" if key == 0 else "%s") % _getUserName(i['user']),
+                'type': 'dir',
+                'tu': i['user']['ids']['slug']
+            })
+
+    return items
+
+def getHistory(user='me'):
     items = [{
         'type': 'dir',
         'title': '$30959',
         'action': 'traktShowList',
         'id': 'rated_movies',
         'tl': 'rated_movies',
+        'tu': user
     }, {
         'type': 'dir',
         'title': '$30960',
         'action': 'traktShowList',
         'id': 'rated_shows',
         'tl': 'rated_shows',
+        'tu': user
     }, {
         'type': 'dir',
         'title': '$30961',
         'action': 'traktShowList',
         'id': 'watched_movies',
-        'tl': 'watched_movies'
+        'tl': 'watched_movies',
+        'tu': user
     }, {
         'type': 'dir',
         'title': '$30962',
         'action': 'traktShowList',
         'id': 'watched_shows',
-        'tl': 'watched_shows'
+        'tl': 'watched_shows',
+        'tu': user
     }, '''
         {
             'type': 'dir',
@@ -311,31 +375,72 @@ def getHistory():
     return items
 
 
-def getList(slug, content=None):
+def getList(slug, content=None, user='me'):
     content = content if content is not None else ''
-    util.debug('[SC] getList slug: %s, content: %s' % (slug, content))
+    util.debug('[SC] getList slug: %s, content: %s, user: %s' % (slug, content, user))
+    ratings = False
     if slug == 'watchlist':
-        result = getTrakt('/users/me/watchlist/%s' % content)
+        result = getTrakt('/users/%s/watchlist/%s' % (user, content))
     elif slug == 'progress':
         result = getTrakt('sync/playback/%s' % content)
     elif slug[0:5] == 'rated':
-        result = getTrakt('/users/me/ratings/%s/' % slug[6:])
+        result = getTrakt('/users/%s/ratings/%s/' % (user, slug[6:]))
+        ratings = {}
     elif slug[0:7] == 'watched':
-        result = getTrakt('/users/me/watched/%s/' % slug[8:])
+        result = getTrakt('/users/%s/watched/%s/' % (user, slug[8:]))
         content = slug[8:-1]
     else:
-        result = getTrakt('/users/me/lists/%s/items/%s' % (slug, content))
+        result = getTrakt('/users/%s/lists/%s/items/%s' % (user, slug, content))
 
     result = json.loads(result)
     ids = []
+    content_type = 'movies'
     for i in result:
-        if 'type' in i and 'imdb' in i[i['type']]['ids']:
-            ids.append(i[i['type']]['ids']['imdb'])
-        elif content in i and 'imdb' in i[content]['ids']:
-            ids.append(i[content]['ids']['imdb'])
+        if 'type' in i and i['type'] == 'show':
+            content_type = 'videos'
+        if 'type' in i and 'trakt' in i[i['type']]['ids']:
+            ids.append(i[i['type']]['ids']['trakt'])
+            if ratings != False and 'rating' in i:
+                ratings[i[i['type']]['ids']['trakt']] = i['rating']
+        elif content in i and 'trakt' in i[content]['ids']:
+            ids.append(i[content]['ids']['trakt'])
+            if ratings != False and 'rating' in i:
+                ratings[i[content]['ids']['trakt']] = i['rating']
         else:
             util.debug('[SC] trakt LIST: %s' % str(i))
-    return ids
+    return (content_type, ids, ratings)
+
+
+def getSpecialLists(slug, page=1):
+    if slug == 'liked_lists':
+        url = '/users/likes/lists?page=%s&limit=200'
+    elif slug == 'popular_lists':
+        url = '/lists/popular?page=%s&limit=200'
+    elif slug == 'trending_lists':
+        url = '/lists/trending?page=%s&limit=200'
+
+    result, __, info = getTrakt(url % str(page), output='info')
+    result = json.loads(result)
+
+    items = [{
+        'title': i['list']['name'],
+        'type': 'dir',
+        'action': 'traktShowList',
+        'id': i['list']['ids']['slug'],
+        'tu': i['list']['user']['ids']['slug'],
+        'tl': i['list']['ids']['slug'],
+        'list': slug[0:-6]
+    } if 'user' in i['list'] else None for i in result]
+
+    if (page != int(info.dict['x-pagination-page-count'])):
+        items.append({
+            'title': '$30982',
+            'type': 'dir',
+            'action': 'traktSpecialLists',
+            'id': slug,
+            'page': page + 1
+        })
+    return items
 
 
 def manager(name, imdb, tvdb, content):
@@ -416,6 +521,72 @@ def manager(name, imdb, tvdb, content):
     except Exception as e:
         util.debug("[SC] trakt error: %s" % str(traceback.format_exc()))
         return
+
+def listAppendToCustom(user, list_id):
+    lists = json.loads(getTrakt('/users/me/lists'))
+    lists = [(i['ids']['slug'], i['name']) for i in lists]
+    select = sctop.selectDialog([i[1] for i in lists], sctop.getString(30968).encode("utf-8"))
+    if select == -1: return
+
+    dst_list = lists[select][0]
+    dst_items = _getListItemsForImport(user, list_id)
+    result, code, info = getTrakt('/users/me/lists/%s/items' % dst_list, post=dst_items, output="info")
+    if code == 201:
+        sctop.infoDialog("%s" % lists[select][1], sctop.getString(30969).encode("utf-8"))
+    else:
+        util.debug('[SC] import to %s failed. %d, %s' % (dst_list, code, result))
+
+
+def listClone(user, list_id):
+    src = json.loads(getTrakt('/users/%s/lists/%s' % (user, list_id)))
+    dst = {'name': '%s (%s)' % (src['name'], _getUserName(src['user'])), 'privacy': 'private', 'display_numbers': False}
+
+    if not sctop.yesnoDialog(
+        sctop.getString(30970).encode("utf-8"),
+        "[B]%s[/B]?" % dst['name'],
+        ""
+    ): return False
+
+    for key in ['description', 'sort_by', 'sort_how']:
+        dst[key] = src[key]
+
+    dst = json.loads(getTrakt('/users/me/lists', post=dst))
+    dst_items = _getListItemsForImport(user, list_id)
+    result, code, info = getTrakt('/users/me/lists/%s/items' % dst['ids']['slug'], post=dst_items, output="info")
+    if code == 201:
+        sctop.infoDialog('%s' % dst['name'], sctop.getString(30976).encode("utf-8"))
+    else:
+        util.debug('[SC] List %s/%s: %d, %s' % (user, list_id, code, result))
+
+
+def listCustomRemove(title, list_id):
+    if not sctop.yesnoDialog(
+        sctop.getString(30972).encode("utf-8"),
+        "[B]%s[/B]?" % title,
+        ""
+    ): return False
+
+    result, code, info = getTrakt('/users/me/lists/%s' % list_id, output="info", method="DELETE")
+
+    if code == 204:
+        sctop.infoDialog("%s" % title, sctop.getString(30973).encode("utf-8"))
+    else:
+        util.debug("[SC] List remove: code %d" % code)
+
+def listLike(title, user, list_id):
+    result, code, info = getTrakt('/users/%s/lists/%s/like' % (user, list_id), post={}, output="info")
+    if code == 204:
+        sctop.infoDialog("%s" % title, sctop.getString(30975).encode("utf-8"))
+    else:
+        util.debug("[SC] List like: %s %d" % result, code)
+
+
+def listUnlike(title, user, list_id):
+    result, code, info = getTrakt('/users/%s/lists/%s/like' % (user, list_id), output="info", method="DELETE")
+    if code == 204:
+        sctop.infoDialog("%s" % title, sctop.getString(30974).encode("utf-8"))
+    else:
+        util.debug("[SC] List unlike: %s %d" % result, code)
 
 
 def slug(name):
@@ -617,3 +788,17 @@ def getTVShowSummary(id):
 
 def getPlaybackProgress(id):
     return getTrakt('sync/playback/%s' % id)
+
+
+def _getListItemsForImport(user, list_id):
+    items = json.loads(getTrakt('/users/%s/lists/%s/items/movies,shows' % (user, list_id)))
+    result = {'movies': [], 'shows': []}
+    for i in items:
+        result['%ss' % i['type']].append({
+            'ids': { 'trakt': i[i['type']]['ids']['trakt'] }
+        })
+    return result
+
+
+def _getUserName(user):
+    return user['name'] if user['name'] else user['username']

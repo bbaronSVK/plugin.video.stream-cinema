@@ -267,7 +267,8 @@ class KODISCLib(xbmcprovider.XBMCMultiResolverContentProvider):
     def add_item_trakt(self, params):
         if trakt.getTraktCredentialsInfo() == True:
             util.debug("[SC] add_item_trakt: %s" % str(params))
-            ids = trakt.getList(params['tl'])
+            user = params['tu'] if 'tu' in params else 'me'
+            content_type, ids = trakt.getList(params['tl'], user=user)
             data = self.provider._json(
                 self.provider._url("/Search/"), {'ids': json.dumps(ids)})
             if 'menu' in data:
@@ -654,6 +655,7 @@ class KODISCLib(xbmcprovider.XBMCMultiResolverContentProvider):
     @bug.buggalo_try_except({'method': 'scutils.run_custom'})
     def run_custom(self, params):
         util.debug("RUN CUSTOM: %s" % str(params))
+        trakt_user = params['tu'] if 'tu' in params else 'me'
         if 'action' in params:
             util.debug("ACTION: %s" % str(params['action']))
             action = params['action']
@@ -707,36 +709,80 @@ class KODISCLib(xbmcprovider.XBMCMultiResolverContentProvider):
                             json.dumps(self.getList(params['id']))
                         }))))
                 return self.endOfDirectory()
-            if action == 'traktManager':
-                if trakt.getTraktCredentialsInfo() == True:
+
+            if action[0:5] == 'trakt':
+                if trakt.getTraktCredentialsInfo() == False: return
+
+                if action == "traktManager":
                     trakt.manager(params['name'], params['imdb'],
                                   params['tvdb'], params['content'])
-                return
-            if action == 'traktWatchlist':
-                if trakt.getTraktCredentialsInfo() == True:
+                    return
+
+                if action == 'traktWatchlist':
                     self.list(
-                        self.provider.items(data={'menu': trakt.getLists()}))
-                else:
-                    self.list([])
-                return self.endOfDirectory()
-            if action == 'traktHistory':
-                if trakt.getTraktCredentialsInfo() == True:
+                        self.provider.items(data={'menu': trakt.getLists(trakt_user)}))
+                    return self.endOfDirectory()
+
+                if action == 'traktHistory':
                     self.list(
-                        self.provider.items(data={'menu': trakt.getHistory()}))
-                else:
-                    self.list([])
-                return self.endOfDirectory()
-            if action == 'traktShowList':
-                if trakt.getTraktCredentialsInfo() == True:
+                        self.provider.items(data={'menu': trakt.getHistory(trakt_user)}))
+                    return self.endOfDirectory()
+
+                if action == 'traktFollowing':
+                    self.list(
+                        self.provider.items(data={'menu': trakt.getFollowing()}))
+                    return self.endOfDirectory()
+
+                if action == 'traktShowList':
                     util.debug("[SC] params: %s" % str(params))
                     content = None if 'content' not in params else params[
                         'content']
-                    ids = trakt.getList(params['id'], content)
+                    content_type, ids, ratings = trakt.getList(params['id'], content, user=trakt_user)
+                    if len(ids) > 0:
+                        data = self.provider._json("/Search/getTrakt", {'ids': json.dumps(ids)})
+                        try:
+                            data['system']['setContent'] = content_type
+                        except:
+                            pass
+                        if ratings != False:
+                            for i, item in enumerate(data['menu']):
+                                data['menu'][i]['rating'] = ratings[int(item['trakt'])]
+
+                        self.list(
+                            self.provider.items(
+                                data=data))
+                    else:
+                        self.list([])
+                    return self.endOfDirectory()
+
+                if action == 'traktSpecialLists':
+                    page = int(params['page']) if 'page' in params else 1
                     self.list(
-                        self.provider.items(
-                            data=self.provider._json(
-                                "/Search/", {'ids': json.dumps(ids)})))
-                return self.endOfDirectory()
+                        self.provider.items(data={'menu': trakt.getSpecialLists(params['id'], page)}))
+                    return self.endOfDirectory()
+
+                if action == 'traktListAppendToCustom':
+                    trakt.listAppendToCustom(params['tu'], params['id'])
+                    return
+
+                if action == 'traktListClone':
+                    trakt.listClone(params['tu'], params['id'])
+                    return
+
+                if action == 'traktListCustomRemove':
+                    trakt.listCustomRemove(params['title'], params['id'])
+                    xbmc.executebuiltin('Container.Refresh')
+                    return
+
+                if action == 'traktListLike':
+                    trakt.listLike(params['title'], params['tu'], params['id'])
+                    return
+
+                if action == 'traktListUnlike':
+                    trakt.listUnlike(params['title'], params['tu'], params['id'])
+                    xbmc.executebuiltin('Container.Refresh')
+                    return
+
             if action == 'authTrakt':
                 trakt.authTrakt()
             if action == 'speedtest':  #                               1:350    2:500    3:750  4:1000 5:1500   6:2000   7:2500 8:3000  9:3500   10:4000

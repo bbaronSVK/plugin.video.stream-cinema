@@ -145,7 +145,25 @@
     <string id="30960">Ohodnocené seriály</string>
     <string id="30961">Shlédnuté filmy</string>
     <string id="30962">Shlédnuté seriály</string>
-    
+    <string id="30963">Přátelé</string>
+    <string id="30964">Oblíbené seznamy</string>
+    <string id="30965">Populárne seznamy</string>
+    <string id="30966">Populárne seznamy za týden</string>
+    <string id="30968">Vyber zoznam, do ktorého chceš pridať položky</string>
+    <string id="30969">Zoznam bol pridaný</string>
+    <string id="30970">Chceš naklonovať zoznam medzi svoje zoznamy?</string>
+    <string id="30972">Naozaj chceš odstrániť zoznam</string>
+    <string id="30973">Sezman byl odstraňen</string>
+    <string id="30974">Zoznam odobratý z obľúbených</string>
+    <string id="30975">Zoznam pridaný do obľúbených</string>
+    <string id="30976">Zoznam bol naklonovaný</string>
+    <string id="30977">Odobrať zoznam z obľúbených</string>
+    <string id="30978">Pridať zoznam do obľúbených</string>
+    <string id="30979">Odstrániť zoznam</string>
+    <string id="30980">Klonovať zoznam</string>
+    <string id="30981">Importovat do seznamu</string>
+    <string id="30982">ďalšia strana</string>
+
     <!-- dni v tyzdni -->
     <string id="30911">Pondělí</string>
     <string id="30912">Úterý</string>    
