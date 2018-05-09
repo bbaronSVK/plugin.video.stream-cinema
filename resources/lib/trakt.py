@@ -262,17 +262,6 @@ def getLists(user='me'):
         #        (xbmcutil._create_plugin_url({'action':'traktShowList', 'id':'progress'}))
         #}
     ]
-    lists = [{
-        'action': 'traktShowList',
-        'title': i['name'],
-        'id': i['ids']['slug'],
-        'type': 'dir',
-        'tl': i['ids']['slug'],
-        'tu': user,
-        'list': 'user'
-    } for i in result]
-    items += lists
-
     if user == "me":
         items += [
             {
@@ -302,6 +291,17 @@ def getLists(user='me'):
                 'page': '1'
             },
         ]
+    lists = [{
+        'action': 'traktShowList',
+        'title': i['name'],
+        'id': i['ids']['slug'],
+        'type': 'dir',
+        'tl': i['ids']['slug'],
+        'tu': user,
+        'list': 'user'
+    } for i in result]
+    items += lists
+
     return items
 
 
