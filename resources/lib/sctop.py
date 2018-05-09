@@ -48,6 +48,7 @@ execute = xbmc.executebuiltin
 trCL = 'bb21f3665cf0fa07f2a1a420ec6990317c49dee91af8e012cb836d66674e75c4'
 trSC = 'fcc25d240d560326147cfb32fc0554868333dc954dc150ea2519f0a2a259f6e2'
 
+
 def getSetting(setting):
     return __addon__.getSetting(setting).strip().decode('utf-8')
 
@@ -82,8 +83,8 @@ def notification(header,
                  message,
                  time=5000,
                  icon=__addon__.getAddonInfo('icon')):
-    xbmc.executebuiltin("XBMC.Notification(%s,%s,%i,%s)" % (header, message,
-                                                            time, icon))
+    xbmc.executebuiltin(
+        "XBMC.Notification(%s,%s,%i,%s)" % (header, message, time, icon))
 
 
 def yesnoDialog(line1,
@@ -200,7 +201,7 @@ def request(url, headers={}, output="content", method=None):
         util._cookie_jar.add_cookie_header(req)
     data = ''
     if method:
-            req.get_method = lambda: method
+        req.get_method = lambda: method
     try:
         response = urllib2.urlopen(req)
         while True:
@@ -370,8 +371,8 @@ def download(url, dest, name, headers={}):
                     kbps = int(
                         float(len(data)) / float((t - lastTime) / 1000) / 1024)
                     done = int(100 * int(dl) / int(total_length))
-                    util.debug("[SC] ... %s%% [%s]KB/s" % (str(done),
-                                                           str(kbps)))
+                    util.debug(
+                        "[SC] ... %s%% [%s]KB/s" % (str(done), str(kbps)))
                     lastTime = t
                     if notifyEnabled and lastNotify != done and (
                             done % notifyPercent) == 0:

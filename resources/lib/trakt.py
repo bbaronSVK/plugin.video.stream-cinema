@@ -32,7 +32,8 @@ import xbmcutil
 def getTrakt(url, post=None, output='content', method=None):
     try:
         use_ssl = sctop.getSettingAsBool('UseSSL')
-        url = urlparse.urljoin('http%s://api.trakt.tv' % 's' if use_ssl else '', url)
+        url = urlparse.urljoin(
+            'http%s://api.trakt.tv' % 's' if use_ssl else '', url)
 
         headers = {'trakt-api-key': sctop.trCL, 'trakt-api-version': '2'}
 
@@ -45,15 +46,16 @@ def getTrakt(url, post=None, output='content', method=None):
             util.debug("[SC] gt 1 result: %s" % str(result))
             return result
 
-        headers['Authorization'] = 'Bearer %s' % sctop.getSetting(
-            'trakt.token')
+        headers[
+            'Authorization'] = 'Bearer %s' % sctop.getSetting('trakt.token')
         #util.debug('[SC] token %s' % sctop.getSetting('trakt.token'))
 
         if post is not None:
             result, code = sctop.post_json(url, post, headers, "extend")
             info = None
         else:
-            result, code, info = sctop.request(url, headers, "info", method=method)
+            result, code, info = sctop.request(
+                url, headers, "info", method=method)
         #util.debug("[SC] trakt gt result: %s %s" % (str(result), str(code)))
         if not (code == 401 or code == 405):
             if output == "content":
@@ -160,8 +162,8 @@ def authTrakt():
         sctop.setSetting('trakt.user', value=user)
         sctop.setSetting('trakt.token', value=token)
         sctop.setSetting('trakt.refresh', value=refresh)
-        util.debug("[SC] auth: %s %s %s" % (str(user), str(token),
-                                            str(refresh)))
+        util.debug(
+            "[SC] auth: %s %s %s" % (str(user), str(token), str(refresh)))
         raise Exception("[SC] ERR koniec")
     except:
         util.debug("[SC] trakt ERROR: %s" % str(traceback.format_exc()))
@@ -310,20 +312,21 @@ def getFollowing():
     friends = [u['user']['ids']['slug'] for u in following[0]]
     items = []
     for key, users in enumerate(following):
-        for i in sorted(
-                users,
-                key=
-                lambda u: _getUserName(u['user']).lower()
-        ):
+        for i in sorted(users, key=lambda u: _getUserName(u['user']).lower()):
             if key == 1 and i['user']['ids']['slug'] in friends: continue
             items.append({
-                'action': 'traktWatchlist',
-                'title': ("[B]%s[/B]" if key == 0 else "%s") % _getUserName(i['user']),
-                'type': 'dir',
-                'tu': i['user']['ids']['slug']
+                'action':
+                'traktWatchlist',
+                'title': ("[B]%s[/B]"
+                          if key == 0 else "%s") % _getUserName(i['user']),
+                'type':
+                'dir',
+                'tu':
+                i['user']['ids']['slug']
             })
 
     return items
+
 
 def getHistory(user='me'):
     items = [{
@@ -377,7 +380,8 @@ def getHistory(user='me'):
 
 def getList(slug, content=None, user='me'):
     content = content if content is not None else ''
-    util.debug('[SC] getList slug: %s, content: %s, user: %s' % (slug, content, user))
+    util.debug(
+        '[SC] getList slug: %s, content: %s, user: %s' % (slug, content, user))
     ratings = False
     if slug == 'watchlist':
         result = getTrakt('/users/%s/watchlist/%s' % (user, content))
@@ -390,7 +394,8 @@ def getList(slug, content=None, user='me'):
         result = getTrakt('/users/%s/watched/%s/' % (user, slug[8:]))
         content = slug[8:-1]
     else:
-        result = getTrakt('/users/%s/lists/%s/items/%s' % (user, slug, content))
+        result = getTrakt(
+            '/users/%s/lists/%s/items/%s' % (user, slug, content))
 
     result = json.loads(result)
     ids = []
@@ -522,59 +527,72 @@ def manager(name, imdb, tvdb, content):
         util.debug("[SC] trakt error: %s" % str(traceback.format_exc()))
         return
 
+
 def listAppendToCustom(user, list_id):
     lists = json.loads(getTrakt('/users/me/lists'))
     lists = [(i['ids']['slug'], i['name']) for i in lists]
-    select = sctop.selectDialog([i[1] for i in lists], sctop.getString(30968).encode("utf-8"))
+    select = sctop.selectDialog([i[1] for i in lists],
+                                sctop.getString(30968).encode("utf-8"))
     if select == -1: return
 
     dst_list = lists[select][0]
     dst_items = _getListItemsForImport(user, list_id)
-    result, code, info = getTrakt('/users/me/lists/%s/items' % dst_list, post=dst_items, output="info")
+    result, code, info = getTrakt(
+        '/users/me/lists/%s/items' % dst_list, post=dst_items, output="info")
     if code == 201:
-        sctop.infoDialog("%s" % lists[select][1], sctop.getString(30969).encode("utf-8"))
+        sctop.infoDialog("%s" % lists[select][1],
+                         sctop.getString(30969).encode("utf-8"))
     else:
-        util.debug('[SC] import to %s failed. %d, %s' % (dst_list, code, result))
+        util.debug(
+            '[SC] import to %s failed. %d, %s' % (dst_list, code, result))
 
 
 def listClone(user, list_id):
     src = json.loads(getTrakt('/users/%s/lists/%s' % (user, list_id)))
-    dst = {'name': '%s (%s)' % (src['name'], _getUserName(src['user'])), 'privacy': 'private', 'display_numbers': False}
+    dst = {
+        'name': '%s (%s)' % (src['name'], _getUserName(src['user'])),
+        'privacy': 'private',
+        'display_numbers': False
+    }
 
     if not sctop.yesnoDialog(
-        sctop.getString(30970).encode("utf-8"),
-        "[B]%s[/B]?" % dst['name'],
-        ""
-    ): return False
+            sctop.getString(30970).encode("utf-8"), "[B]%s[/B]?" % dst['name'],
+            ""):
+        return False
 
     for key in ['description', 'sort_by', 'sort_how']:
         dst[key] = src[key]
 
     dst = json.loads(getTrakt('/users/me/lists', post=dst))
     dst_items = _getListItemsForImport(user, list_id)
-    result, code, info = getTrakt('/users/me/lists/%s/items' % dst['ids']['slug'], post=dst_items, output="info")
+    result, code, info = getTrakt(
+        '/users/me/lists/%s/items' % dst['ids']['slug'],
+        post=dst_items,
+        output="info")
     if code == 201:
-        sctop.infoDialog('%s' % dst['name'], sctop.getString(30976).encode("utf-8"))
+        sctop.infoDialog('%s' % dst['name'],
+                         sctop.getString(30976).encode("utf-8"))
     else:
         util.debug('[SC] List %s/%s: %d, %s' % (user, list_id, code, result))
 
 
 def listCustomRemove(title, list_id):
     if not sctop.yesnoDialog(
-        sctop.getString(30972).encode("utf-8"),
-        "[B]%s[/B]?" % title,
-        ""
-    ): return False
+            sctop.getString(30972).encode("utf-8"), "[B]%s[/B]?" % title, ""):
+        return False
 
-    result, code, info = getTrakt('/users/me/lists/%s' % list_id, output="info", method="DELETE")
+    result, code, info = getTrakt(
+        '/users/me/lists/%s' % list_id, output="info", method="DELETE")
 
     if code == 204:
         sctop.infoDialog("%s" % title, sctop.getString(30973).encode("utf-8"))
     else:
         util.debug("[SC] List remove: code %d" % code)
 
+
 def listLike(title, user, list_id):
-    result, code, info = getTrakt('/users/%s/lists/%s/like' % (user, list_id), post={}, output="info")
+    result, code, info = getTrakt(
+        '/users/%s/lists/%s/like' % (user, list_id), post={}, output="info")
     if code == 204:
         sctop.infoDialog("%s" % title, sctop.getString(30975).encode("utf-8"))
     else:
@@ -582,7 +600,10 @@ def listLike(title, user, list_id):
 
 
 def listUnlike(title, user, list_id):
-    result, code, info = getTrakt('/users/%s/lists/%s/like' % (user, list_id), output="info", method="DELETE")
+    result, code, info = getTrakt(
+        '/users/%s/lists/%s/like' % (user, list_id),
+        output="info",
+        method="DELETE")
     if code == 204:
         sctop.infoDialog("%s" % title, sctop.getString(30974).encode("utf-8"))
     else:
@@ -791,11 +812,14 @@ def getPlaybackProgress(id):
 
 
 def _getListItemsForImport(user, list_id):
-    items = json.loads(getTrakt('/users/%s/lists/%s/items/movies,shows' % (user, list_id)))
+    items = json.loads(
+        getTrakt('/users/%s/lists/%s/items/movies,shows' % (user, list_id)))
     result = {'movies': [], 'shows': []}
     for i in items:
         result['%ss' % i['type']].append({
-            'ids': { 'trakt': i[i['type']]['ids']['trakt'] }
+            'ids': {
+                'trakt': i[i['type']]['ids']['trakt']
+            }
         })
     return result
 

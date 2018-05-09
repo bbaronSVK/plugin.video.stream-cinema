@@ -174,8 +174,8 @@ class KODISCLib(xbmcprovider.XBMCMultiResolverContentProvider):
         dialog = xbmcgui.DialogProgress()
         dialog.create('Stream Cinema CZ & SK', 'Add all to library')
 
-        data = self.provider._json("%s/Lib/%s" % (sctop.BASE_URL,
-                                                  params['id']))
+        data = self.provider._json(
+            "%s/Lib/%s" % (sctop.BASE_URL, params['id']))
         page = 1
         while data is not None:
             dialog.update(0)
@@ -192,9 +192,8 @@ class KODISCLib(xbmcprovider.XBMCMultiResolverContentProvider):
 
                 try:
                     dialog.update(
-                        int(perc), "%s / %s - %s" % (str(page),
-                                                     str(data['total']),
-                                                     i['title']))
+                        int(perc), "%s / %s - %s" %
+                        (str(page), str(data['total']), i['title']))
                 except Exception:
                     util.debug('[SC] ERR: %s' % str(traceback.format_exc()))
                     pass
@@ -228,9 +227,9 @@ class KODISCLib(xbmcprovider.XBMCMultiResolverContentProvider):
                     )
                     data = None
                 else:
-                    data = self.provider._json("%s/Lib/%s/?p=%s" %
-                                               (sctop.BASE_URL, params['id'],
-                                                str(page)))
+                    data = self.provider._json(
+                        "%s/Lib/%s/?p=%s" % (sctop.BASE_URL, params['id'],
+                                             str(page)))
             else:
                 data = None
 
@@ -329,8 +328,8 @@ class KODISCLib(xbmcprovider.XBMCMultiResolverContentProvider):
         error = False
         new_items = False
         if data is None:
-            data = self.provider._json("%s/Lib/%s" % (sctop.BASE_URL,
-                                                      params['id']))
+            data = self.provider._json(
+                "%s/Lib/%s" % (sctop.BASE_URL, params['id']))
 
         if data is None or 'title' not in data:
             return (True, False)
@@ -375,8 +374,8 @@ class KODISCLib(xbmcprovider.XBMCMultiResolverContentProvider):
 
             for itm in data['ep']:
                 item_path = os.path.join(
-                    item_dir, self.normalize_filename(
-                        data['title']), 'Season ' + itm['season'],
+                    item_dir, self.normalize_filename(data['title']),
+                    'Season ' + itm['season'],
                     "S" + itm['season'] + "E" + itm['episode'] + '.strm')
                 (err, new) = self.add_item_to_library(item_path,
                                                       self._link(itm))
@@ -401,8 +400,8 @@ class KODISCLib(xbmcprovider.XBMCMultiResolverContentProvider):
     def canCheck(self, last_run):
         next_check = last_run + (
             (sctop.getSettingAsInt('refresh_time')) * 3600 * 24) + 3600
-        util.debug("[SC] can check: %d %d" % (int(next_check),
-                                              int(time.time())))
+        util.debug(
+            "[SC] can check: %d %d" % (int(next_check), int(time.time())))
         return next_check < time.time()
 
     def sinput(self, edit):
@@ -502,9 +501,8 @@ class KODISCLib(xbmcprovider.XBMCMultiResolverContentProvider):
                             num += 1
                             if force is True and dialog is not None:
                                 perc = 100 * num / total
-                                util.info("percento: %s %d %d" % (str(perc),
-                                                                  int(num),
-                                                                  int(total)))
+                                util.info("percento: %s %d %d" %
+                                          (str(perc), int(num), int(total)))
                                 if dialog.iscanceled():
                                     self.setSubs(subs)
                                     return
@@ -720,37 +718,41 @@ class KODISCLib(xbmcprovider.XBMCMultiResolverContentProvider):
 
                 if action == 'traktWatchlist':
                     self.list(
-                        self.provider.items(data={'menu': trakt.getLists(trakt_user)}))
+                        self.provider.items(
+                            data={'menu': trakt.getLists(trakt_user)}))
                     return self.endOfDirectory()
 
                 if action == 'traktHistory':
                     self.list(
-                        self.provider.items(data={'menu': trakt.getHistory(trakt_user)}))
+                        self.provider.items(
+                            data={'menu': trakt.getHistory(trakt_user)}))
                     return self.endOfDirectory()
 
                 if action == 'traktFollowing':
                     self.list(
-                        self.provider.items(data={'menu': trakt.getFollowing()}))
+                        self.provider.items(
+                            data={'menu': trakt.getFollowing()}))
                     return self.endOfDirectory()
 
                 if action == 'traktShowList':
                     util.debug("[SC] params: %s" % str(params))
                     content = None if 'content' not in params else params[
                         'content']
-                    content_type, ids, ratings = trakt.getList(params['id'], content, user=trakt_user)
+                    content_type, ids, ratings = trakt.getList(
+                        params['id'], content, user=trakt_user)
                     if len(ids) > 0:
-                        data = self.provider._json("/Search/getTrakt", {'ids': json.dumps(ids)})
+                        data = self.provider._json("/Search/getTrakt",
+                                                   {'ids': json.dumps(ids)})
                         try:
                             data['system']['setContent'] = content_type
                         except:
                             pass
                         if ratings != False:
                             for i, item in enumerate(data['menu']):
-                                data['menu'][i]['rating'] = ratings[int(item['trakt'])]
+                                data['menu'][i]['rating'] = ratings[int(
+                                    item['trakt'])]
 
-                        self.list(
-                            self.provider.items(
-                                data=data))
+                        self.list(self.provider.items(data=data))
                     else:
                         self.list([])
                     return self.endOfDirectory()
@@ -758,7 +760,10 @@ class KODISCLib(xbmcprovider.XBMCMultiResolverContentProvider):
                 if action == 'traktSpecialLists':
                     page = int(params['page']) if 'page' in params else 1
                     self.list(
-                        self.provider.items(data={'menu': trakt.getSpecialLists(params['id'], page)}))
+                        self.provider.items(data={
+                            'menu':
+                            trakt.getSpecialLists(params['id'], page)
+                        }))
                     return self.endOfDirectory()
 
                 if action == 'traktListAppendToCustom':
@@ -779,7 +784,8 @@ class KODISCLib(xbmcprovider.XBMCMultiResolverContentProvider):
                     return
 
                 if action == 'traktListUnlike':
-                    trakt.listUnlike(params['title'], params['tu'], params['id'])
+                    trakt.listUnlike(params['title'], params['tu'],
+                                     params['id'])
                     xbmc.executebuiltin('Container.Refresh')
                     return
 
@@ -835,21 +841,22 @@ class KODISCLib(xbmcprovider.XBMCMultiResolverContentProvider):
                 sctop.setSetting('bitrate', int(wsdown))
                 sctop.setSetting('bitrateformated', str(pretty_speed(wsdown)))
                 if str(params.get('wizard', '')) == '1':
-                    sctop.win.setProperty('scwizard',
-                                          json.dumps({
-                                              'ws': {
-                                                  'host': wspeedtest.host,
-                                                  'speed': pretty_speed(wsdown)
-                                              },
-                                              'oth': {
-                                                  'host': speedtest.host,
-                                                  'speed': pretty_speed(bedown)
-                                              }
-                                          }))
+                    sctop.win.setProperty(
+                        'scwizard',
+                        json.dumps({
+                            'ws': {
+                                'host': wspeedtest.host,
+                                'speed': pretty_speed(wsdown)
+                            },
+                            'oth': {
+                                'host': speedtest.host,
+                                'speed': pretty_speed(bedown)
+                            }
+                        }))
                     return
                 sctop.dialog.ok(
-                    g(30050), "%s: %s" % (wspeedtest.host,
-                                          str(pretty_speed(wsdown))),
+                    g(30050),
+                    "%s: %s" % (wspeedtest.host, str(pretty_speed(wsdown))),
                     "%s: %s" % (speedtest.host, str(pretty_speed(bedown))))
                 sctop.openSettings('1.0')
             if action == 'play-force':
@@ -868,14 +875,14 @@ class KODISCLib(xbmcprovider.XBMCMultiResolverContentProvider):
                 return self.csearch(params)
             if action == 'search-actor':
                 self.list(
-                    self.provider.items(None,
-                                        self.provider._json(
-                                            "/Search/actor/%s/%s" %
-                                            (params['id'],
-                                             params['subtype']), {
-                                                 'id': params['id'],
-                                                 'type': params['subtype']
-                                             })))
+                    self.provider.items(
+                        None,
+                        self.provider._json(
+                            "/Search/actor/%s/%s" %
+                            (params['id'], params['subtype']), {
+                                'id': params['id'],
+                                'type': params['subtype']
+                            })))
                 return self.endOfDirectory()
             if action == 'info':
                 #metahandler
@@ -1820,8 +1827,8 @@ class KODISCLib(xbmcprovider.XBMCMultiResolverContentProvider):
         if bt > 0 and sctop.getSettingAsBool('bitratefilter'):
             tmp = []
             for s in resolved:
-                util.debug("[SC] bitrate video %s vs %s" %
-                           (str(s.get('bitrate', 0)), str(bt)))
+                util.debug("[SC] bitrate video %s vs %s" % (str(
+                    s.get('bitrate', 0)), str(bt)))
                 if int(s.get('bitrate', 0)) <= bt:
                     util.debug(
                         "[SC] pridavam BT %s" % str(s.get('bitrate', 0)))
@@ -1854,9 +1861,8 @@ class KODISCLib(xbmcprovider.XBMCMultiResolverContentProvider):
                     break
                 for a in alist:
                     if a in s['linfo']:
-                        util.debug(
-                            "[SC] pridavam stream s audio jazykom %s %s" %
-                            (str(lang), s['lang']))
+                        util.debug("[SC] pridavam stream s audio jazykom %s %s"
+                                   % (str(lang), s['lang']))
                         tmp.append(s)
             elif 'lang' in s and s['lang'] != '' and s['lang'] == lang:
                 util.debug("[SC] pridavam stream s jazykom %s" % str(lang))

@@ -92,8 +92,8 @@ class Webshare():
                 # create hashes
                 password = hashlib.sha1(
                     md5crypt(self.password, salt.encode('utf-8'))).hexdigest()
-                digest = hashlib.md5(
-                    self.username + ':Webshare:' + self.password).hexdigest()
+                digest = hashlib.md5(self.username + ':Webshare:' +
+                                     self.password).hexdigest()
                 # login
                 headers, req = self._create_request(
                     '', {

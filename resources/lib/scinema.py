@@ -195,8 +195,8 @@ class StreamCinemaContentProvider(ContentProvider):
                 int(sys.argv[1]), data["setPluginFanart"])
 
         if cl is False and "version" in data:
-            util.info("[SC] kontrola verzie: %s %s" %
-                      (str(sctop.addonInfo('version')), data["version"]))
+            util.info("[SC] kontrola verzie: %s %s" % (str(
+                sctop.addonInfo('version')), data["version"]))
             if sctop.addonInfo(
                     'version') != data["version"] and sctop.getSetting(
                         'ver') != data['version']:
@@ -240,8 +240,8 @@ class StreamCinemaContentProvider(ContentProvider):
         return self.items(url)
 
     def _oldapi(self):
-        xbmc.executebuiltin("Container.Update(plugin://%s)" %
-                            (sctop.__scriptid__))
+        xbmc.executebuiltin(
+            "Container.Update(plugin://%s)" % (sctop.__scriptid__))
 
     @bug.buggalo_try_except({'method': 'scinema.get_data_cached'})
     def get_data_cached(self, url, post=False):
@@ -299,8 +299,8 @@ class StreamCinemaContentProvider(ContentProvider):
             return ret
         except Exception as e:
             inet = sctop.getCondVisibility('System.InternetState')
-            util.debug("[SC] inet scinema status: %s | %s" % (str(inet),
-                                                              str(e)))
+            util.debug(
+                "[SC] inet scinema status: %s | %s" % (str(inet), str(e)))
             if inet is False or inet == 0:
                 HANDLE = int(sys.argv[1])
                 xbmcplugin.endOfDirectory(HANDLE, succeeded=False)
@@ -418,7 +418,7 @@ class StreamCinemaContentProvider(ContentProvider):
                     'action': 'traktListCustomRemove',
                     'title': data['title'],
                     'id': item['id'],
-                    }
+                }
             })
         elif 'list' in item:
             menu.update({
@@ -609,8 +609,8 @@ class StreamCinemaContentProvider(ContentProvider):
                         import re
                         o = urlparse(itm['subs'])
                         g = re.split('/', o[2] if o[5] == '' else o[5])
-                        util.debug("[SC] webshare titulky: %s | %s" %
-                                   (str(g[2]), itm['subs']))
+                        util.debug("[SC] webshare titulky: %s | %s" % (str(
+                            g[2]), itm['subs']))
                         url = self.ws.resolve(g[2])
                         itm['subs'] = url
                         content = sctop.request(url)

@@ -76,8 +76,8 @@ class MyPlayer(xbmc.Player):
             )
             if self.se is not None and self.se.isdigit(
             ) and self.ep is not None and self.ep.isdigit():
-                util.debug("[SC] serial [%s]x[%s]" % (str(self.se),
-                                                      str(self.ep)))
+                util.debug(
+                    "[SC] serial [%s]x[%s]" % (str(self.se), str(self.ep)))
                 trakt.markEpisodeAsWatchedT(self.ids, self.se, self.ep)
             else:
                 util.debug("[SC] film")
@@ -127,8 +127,8 @@ class MyPlayer(xbmc.Player):
                     "id": 1
                 }
                 ret = self.executeJSON(metaReq)
-                util.debug("[SC] resumepoint: %s %s" % (str(metaReq),
-                                                        str(ret)))
+                util.debug(
+                    "[SC] resumepoint: %s %s" % (str(metaReq), str(ret)))
             elif self.itemType == 'movie':
                 metaReq = {
                     "jsonrpc": "2.0",
@@ -143,8 +143,8 @@ class MyPlayer(xbmc.Player):
                     "id": 1
                 }
                 ret = self.executeJSON(metaReq)
-                util.debug("[SC] resumepoint: %s %s" % (str(metaReq),
-                                                        str(ret)))
+                util.debug(
+                    "[SC] resumepoint: %s %s" % (str(metaReq), str(ret)))
             '''resume = self.parent.getResumePoint()
             resume.update({self.itemDBID: seconds})
             self.parent.setResumePoint(resume)'''
@@ -167,8 +167,8 @@ class MyPlayer(xbmc.Player):
         util.debug("[SC] zoznam audio: %s | %s" % (str(alist), str(streams)))
         for i in alist:
             if i in streams:
-                util.debug("[SC] mame audio: %s pre jazyk %s" % (str(i),
-                                                                 str(lang)))
+                util.debug(
+                    "[SC] mame audio: %s pre jazyk %s" % (str(i), str(lang)))
                 stream_number = streams.index(i)
                 self.setAudioStream(stream_number)
                 return True
@@ -306,8 +306,8 @@ class MyPlayer(xbmc.Player):
                             "[SC] trakt.tv error - nepodarilo sa pridat film do kolekcie: %s"
                             % str(traceback.format_exc()))
                         pass
-                    value = "%s (%s).strm" % (
-                        self.parent.normalize_filename(str(title)), str(year))
+                    value = "%s (%s).strm" % (self.parent.normalize_filename(
+                        str(title)), str(year))
                     field = 'filename'
                     res = self.executeJSON({
                         'jsonrpc': '2.0',
@@ -489,8 +489,8 @@ class MyPlayer(xbmc.Player):
         try:
             util.debug("[SC] watched %f duration %f" % (self.watchedTime,
                                                         self.itemDuration))
-            return float("%.3f" %
-                         (self.watchedTime / math.floor(self.itemDuration)))
+            return float(
+                "%.3f" % (self.watchedTime / math.floor(self.itemDuration)))
         except Exception as e:
             util.debug("[SC] timeRatio error")
             util.debug(e)
@@ -616,9 +616,8 @@ class MyPlayer(xbmc.Player):
                 util.debug("[SC] upNext: mame serial %sx%s" % (str(self.se),
                                                                str(self.ep)))
                 provider = self.parent.provider
-                url = provider._url('/upNext/%s/%s/%s' % (str(self.scid),
-                                                          str(self.se),
-                                                          str(self.ep)))
+                url = provider._url('/upNext/%s/%s/%s' % (str(
+                    self.scid), str(self.se), str(self.ep)))
                 util.debug("[SC] upNext URL: %s" % str(url))
                 data = provider._json(url)
                 util.debug("[SC] upNext data: %s" % str(data))
@@ -645,9 +644,9 @@ class MyPlayer(xbmc.Player):
                     shouldPlayDefault = not nextUpPage.isCancel()
                     shouldPlayNonDefault = nextUpPage.isWatchNow()
                     self.upNextEnable = False
-                    util.debug("[SC] upNext: [%s] [%s] " %
-                               (str(shouldPlayDefault),
-                                str(shouldPlayNonDefault)))
+                    util.debug(
+                        "[SC] upNext: [%s] [%s] " %
+                        (str(shouldPlayDefault), str(shouldPlayNonDefault)))
                     if shouldPlayDefault or shouldPlayNonDefault:
                         self.stop()
                         data.update({'play': data['url'], 'url': data['url']})
