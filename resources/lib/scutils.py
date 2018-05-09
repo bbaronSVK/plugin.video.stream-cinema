@@ -420,7 +420,8 @@ class KODISCLib(xbmcprovider.XBMCMultiResolverContentProvider):
     def csearch(self, params):
         util.debug("[SC] vyhladavanie: %s " % str(params))
         edit = False
-        if 'action' in params and params['action'] in [
+        if 'action' in params and 'title' in params and params['title'] != '' and \
+                params['action'] in [
                 'csearch-remove', 'csearch-edit'
         ]:
             self.addList(
@@ -443,7 +444,14 @@ class KODISCLib(xbmcprovider.XBMCMultiResolverContentProvider):
                 params['id'],
                 what,
                 max=sctop.getSettingAsInt("searchHistoryNum"))
-            self.list(self.provider.search(what, params['id']))
+            params['action'] = 'csearch'
+            params['csearch'] = what
+            params['title'] = what
+            url = sctop._create_plugin_url(params,
+                                        'plugin://%s/' % sctop.__scriptid__)
+            #self.endOfDirectory(succeeded=False, cacheToDisc=False)
+            xbmc.executebuiltin('Container.Update(%s,true)' % url)
+            #self.list(self.provider.search(what, params['id']))
         else:
             out = [{
                 'title': '#',
@@ -1957,6 +1965,7 @@ class KODISCLib(xbmcprovider.XBMCMultiResolverContentProvider):
                     dialog = xbmcgui.Dialog()
                     opts = []
                     for r in resolved:
+                        util.debug('[SC] select_cb r: %s' % str(r))
                         d = defaultdict(lambda: '', r)
                         if d['sinfo'] == True:
                             d['lang'] = '%s+tit' % d['lang']

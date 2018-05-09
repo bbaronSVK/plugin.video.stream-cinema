@@ -93,7 +93,11 @@ def onExceptionRaised(extraData=None):
     """
     # start by logging the usual info to stderr
     (etype, value, traceback) = sys.exc_info()
-    tb.print_exception(etype, value, traceback)
+    try:
+        tb.print_exception(etype, value, traceback)
+    except Exception as e:
+        pass
+
 
     if not SCRIPT_ADDON:
         try:
