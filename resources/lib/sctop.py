@@ -83,8 +83,8 @@ def notification(header,
                  message,
                  time=5000,
                  icon=__addon__.getAddonInfo('icon')):
-    xbmc.executebuiltin("XBMC.Notification(%s,%s,%i,%s)" % (header, message,
-                                                            time, icon))
+    xbmc.executebuiltin(
+        "XBMC.Notification(%s,%s,%i,%s)" % (header, message, time, icon))
 
 
 def yesnoDialog(line1,
@@ -193,13 +193,15 @@ def iso_2_utc(iso_ts):
     return seconds
 
 
-def request(url, headers={}, output="content"):
+def request(url, headers={}, output="content", method=None):
     util.debug('request: %s' % url)
     req = urllib2.Request(url, headers=headers)
     req.add_header('User-Agent', util.UA)
     if util._cookie_jar is not None:
         util._cookie_jar.add_cookie_header(req)
     data = ''
+    if method:
+        req.get_method = lambda: method
     try:
         response = urllib2.urlopen(req)
         while True:
@@ -299,7 +301,7 @@ def _create_plugin_url(params, plugin=sys.argv[0]):
                 "dtitle", "url", "action", "list", "cmd", "down", "play",
                 "force", "search-list", "search", "csearch", "search-remove",
                 "search-edit", "tl", "id", "subtype", "title", "name", "imdb",
-                "tvdb", "csfd", "trakt", "content"
+                "tvdb", "csfd", "trakt", "content", "tu", "page", "list"
         ]:
             continue
         try:
@@ -369,8 +371,8 @@ def download(url, dest, name, headers={}):
                     kbps = int(
                         float(len(data)) / float((t - lastTime) / 1000) / 1024)
                     done = int(100 * int(dl) / int(total_length))
-                    util.debug("[SC] ... %s%% [%s]KB/s" % (str(done),
-                                                           str(kbps)))
+                    util.debug(
+                        "[SC] ... %s%% [%s]KB/s" % (str(done), str(kbps)))
                     lastTime = t
                     if notifyEnabled and lastNotify != done and (
                             done % notifyPercent) == 0:

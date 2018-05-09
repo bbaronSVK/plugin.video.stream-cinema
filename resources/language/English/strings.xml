@@ -145,6 +145,24 @@
     <string id="30960">Rated Shows</string>
     <string id="30961">Watched Movies</string>
     <string id="30962">Watched Shows</string>
+    <string id="30963">Friends and Following</string>
+    <string id="30964">Liked Lists</string>
+    <string id="30965">Popular Lists</string>
+    <string id="30966">Trending Lists</string>
+    <string id="30968">Select list where do you want to import items to</string>
+    <string id="30969">List items appended to</string>
+    <string id="30970">Are you sure, you want to clone list</string>
+    <string id="30972">Are you sure you want to delete your trakt list</string>
+    <string id="30973">List removed</string>
+    <string id="30974">You've unliked a list</string>
+    <string id="30975">You liked a list</string>
+    <string id="30976">List cloned</string>
+    <string id="30977">Unlike list</string>
+    <string id="30978">Like a list</string>
+    <string id="30979">Delete list</string>
+    <string id="30980">Clone list</string>
+    <string id="30981">Import to list</string>
+    <string id="30982">next</string>
     
     <!-- dni v tyzdni -->
     <string id="30911">Monday</string>
