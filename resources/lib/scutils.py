@@ -448,7 +448,7 @@ class KODISCLib(xbmcprovider.XBMCMultiResolverContentProvider):
             params['csearch'] = what
             params['title'] = what
             url = sctop._create_plugin_url(params,
-                                        'plugin://%s/' % sctop.__scriptid__)
+                                           'plugin://%s/' % sctop.__scriptid__)
             #self.endOfDirectory(succeeded=False, cacheToDisc=False)
             xbmc.executebuiltin('Container.Update(%s,true)' % url)
             #self.list(self.provider.search(what, params['id']))
