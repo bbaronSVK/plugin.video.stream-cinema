@@ -118,7 +118,7 @@ class speedTest():
         return total_ms
 
     def chooseserver(self):
-        connection = self.connect('www.speedtest.net')
+        connection = self.connect('c.speedtest.net')
         now = int(time() * 1000)
         # really contribute to speedtest.net OS statistics
         # maybe they won't block us again...

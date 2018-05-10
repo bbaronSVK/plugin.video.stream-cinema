@@ -102,7 +102,8 @@ class StreamCinemaContentProvider(ContentProvider):
         q.update({
             'uid': self.uid,
             'ver': sctop.API_VERSION,
-            'lang': sctop.KODI_LANG
+            'lang': sctop.KODI_LANG,
+            'v': sctop.addonInfo('version')
         })
         if sctop.getSettingAsBool('filter_audio'):
             q.update({'l': sctop.getSetting('filter_lang.1')})
@@ -208,6 +209,9 @@ class StreamCinemaContentProvider(ContentProvider):
                     pass
                 xbmc.executebuiltin('UpdateAddonRepos')
                 sctop.setSetting('ver', data['version'])
+                sctop.setSetting('ws_checkssl', 'false')
+                sctop.setSetting('check_ssl1', 'false')
+                sctop.setSetting('usecache', 'true')
             if sctop.getSettingAsBool(
                     'cachemigrate'
             ) == '' or sctop.getSettingAsBool('cachemigrate') is False:
