@@ -437,8 +437,9 @@ class KODISCLib(xbmcprovider.XBMCMultiResolverContentProvider):
             self.list(self.provider.search(params['csearch'], params['id']))
             return self.endOfDirectory(cacheToDisc=False)
         li = self.getList(params['id'])
-        if len(li) == 0 or ('title' in params and params['title'] == '#') or sctop.getSettingAsBool(
-                "searchHistory") is False or edit is True:
+        if len(li) == 0 or (
+                'title' in params and params['title'] == '#'
+        ) or sctop.getSettingAsBool("searchHistory") is False or edit is True:
             what = self.sinput(params['title'])
             self.addList(
                 params['id'],
