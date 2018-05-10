@@ -98,7 +98,6 @@ def onExceptionRaised(extraData=None):
     except Exception as e:
         pass
 
-
     if not SCRIPT_ADDON:
         try:
             # signal error to XBMC to hide progress dialog
