@@ -399,16 +399,19 @@ def getList(slug, content=None, user='me'):
 
     result = json.loads(result)
     ids = []
+    types = {'movie':0, 'show':3}
     content_type = 'movies'
     for i in result:
+        if i['type'] not in types:
+            continue
         if 'type' in i and i['type'] == 'show':
             content_type = 'videos'
         if 'type' in i and 'trakt' in i[i['type']]['ids']:
-            ids.append(i[i['type']]['ids']['trakt'])
+            ids.append('%d,%d' % (types[i['type']],i[i['type']]['ids']['trakt']))
             if ratings != False and 'rating' in i:
                 ratings[i[i['type']]['ids']['trakt']] = i['rating']
         elif content in i and 'trakt' in i[content]['ids']:
-            ids.append(i[content]['ids']['trakt'])
+            ids[types[content]].append(i[content]['ids']['trakt'])
             if ratings != False and 'rating' in i:
                 ratings[i[content]['ids']['trakt']] = i['rating']
         else:
