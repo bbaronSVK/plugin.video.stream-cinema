@@ -33,7 +33,7 @@ def getTrakt(url, post=None, output='content', method=None):
     try:
         use_ssl = sctop.getSettingAsBool('UseSSL')
         url = urlparse.urljoin(
-            'http%s://api.trakt.tv' % 's' if use_ssl else '', url)
+            'http%s://api.trakt.tv' % ('s' if use_ssl else ''), url)
 
         headers = {'trakt-api-key': sctop.trCL, 'trakt-api-version': '2'}
 
@@ -63,7 +63,7 @@ def getTrakt(url, post=None, output='content', method=None):
             else:
                 return (result, code, info)
 
-        oauth = 'http%s://api.trakt.tv/oauth/token' % 's' if use_ssl else ''
+        oauth = 'http%s://api.trakt.tv/oauth/token' % ('s' if use_ssl else '')
         opost = {
             'client_id': sctop.trCL,
             'client_secret': sctop.trSC,
