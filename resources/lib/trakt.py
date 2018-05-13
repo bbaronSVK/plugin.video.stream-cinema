@@ -391,7 +391,8 @@ def getList(slug, content=None, user='me'):
         result = getTrakt('/users/%s/ratings/%s/' % (user, slug[6:]))
         ratings = {}
     elif slug[0:7] == 'watched':
-        result = getTrakt('/users/%s/history/%s/?limit=1000000' % (user, slug[8:]))
+        result = getTrakt(
+            '/users/%s/history/%s/?limit=1000000' % (user, slug[8:]))
         content = slug[8:-1]
     else:
         result = getTrakt(
