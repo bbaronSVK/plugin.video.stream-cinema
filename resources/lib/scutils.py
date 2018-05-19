@@ -916,6 +916,17 @@ class KODISCLib(xbmcprovider.XBMCMultiResolverContentProvider):
             if action == 'refreshrepo':
                 xbmc.executebuiltin("UpdateAddonRepos()")
                 xbmc.executebuiltin("UpdateLocalAddons()")
+            if action == 'filter':
+                self.list(
+                    self.provider.items(
+                        None,
+                        self.provider._json(
+                            '/Filter/',
+                            params
+                        )
+                    )
+                )
+                return self.endOfDirectory(cacheToDisc=False)
             if action == 'test':
                 self.evalSchedules()
                 #data = myPlayer.MyPlayer.executeJSON({'jsonrpc': '2.0', 'id': 0, 'method': 'VideoLibrary.GetMovies', 'params': {'properties': ['title', 'imdbnumber', 'year', 'playcount', 'lastplayed', 'file', 'dateadded', 'runtime', 'userrating']}})
