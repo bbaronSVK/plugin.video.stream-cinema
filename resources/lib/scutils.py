@@ -269,7 +269,8 @@ class KODISCLib(xbmcprovider.XBMCMultiResolverContentProvider):
             user = params['tu'] if 'tu' in params else 'me'
             __, ids, __ = trakt.getList(params['tl'], user=user)
             data = self.provider._json(
-                self.provider._url("/Search/getTrakt"), {'ids': json.dumps(ids)})
+                self.provider._url("/Search/getTrakt"),
+                {'ids': json.dumps(ids)})
             if 'menu' in data:
                 error = False
                 new = False
