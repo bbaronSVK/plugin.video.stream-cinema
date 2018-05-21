@@ -722,8 +722,8 @@ class KODISCLib(xbmcprovider.XBMCMultiResolverContentProvider):
                 if trakt.getTraktCredentialsInfo() == False: return
 
                 if action == "traktManager":
-                    trakt.manager(params['name'], params['imdb'],
-                                  params['tvdb'], params['content'])
+                    trakt.manager(params['name'], params['trakt'],
+                                  params['content'])
                     return
 
                 if action == 'traktWatchlist':

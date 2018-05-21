@@ -454,19 +454,19 @@ def getSpecialLists(slug, page=1):
     return items
 
 
-def manager(name, imdb, tvdb, content):
+def manager(name, trakt, content):
     try:
         icon = sctop.infoLabel('ListItem.Icon')
         post = {
             "movies": [{
                 "ids": {
-                    "imdb": imdb
+                    "trakt": trakt
                 }
             }]
         } if content == 'movie' else {
             "shows": [{
                 "ids": {
-                    "tvdb": tvdb
+                    "trakt": trakt
                 }
             }]
         }

@@ -471,14 +471,11 @@ class StreamCinemaContentProvider(ContentProvider):
             #name, imdb, tvdb, content
             content = 'series' if 'season' in data and data['season'].isdigit(
             ) else 'movie'
-            imdb = 'tt%07d' % int(data['imdb']) if 'imdb' in data else 0
-            tvdb = data['tvdb'] if 'tvdb' in data else 0
             menu.update({
                 "Trakt menu": {
                     "action": "traktManager",
                     'name': data['title'],
-                    'imdb': imdb,
-                    'tvdb': tvdb,
+                    'trakt': data['trakt'],
                     'content': content
                 }
             })
