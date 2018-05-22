@@ -719,7 +719,8 @@ class KODISCLib(xbmcprovider.XBMCMultiResolverContentProvider):
                 return self.endOfDirectory()
 
             if action[0:5] == 'trakt':
-                if trakt.getTraktCredentialsInfo() == False: return
+                if trakt.getTraktCredentialsInfo() == False:
+                    return
 
                 if action == "traktManager":
                     trakt.manager(params['name'], params['trakt'],
