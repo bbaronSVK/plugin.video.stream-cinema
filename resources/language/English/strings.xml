@@ -163,7 +163,22 @@
     <string id="30980">Clone list</string>
     <string id="30981">Import to list</string>
     <string id="30982">next</string>
-    
+
+    <string id="30987">Rating added (%d)</string>
+    <string id="30988">Rating removed</string>
+    <string id="30989">Rate this</string>
+    <string id="30990">Remove rating</string>
+    <string id="30991"> 1 - Weak sauce :(</string>
+    <string id="30992"> 2 - Terrible</string>
+    <string id="30993"> 3 - Bad</string>
+    <string id="30994"> 4 - Poor</string>
+    <string id="30995"> 5 - Meh</string>
+    <string id="30996"> 6 - Unrate</string>
+    <string id="30997"> 7 - Good</string>
+    <string id="30998"> 8 - Great</string>
+    <string id="30999"> 9 - Superb</string>
+    <string id="31000">10 - Totally ninja!</string>
+
     <!-- dni v tyzdni -->
     <string id="30911">Monday</string>
     <string id="30912">Tuesday</string>    

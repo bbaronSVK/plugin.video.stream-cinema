@@ -457,14 +457,10 @@ def getSpecialLists(slug, page=1):
 def manager(name, trakt, content):
     try:
         icon = sctop.infoLabel('ListItem.Icon')
+        message = sctop.getString(30941).encode('utf-8')
+        content = "movies" if content == 'movie' else "shows"
         post = {
-            "movies": [{
-                "ids": {
-                    "trakt": trakt
-                }
-            }]
-        } if content == 'movie' else {
-            "shows": [{
+            content: [{
                 "ids": {
                     "trakt": trakt
                 }
@@ -477,8 +473,10 @@ def manager(name, trakt, content):
         items += [(sctop.getString(30936).encode('utf-8'), '/sync/watchlist')]
         items += [(sctop.getString(30937).encode('utf-8'),
                    '/sync/watchlist/remove')]
+        items += [(sctop.getString(30989), None)]
         items += [(sctop.getString(30938).encode('utf-8'),
                    '/users/me/lists/%s/items')]
+
 
         result = getTrakt('/users/me/lists')
         result = json.loads(result)
@@ -499,6 +497,37 @@ def manager(name, trakt, content):
         if select == -1:
             return
         elif select == 4:
+            ratings = [(sctop.getString(i+30990).encode('utf-8'), i) for i in range(10,-1, -1)]
+            select = sctop.selectDialog([i[0] for i in ratings], str(name))
+            url = "/sync/ratings/remove"
+            if select == -1:
+                return
+            elif ratings[select][1] != 0:
+                url = "/sync/ratings"
+                post[content][0]['rating'] = ratings[select][1]
+            try:
+                result = getTrakt(url, post=post)
+                result = json.loads(result)
+            except:
+                return sctop.infoDialog(
+                    sctop.getString(30941).encode('utf-8'),
+                    heading=str(name),
+                    sound=True,
+                    icon='ERROR')
+
+            if 'added' in result:
+                if result['added'][content]:
+                    message = sctop.getString(30987).encode('utf-8') % ratings[select][1]
+                else:
+                    return
+
+            if 'deleted' in result:
+                if result['deleted'][content]:
+                    message = sctop.getString(30988).encode('utf-8')
+                else:
+                    return
+
+        elif select == 5:
             t = sctop.getString(30938).encode('utf-8')
             k = sctop.keyboard('', t)
             k.doModal()
@@ -525,7 +554,7 @@ def manager(name, trakt, content):
         icon = icon if not result == None else 'ERROR'
 
         sctop.infoDialog(
-            sctop.getString(30941).encode('utf-8'),
+            message,
             heading=str(name),
             sound=True,
             icon=icon)
