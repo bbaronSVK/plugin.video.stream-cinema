@@ -241,52 +241,55 @@ def getLists(user='me'):
     items = []
     items_below = []
     if sctop.getSettingAsBool('trakt.watchlist') or user != 'me':
-        items += [
-            {
-                'type': 'dir',
-                'title': '[B]$30944[/B]',
-                'action': 'traktShowList',
-                'id': 'watchlist',
-                'tl': 'watchlist',
-                'tu': user
-            }]
+        items += [{
+            'type': 'dir',
+            'title': '[B]$30944[/B]',
+            'action': 'traktShowList',
+            'id': 'watchlist',
+            'tl': 'watchlist',
+            'tu': user
+        }]
 
     items += [{
-                'type': 'dir',
-                'title': '[B]$30958[/B]',
-                'action': 'traktHistory',
-                'id': 'history',
-                'tu': user
-        }]
-        #,
-        #{
-        #    'type': 'dir',
-        #    'title': 'Nedokoncene',
-        #    'url': 'cmd://Container.Update("%s")' % \
-        #        (xbmcutil._create_plugin_url({'action':'traktShowList', 'id':'progress'}))
-        #}
+        'type': 'dir',
+        'title': '[B]$30958[/B]',
+        'action': 'traktHistory',
+        'id': 'history',
+        'tu': user
+    }]
+    #,
+    #{
+    #    'type': 'dir',
+    #    'title': 'Nedokoncene',
+    #    'url': 'cmd://Container.Update("%s")' % \
+    #        (xbmcutil._create_plugin_url({'action':'traktShowList', 'id':'progress'}))
+    #}
 
     if user == "me":
         if sctop.getSettingAsBool('trakt.following'):
             below = sctop.getSettingAsBool('trakt.following-below')
             (items_below if below else items).append({
-                'action': 'traktFollowing',
-                'title': '[B]$30963[/B]',
-                'id': 'following',
-                'type': 'dir'
+                'action':
+                'traktFollowing',
+                'title':
+                '[B]$30963[/B]',
+                'id':
+                'following',
+                'type':
+                'dir'
             })
 
-        for l, t in (('liked', '$30964'),
-                     ('popular', '$30965'),
-                     ('trending', '$30966')):
+        for l, t in (('liked', '$30964'), ('popular', '$30965'), ('trending',
+                                                                  '$30966')):
             if sctop.getSettingAsBool('trakt.%s' % l):
-                (items_below if sctop.getSettingAsBool('trakt.%s-below' % l) else items).append({
-                    'action': 'traktSpecialLists',
-                    'title': '[B]%s[/B]' % t,
-                    'id': '%s_lists' % l,
-                    'type': 'dir',
-                    'page': '1'
-                })
+                (items_below if sctop.getSettingAsBool('trakt.%s-below' % l)
+                 else items).append({
+                     'action': 'traktSpecialLists',
+                     'title': '[B]%s[/B]' % t,
+                     'id': '%s_lists' % l,
+                     'type': 'dir',
+                     'page': '1'
+                 })
 
     lists = [{
         'action': 'traktShowList',
@@ -457,27 +460,22 @@ def manager(name, trakt, content):
         icon = sctop.infoLabel('ListItem.Icon')
         message = sctop.getString(30941).encode('utf-8')
         content = "movies" if content == 'movie' else "shows"
-        post = {
-            content: [{
-                "ids": {
-                    "trakt": trakt
-                }
-            }]
-        }
+        post = {content: [{"ids": {"trakt": trakt}}]}
 
         items = []
         if sctop.getSettingAsBool('trakt.collections'):
-            items = [(sctop.getString(30934).encode('utf-8'), '/sync/collection')]
+            items = [(sctop.getString(30934).encode('utf-8'),
+                      '/sync/collection')]
             items += [(sctop.getString(30935).encode('utf-8'),
                        '/sync/collection/remove')]
         if sctop.getSettingAsBool('trakt.watchlist'):
-            items += [(sctop.getString(30936).encode('utf-8'), '/sync/watchlist')]
+            items += [(sctop.getString(30936).encode('utf-8'),
+                       '/sync/watchlist')]
             items += [(sctop.getString(30937).encode('utf-8'),
                        '/sync/watchlist/remove')]
         items += [(sctop.getString(30989), 'rating')]
         items += [(sctop.getString(30938).encode('utf-8'),
                    '/users/me/lists/%s/items')]
-
 
         result = getTrakt('/users/me/lists')
         result = json.loads(result)
@@ -498,7 +496,8 @@ def manager(name, trakt, content):
         if select == -1:
             return
         elif items[select][1] == 'rating':
-            ratings = [(sctop.getString(i+30990).encode('utf-8'), i) for i in range(10,-1, -1)]
+            ratings = [(sctop.getString(i + 30990).encode('utf-8'), i)
+                       for i in range(10, -1, -1)]
             select = sctop.selectDialog([i[0] for i in ratings], str(name))
             url = "/sync/ratings/remove"
             if select == -1:
@@ -518,7 +517,8 @@ def manager(name, trakt, content):
 
             if 'added' in result:
                 if result['added'][content]:
-                    message = sctop.getString(30987).encode('utf-8') % ratings[select][1]
+                    message = sctop.getString(30987).encode(
+                        'utf-8') % ratings[select][1]
                 else:
                     return
 
@@ -554,11 +554,7 @@ def manager(name, trakt, content):
 
         icon = icon if not result == None else 'ERROR'
 
-        sctop.infoDialog(
-            message,
-            heading=str(name),
-            sound=True,
-            icon=icon)
+        sctop.infoDialog(message, heading=str(name), sound=True, icon=icon)
     except Exception as e:
         util.debug("[SC] trakt error: %s" % str(traceback.format_exc()))
         return
