@@ -920,13 +920,7 @@ class KODISCLib(xbmcprovider.XBMCMultiResolverContentProvider):
             if action == 'filter':
                 self.list(
                     self.provider.items(
-                        None,
-                        self.provider._json(
-                            '/Filter/',
-                            params
-                        )
-                    )
-                )
+                        None, self.provider._json('/Filter/', params)))
                 return self.endOfDirectory(cacheToDisc=False)
             if action == 'test':
                 self.evalSchedules()
