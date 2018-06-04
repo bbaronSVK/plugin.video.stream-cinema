@@ -840,24 +840,26 @@ class KODISCLib(xbmcprovider.XBMCMultiResolverContentProvider):
                 pg = sctop.progressDialog
                 pg.create(g(30050))
                 pg.update(0)
+                '''
                 wspeedtest = speedTest('speedtest.webshare.cz', run, out)
                 pg.update(10, wspeedtest.host)
                 wsdown = wspeedtest.download()
                 pg.update(50)
+                '''
                 speedtest = speedTest(None, run, out)
                 pg.update(60, speedtest.host)
                 bedown = speedtest.download()
                 pg.update(100)
                 pg.close()
-                sctop.setSetting('bitrate', int(wsdown))
-                sctop.setSetting('bitrateformated', str(pretty_speed(wsdown)))
+                sctop.setSetting('bitrate', int(bedown))
+                sctop.setSetting('bitrateformated', str(pretty_speed(bedown)))
                 if str(params.get('wizard', '')) == '1':
                     sctop.win.setProperty(
                         'scwizard',
                         json.dumps({
                             'ws': {
-                                'host': wspeedtest.host,
-                                'speed': pretty_speed(wsdown)
+                                'host': speedtest.host,
+                                'speed': pretty_speed(bedown)
                             },
                             'oth': {
                                 'host': speedtest.host,
@@ -867,8 +869,7 @@ class KODISCLib(xbmcprovider.XBMCMultiResolverContentProvider):
                     return
                 sctop.dialog.ok(
                     g(30050),
-                    "%s: %s" % (wspeedtest.host, str(pretty_speed(wsdown))),
-                    "%s: %s" % (speedtest.host, str(pretty_speed(bedown))))
+                    "%s: %s" % (speedtest.host, str(pretty_speed(bedown))), '')
                 sctop.openSettings('1.0')
             if action == 'play-force':
                 self.force = True
