@@ -233,64 +233,64 @@ def addTraktCollection(info):
 
 def getLists(user='me'):
     result = getTrakt('/users/%s/lists' % user)
+
     if not result:
         return []
     result = json.loads(result)
 
-    items = [
-        {
+    items = []
+    items_below = []
+    if sctop.getSettingAsBool('trakt.watchlist') or user != 'me':
+        items += [{
             'type': 'dir',
             'title': '[B]$30944[/B]',
-            #'url': 'cmd://Container.Update("%s")' % \
             'action': 'traktShowList',
             'id': 'watchlist',
             'tl': 'watchlist',
             'tu': user
-        },
-        {
-            'type': 'dir',
-            'title': '[B]$30958[/B]',
-            'action': 'traktHistory',
-            'id': 'history',
-            'tu': user
-        }
-        #,
-        #{
-        #    'type': 'dir',
-        #    'title': 'Nedokoncene',
-        #    'url': 'cmd://Container.Update("%s")' % \
-        #        (xbmcutil._create_plugin_url({'action':'traktShowList', 'id':'progress'}))
-        #}
-    ]
+        }]
+
+    items += [{
+        'type': 'dir',
+        'title': '[B]$30958[/B]',
+        'action': 'traktHistory',
+        'id': 'history',
+        'tu': user
+    }]
+    #,
+    #{
+    #    'type': 'dir',
+    #    'title': 'Nedokoncene',
+    #    'url': 'cmd://Container.Update("%s")' % \
+    #        (xbmcutil._create_plugin_url({'action':'traktShowList', 'id':'progress'}))
+    #}
+
     if user == "me":
-        items += [
-            {
-                'action': 'traktFollowing',
-                'title': '[B]$30963[/B]',
-                'id': 'following',
-                'type': 'dir'
-            },
-            {
-                'action': 'traktSpecialLists',
-                'title': '[B]$30964[/B]',
-                'id': 'liked_lists',
-                'type': 'dir',
-            },
-            {
-                'action': 'traktSpecialLists',
-                'title': '[B]$30965[/B]',
-                'id': 'popular_lists',
-                'type': 'dir',
-                'page': '1'
-            },
-            {
-                'action': 'traktSpecialLists',
-                'title': '[B]$30966[/B]',
-                'id': 'trending_lists',
-                'type': 'dir',
-                'page': '1'
-            },
-        ]
+        if sctop.getSettingAsBool('trakt.following'):
+            below = sctop.getSettingAsBool('trakt.following-below')
+            (items_below if below else items).append({
+                'action':
+                'traktFollowing',
+                'title':
+                '[B]$30963[/B]',
+                'id':
+                'following',
+                'type':
+                'dir'
+            })
+
+        for l, t in (('liked', '$30964'), ('popular', '$30965'), ('trending',
+                                                                  '$30966')):
+            if sctop.getSettingAsBool('trakt.%s' % l):
+                (items_below if sctop.getSettingAsBool('trakt.%s-below' % l)
+                 else items).append({
+                     'action': 'traktSpecialLists',
+                     'title': '[B]%s[/B]' % t,
+                     'id': '%s_lists' % l,
+                     'type': 'dir',
+                     'page': '1'
+                 })
+
     lists = [{
         'action': 'traktShowList',
         'title': i['name'],
@@ -300,9 +300,10 @@ def getLists(user='me'):
         'tu': user,
         'list': 'user'
     } for i in result]
+
     items += lists
 
-    return items
+    return items + items_below
 
 
 def getFollowing():
@@ -454,29 +455,25 @@ def getSpecialLists(slug, page=1):
     return items
 
 
-def manager(name, imdb, tvdb, content):
+def manager(name, trakt, content):
     try:
         icon = sctop.infoLabel('ListItem.Icon')
-        post = {
-            "movies": [{
-                "ids": {
-                    "imdb": imdb
-                }
-            }]
-        } if content == 'movie' else {
-            "shows": [{
-                "ids": {
-                    "tvdb": tvdb
-                }
-            }]
-        }
+        message = sctop.getString(30941).encode('utf-8')
+        content = "movies" if content == 'movie' else "shows"
+        post = {content: [{"ids": {"trakt": trakt}}]}
 
-        items = [(sctop.getString(30934).encode('utf-8'), '/sync/collection')]
-        items += [(sctop.getString(30935).encode('utf-8'),
-                   '/sync/collection/remove')]
-        items += [(sctop.getString(30936).encode('utf-8'), '/sync/watchlist')]
-        items += [(sctop.getString(30937).encode('utf-8'),
-                   '/sync/watchlist/remove')]
+        items = []
+        if sctop.getSettingAsBool('trakt.collections'):
+            items = [(sctop.getString(30934).encode('utf-8'),
+                      '/sync/collection')]
+            items += [(sctop.getString(30935).encode('utf-8'),
+                       '/sync/collection/remove')]
+        if sctop.getSettingAsBool('trakt.watchlist'):
+            items += [(sctop.getString(30936).encode('utf-8'),
+                       '/sync/watchlist')]
+            items += [(sctop.getString(30937).encode('utf-8'),
+                       '/sync/watchlist/remove')]
+        items += [(sctop.getString(30989), 'rating')]
         items += [(sctop.getString(30938).encode('utf-8'),
                    '/users/me/lists/%s/items')]
 
@@ -498,7 +495,40 @@ def manager(name, imdb, tvdb, content):
 
         if select == -1:
             return
-        elif select == 4:
+        elif items[select][1] == 'rating':
+            ratings = [(sctop.getString(i + 30990).encode('utf-8'), i)
+                       for i in range(10, -1, -1)]
+            select = sctop.selectDialog([i[0] for i in ratings], str(name))
+            url = "/sync/ratings/remove"
+            if select == -1:
+                return
+            elif ratings[select][1] != 0:
+                url = "/sync/ratings"
+                post[content][0]['rating'] = ratings[select][1]
+            try:
+                result = getTrakt(url, post=post)
+                result = json.loads(result)
+            except:
+                return sctop.infoDialog(
+                    sctop.getString(30941).encode('utf-8'),
+                    heading=str(name),
+                    sound=True,
+                    icon='ERROR')
+
+            if 'added' in result:
+                if result['added'][content]:
+                    message = sctop.getString(30987).encode(
+                        'utf-8') % ratings[select][1]
+                else:
+                    return
+
+            if 'deleted' in result:
+                if result['deleted'][content]:
+                    message = sctop.getString(30988).encode('utf-8')
+                else:
+                    return
+
+        elif items[select][1] == '/users/me/lists/%s/items':
             t = sctop.getString(30938).encode('utf-8')
             k = sctop.keyboard('', t)
             k.doModal()
@@ -524,11 +554,7 @@ def manager(name, imdb, tvdb, content):
 
         icon = icon if not result == None else 'ERROR'
 
-        sctop.infoDialog(
-            sctop.getString(30941).encode('utf-8'),
-            heading=str(name),
-            sound=True,
-            icon=icon)
+        sctop.infoDialog(message, heading=str(name), sound=True, icon=icon)
     except Exception as e:
         util.debug("[SC] trakt error: %s" % str(traceback.format_exc()))
         return

@@ -79,6 +79,18 @@
     <string id="30700">Povoliť históriu</string>
     <string id="30701">Počet položiek v historií</string>
 
+    <string id="30080">Trakt.tv</string>
+    <string id="30800">Používať zbierky</string>
+    <string id="30801">Používať zoznam na pozretie</string>
+    <string id="30802">Zobraziť priateľov a sledovaných</string>
+    <string id="30803">Priatelia a sledovaní pod mojimi zoznamami</string>
+    <string id="30804">Zobraziť obľúbené zoznamy</string>
+    <string id="30805">Obľúbené zoznamy pod mojimi zoznamami</string>
+    <string id="30806">Zobraziť populárne zoznamy</string>
+    <string id="30807">Populárne zoznamy pod mojimi zoznamami</string>
+    <string id="30808">Zobraziť populárne zoznamy za týždeň</string>
+    <string id="30809">Populárne zoznamy za týždeň pod mojimi zoznamami</string>
+
     <!-- texty v menu -->
     <string id="30901">Filmy</string>
     <string id="30902">Seriály</string>
@@ -164,6 +176,22 @@
     <string id="30981">Importovať do zoznamu</string>
     <string id="30982">ďalšia strana</string>
     
+
+    <string id="30987">Hodnotenie odoslané (%d)</string>
+    <string id="30988">Hodnotenie odstránené</string>
+    <string id="30989">Ohodnotiť</string>
+    <string id="30990">Odstrániť hodnotenie</string>
+    <string id="30991">  1 - Najhoršie</string>
+    <string id="30992">  2 - Veľmi zlé</string>
+    <string id="30993">  3 - Zlé</string>
+    <string id="30994">  4 - Podpriemerné</string>
+    <string id="30995">  5 - Priemerné</string>
+    <string id="30996">  6 - Prijateľné</string>
+    <string id="30997">  7 - Dobré</string>
+    <string id="30998">  8 - Veľmi dobré</string>
+    <string id="30999">  9 - Výborné</string>
+    <string id="31000">10 - Najlepšie</string>
+
     <!-- dni v tyzdni -->
     <string id="30911">Pondelok</string>
     <string id="30912">Utorok</string>    
