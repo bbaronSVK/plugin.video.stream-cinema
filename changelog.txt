@@ -1,3 +1,7 @@
+[B]1.3.8[/B]
+- upravena praca s ws tokenom
+- prenasanie nastavenia http(s) na webshare
+
 [B]1.2.8[/B]
 - nova cache
 - cachovanie zoznamov v plugine podla casu, ktory posiela server

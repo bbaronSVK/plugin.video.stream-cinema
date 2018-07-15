@@ -25,7 +25,7 @@ from provider import ResolveException
 import traceback
 import urlparse
 import util
-from resources.lib.sctop import post, checkSupportHTTPS, getSettingAsBool, setSetting
+from resources.lib.sctop import post, checkSupportHTTPS, getSettingAsBool, setSetting, getSetting
 import xbmcgui
 
 
@@ -42,6 +42,8 @@ class Webshare():
             self.base_url = self.base_url.replace('http://', 'https://')
         self.cache = cache
         self.win = xbmcgui.Window(10000)
+        self._userData = None
+        self.token = None
         self.getToken()
 
     def _url(self, url):
@@ -63,32 +65,58 @@ class Webshare():
                 req[key] = args[key]
         return headers, req
 
+    def checkHTTPS(self, userData):
+        util.debug('[SC] kontrolujem nastavenia HTTPS s WS [%s] [%s]' % (getSetting('ws_usessl'), userData.find('wants_https_download').text))
+        toggle = False
+        if getSettingAsBool('ws_usessl') is not True and userData.find('wants_https_download').text == '1':
+            toggle = True
+        elif getSettingAsBool('ws_usessl') is True and userData.find('wants_https_download').text == '0':
+            toggle = True
+
+        if toggle:
+            headers, req = self._create_request('/', {'wst': self.token})
+            try:
+                util.info('[SC] userData menim nastavenie http(s)')
+                data = post(self._url('api/toggle_https_download/'), req, headers=headers, output="content")
+                util.debug('[SC] zmena: %s' % str(data))
+            except:
+                self.clearToken()
+                return False
+            pass
+
     def login(self):
+        util.debug('[SC] start login')
         if not self.username or not self.password:
+            util.debug('[SC] idem sa odhlasit lebo nemam meno/heslo')
             self.logout()
             return True  # fall back to free account
         elif self.token is not None:
-            if self.userData() is not False:
+            userData = self.userData(True)
+            if userData is not False:
+                self.checkHTTPS(userData)
                 return True
-            self.token = None
+            self.clearToken()
 
         if self.username and self.password and len(self.username) > 0 and len(
                 self.password) > 0:
             self.logout()
-            util.info('[SC] Login user=%s, pass=*****' % self.username)
+            util.info('[SC] Login user=%s, pass=***** (%d)' % (self.username, len(self.password)))
 
             try:
                 # get salt
                 headers, req = self._create_request(
                     '', {'username_or_email': self.username})
-                data = post(self._url('api/salt/'), req, headers=headers)
-                xml = ET.fromstring(data)
-                if not xml.find('status').text == 'OK':
+                data = post(self._url('api/salt/'), req, headers=headers, output="content")
+                util.info('[SC] salt: %s' % str(data))
+                xml = ET.fromstring(str(data))
+                if not xml.find('status').text == 'OK' or xml.find('salt').text is None:
                     util.error(
                         '[SC] Server returned error status, response: %s' %
                         data)
                     return False
                 salt = xml.find('salt').text
+                if salt is None:
+                    return False
                 # create hashes
                 password = hashlib.sha1(
                     md5crypt(self.password, salt.encode('utf-8'))).hexdigest()
@@ -102,7 +130,7 @@ class Webshare():
                         'digest': digest,
                         'keep_logged_in': 1
                     })
-                data = post(self._url('api/login/'), req, headers=headers)
+                data = post(self._url('api/login/'), req, headers=headers, output="content")
                 xml = ET.fromstring(data)
                 if not xml.find('status').text == 'OK':
                     self.clearToken()
@@ -112,6 +140,8 @@ class Webshare():
                     return False
                 self.saveToken(xml.find('token').text)
                 util.info('[SC] Login successfull')
+                userData = self.userData(True)
+                self.checkHTTPS(userData)
                 return True
             except Exception as e:
                 util.info('[SC] Login error %s' % str(e))
@@ -119,16 +149,21 @@ class Webshare():
         return False
 
     def userData(self, all=False):
+        self.getToken()
         if self.token is not None:
-            headers, req = self._create_request('/', {'wst': self.token})
-            try:
-                util.info('[SC] userData')
-                data = post(self._url('api/user_data/'), req, headers=headers)
-            except:
-                self.clearToken()
-                return False
-            #util.info('[SC] userdata dat: %s' % data)
-            xml = ET.fromstring(data)
+            if self._userData is None:
+                headers, req = self._create_request('/', {'wst': self.token})
+                try:
+                    util.info('[SC] userData')
+                    data = post(self._url('api/user_data/'), req, headers=headers, output="content")
+                except:
+                    self.clearToken()
+                    return False
+                util.info('[SC] userdata dat: %s' % str(data))
+                xml = ET.fromstring(str(data))
+                self._userData = xml
+            else:
+                xml = self._userData
             if not xml.find('status').text == 'OK':
                 self.clearToken()
                 return False
@@ -152,54 +187,48 @@ class Webshare():
         util.info("[SC] logout")
         headers, req = self._create_request('/', {'wst': self.token})
         try:
-            post(self._url('api/logout/'), req, headers=headers)
+            post(self._url('api/logout/'), req, headers=headers, output="content")
         except:
             util.debug("[SC] chyba logout")
             pass
         self.clearToken()
 
     def clearToken(self):
-        try:
-            if self.cache is not None:
-                util.debug('[SC] mazem token z cache')
-                self.cache.set('ws.token', None)
-        except:
-            pass
-        util.debug('[SC] mazem token z Prop')
-        self.win.clearProperty('ws.token')
-        util.debug('[SC] mazem self token')
+        util.debug('[SC] mazem token z nastavenia')
+        setSetting('ws_token', '')
+        setSetting('ws_chsum', '')
         self.token = None
+        self._userData = None
         pass
 
     def getToken(self):
         try:
-            if self.cache is None:
-                self.w = xbmcgui.Window(10000)
-                util.debug('[SC] token z Prop')
-                token = self.w.getProperty('ws.token')
-            else:
-                util.debug('[SC] token z CACHE')
-                token = self.cache.get('ws.token')
+            chsum = getSetting('ws_chsum')
+            if chsum is None or chsum == '':
+                return
+            testchsum = hashlib.md5("%s|%s" % (self.password.encode('utf-8'), self.username.encode('utf-8'))).hexdigest()
+            util.debug('[SC] chsum [%s] [%s]' % (chsum, testchsum))
+            if chsum != testchsum:
+                util.debug('[SC] prihlasovacie udaje niesu zhodne s tokenom')
+                return
+
+            token = getSetting('ws_token')
 
             if token is not None and token != '':
-                util.debug('[SC] mame platny token')
+                util.debug('[SC] mame token')
                 self.token = token
             else:
-                util.debug('[SC] token je neplatny')
+                util.debug('[SC] NEMAME token')
                 self.token = None
         except:
-            util.info('[SC] token ERR %s' % str(traceback.format_exc()))
+            util.debug('[SC] token ERR %s' % str(traceback.format_exc()))
             self.token = None
 
     def saveToken(self, token):
         self.token = str(token)
-        if self.cache is not None:
-            ttl = timedelta(days=7)
-            try:
-                self.cache.set('ws.token', self.token, expiration=ttl)
-            except:
-                pass
-        self.win.setProperty('ws.token', self.token)
+        util.debug('[SC] ukladam token')
+        setSetting('ws_token', token)
+        setSetting('ws_chsum', hashlib.md5("%s|%s" % (self.password.encode('utf-8'), self.username.encode('utf-8'))).hexdigest())
         pass
 
     def resolve(self, ident):
@@ -210,7 +239,7 @@ class Webshare():
         util.info(headers)
         util.info(req)
         try:
-            data = post(self._url('api/file_link/'), req, headers=headers)
+            data = post(self._url('api/file_link/'), req, headers=headers, output="content")
             xml = ET.fromstring(data)
             if not xml.find('status').text == 'OK':
                 self.clearToken()

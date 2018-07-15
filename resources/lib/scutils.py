@@ -671,7 +671,7 @@ class KODISCLib(xbmcprovider.XBMCMultiResolverContentProvider):
             if action == 'ws-logout':
                 try:
                     from myprovider.webshare import Webshare
-                    ws = Webshare(None, None, self.cache)
+                    ws = Webshare('', '', self.cache)
                     ws.logout()
                     sctop.notification('Webshare.cz',
                                        sctop.__language__(30112))
