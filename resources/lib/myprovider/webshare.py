@@ -66,18 +66,26 @@ class Webshare():
         return headers, req
 
     def checkHTTPS(self, userData):
-        util.debug('[SC] kontrolujem nastavenia HTTPS s WS [%s] [%s]' % (getSetting('ws_usessl'), userData.find('wants_https_download').text))
+        util.debug('[SC] kontrolujem nastavenia HTTPS s WS [%s] [%s]' %
+                   (getSetting('ws_usessl'),
+                    userData.find('wants_https_download').text))
         toggle = False
-        if getSettingAsBool('ws_usessl') is not True and userData.find('wants_https_download').text == '1':
+        if getSettingAsBool('ws_usessl') is not True and userData.find(
+                'wants_https_download').text == '1':
             toggle = True
-        elif getSettingAsBool('ws_usessl') is True and userData.find('wants_https_download').text == '0':
+        elif getSettingAsBool('ws_usessl') is True and userData.find(
+                'wants_https_download').text == '0':
             toggle = True
 
         if toggle:
             headers, req = self._create_request('/', {'wst': self.token})
             try:
                 util.info('[SC] userData menim nastavenie http(s)')
-                data = post(self._url('api/toggle_https_download/'), req, headers=headers, output="content")
+                data = post(
+                    self._url('api/toggle_https_download/'),
+                    req,
+                    headers=headers,
+                    output="content")
                 util.debug('[SC] zmena: %s' % str(data))
             except:
                 self.clearToken()
@@ -100,16 +108,22 @@ class Webshare():
         if self.username and self.password and len(self.username) > 0 and len(
                 self.password) > 0:
             self.logout()
-            util.info('[SC] Login user=%s, pass=***** (%d)' % (self.username, len(self.password)))
+            util.info('[SC] Login user=%s, pass=***** (%d)' %
+                      (self.username, len(self.password)))
 
             try:
                 # get salt
                 headers, req = self._create_request(
                     '', {'username_or_email': self.username})
-                data = post(self._url('api/salt/'), req, headers=headers, output="content")
+                data = post(
+                    self._url('api/salt/'),
+                    req,
+                    headers=headers,
+                    output="content")
                 util.info('[SC] salt: %s' % str(data))
                 xml = ET.fromstring(str(data))
-                if not xml.find('status').text == 'OK' or xml.find('salt').text is None:
+                if not xml.find('status').text == 'OK' or xml.find(
+                        'salt').text is None:
                     util.error(
                         '[SC] Server returned error status, response: %s' %
                         data)
@@ -130,7 +144,11 @@ class Webshare():
                         'digest': digest,
                         'keep_logged_in': 1
                     })
-                data = post(self._url('api/login/'), req, headers=headers, output="content")
+                data = post(
+                    self._url('api/login/'),
+                    req,
+                    headers=headers,
+                    output="content")
                 xml = ET.fromstring(data)
                 if not xml.find('status').text == 'OK':
                     self.clearToken()
@@ -155,7 +173,11 @@ class Webshare():
                 headers, req = self._create_request('/', {'wst': self.token})
                 try:
                     util.info('[SC] userData')
-                    data = post(self._url('api/user_data/'), req, headers=headers, output="content")
+                    data = post(
+                        self._url('api/user_data/'),
+                        req,
+                        headers=headers,
+                        output="content")
                 except:
                     self.clearToken()
                     return False
@@ -187,7 +209,11 @@ class Webshare():
         util.info("[SC] logout")
         headers, req = self._create_request('/', {'wst': self.token})
         try:
-            post(self._url('api/logout/'), req, headers=headers, output="content")
+            post(
+                self._url('api/logout/'),
+                req,
+                headers=headers,
+                output="content")
         except:
             util.debug("[SC] chyba logout")
             pass
@@ -206,7 +232,9 @@ class Webshare():
             chsum = getSetting('ws_chsum')
             if chsum is None or chsum == '':
                 return
-            testchsum = hashlib.md5("%s|%s" % (self.password.encode('utf-8'), self.username.encode('utf-8'))).hexdigest()
+            testchsum = hashlib.md5(
+                "%s|%s" % (self.password.encode('utf-8'),
+                           self.username.encode('utf-8'))).hexdigest()
             util.debug('[SC] chsum [%s] [%s]' % (chsum, testchsum))
             if chsum != testchsum:
                 util.debug('[SC] prihlasovacie udaje niesu zhodne s tokenom')
@@ -228,7 +256,10 @@ class Webshare():
         self.token = str(token)
         util.debug('[SC] ukladam token')
         setSetting('ws_token', token)
-        setSetting('ws_chsum', hashlib.md5("%s|%s" % (self.password.encode('utf-8'), self.username.encode('utf-8'))).hexdigest())
+        setSetting(
+            'ws_chsum',
+            hashlib.md5("%s|%s" % (self.password.encode('utf-8'),
+                                   self.username.encode('utf-8'))).hexdigest())
         pass
 
     def resolve(self, ident):
@@ -239,7 +270,11 @@ class Webshare():
         util.info(headers)
         util.info(req)
         try:
-            data = post(self._url('api/file_link/'), req, headers=headers, output="content")
+            data = post(
+                self._url('api/file_link/'),
+                req,
+                headers=headers,
+                output="content")
             xml = ET.fromstring(data)
             if not xml.find('status').text == 'OK':
                 self.clearToken()
