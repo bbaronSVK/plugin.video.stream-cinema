@@ -122,20 +122,28 @@ class Webshare():
                     output="content")
                 util.info('[SC] salt: %s' % str(data))
                 xml = ET.fromstring(str(data))
-                if not xml.find('status').text == 'OK' or xml.find(
-                        'salt').text is None:
+                if not xml.find('status').text == 'OK':
                     util.error(
                         '[SC] Server returned error status, response: %s' %
                         data)
                     return False
                 salt = xml.find('salt').text
                 if salt is None:
-                    return False
+                    salt = ''
                 # create hashes
                 password = hashlib.sha1(
-                    md5crypt(self.password, salt.encode('utf-8'))).hexdigest()
-                digest = hashlib.md5(self.username + ':Webshare:' +
-                                     self.password).hexdigest()
+                    md5crypt(
+                        self.password.encode('utf-8'),
+                        salt.encode('utf-8'))).hexdigest()
+                digest = hashlib.md5(
+                    self.username.encode('utf-8') + ':Webshare:' +
+                    self.password.encode('utf-8')).hexdigest()
+                util.debug('[SC] pass: %s | [%s] digest: %s' %
+                           (password,
+                            str(
+                                md5crypt(
+                                    self.password.encode('utf-8'),
+                                    salt.encode('utf-8'))), digest))
                 # login
                 headers, req = self._create_request(
                     '', {
