@@ -11,10 +11,10 @@
     <string id="30107">Spustit test připojení...</string>
     <string id="30008">Up Next</string>
     <string id="30109">stream-cinema.online</string>
-    <string id="30110">Použiť SSL</string>
+    <string id="30110">Použít SSL</string>
     <string id="30111">Odhlásit z webshare.cz</string>
     <string id="30112">Odhlášení z webshare.cz bylo úspěšné</string>
-    <string id="30113">Skontrolovat aktualizace</string>
+    <string id="30113">Zkontrolovat aktualizace</string>
     
     <string id="30020">Titulky</string>
     <string id="30201">Povolit titulky</string>
@@ -22,7 +22,7 @@
     <string id="30203">Primární jazyk</string>
     <string id="30204">Sekundární jazyk</string>
     <string id="39001">Titulky nemusí být dostupné nebo synchonizované.</string>
-    <string id="39002">V tom případě použijte vlastní titulky.</string>
+    <string id="39002">V tom případě použijte titulky vlastní.</string>
     
     <string id="30030">Stahovaní</string>
     <string id="30301">složka pro stahovaní</string>
@@ -32,7 +32,7 @@
     <string id="30312">5%</string>
     <string id="30313">1%</string>
     <string id="30304">Omezení vyrovnávací paměti pro stahování</string>
-    <string id="30314">Stahuju</string>
+    <string id="30314">Stahuje se</string>
     <string id="30315">Hotovo</string>
     <string id="30316">Chyba</string>
     
@@ -42,16 +42,16 @@
     <string id="30402">Zpozdit start služby o (minuty)</string>
     <string id="30403">Čas pro obnovu seriálu (dni)</string>
     <string id="30404">Automaticky přidávat filmy do knihovny</string>
-    <string id="30405">Skontrolovat nové části</string>
+    <string id="30405">Zkontrolovat nové části</string>
     
     <string id="30050">SpeedTest</string>
     <string id="30500">Spustit test připojení...</string>
-    <string id="30501">Vyber stahované velikosti souborů</string>
+    <string id="30501">Vybrat stahované velikosti souborů</string>
     <string id="30502">Zapnutím filtrování se nemusí zobrazovat všechen dostupný obsah</string>
     <string id="30503">Naměrená rychlost (webshare.cz)</string>
     <string id="30504">Filtrovat streamy podle rychlosti</string>
     <!-- "250KB", "500KB", "1MB", "2MB", "4.5MB", "7.5MB", "12MB", "17MB", "24MB", "31MB" -->
-    <string id="30551">250KB - pomale připojení</string> 
+    <string id="30551">250KB - pomalé připojení</string> 
     <string id="30552">500KB</string> 
     <string id="30553">1MB</string> 
     <string id="30554">2MB - DSL</string> 
@@ -70,26 +70,26 @@
     <string id="30604">Sekundární jazyk</string>
     <string id="30605">Filtrování podle kvality</string>
     <string id="30606">Vybraná kvalita</string>
-    <string id="30607">Vyradit HEVC stream</string>
+    <string id="30607">Zakázat HEVC stream</string>
     <string id="30608">Podrobný výběr streamu</string>
-    <string id="30609">Nabídnout následujíci epizodu</string>
-    <string id="30610">Vyradit 3D stream</string>
+    <string id="30609">Nabídnout následující epizodu</string>
+    <string id="30610">Zakázat 3D stream</string>
 
-    <string id="30070">Vyledávání</string>
+    <string id="30070">Vyhledávání</string>
     <string id="30700">Povolit historii</string>
-    <string id="30701">Počet položek v historií</string>
+    <string id="30701">Počet položek v historii</string>
 
     <string id="30080">Trakt.tv</string>
-    <string id="30800">Používať zbierky</string>
-    <string id="30801">Používať zoznam na pozretie</string>
-    <string id="30802">Zobraziť priateľov a sledovaných</string>
-    <string id="30803">Priatelia a sledovaní pod mojimi zoznamami</string>
-    <string id="30804">Zobraziť obľúbené zoznamy</string>
-    <string id="30805">Obľúbené zoznamy pod mojimi zoznamami</string>
-    <string id="30806">Zobraziť populárne zoznamy</string>
-    <string id="30807">Populárne zoznamy pod mojimi zoznamami</string>
-    <string id="30808">Zobraziť populárne zoznamy za týždeň</string>
-    <string id="30809">Populárne zoznamy za týždeň pod mojimi zoznamami</string>
+    <string id="30800">Použít sbírky</string>
+    <string id="30801">Použít seznam na prohlédnutí</string>
+    <string id="30802">Zobrazit přátelé a sledované</string>
+    <string id="30803">Přátelé a sledovaní pod mými seznamy</string>
+    <string id="30804">Zobrazit oblíbené seznamy</string>
+    <string id="30805">Oblíbené playlisty pod mými seznamy</string>
+    <string id="30806">Zobrazit populární seznamy</string>
+    <string id="30807">Populární playlisty pod mými seznamy</string>
+    <string id="30808">Zobrazit populární seznamy za týden</string>
+    <string id="30809">Populární playlisty za týden pod mými seznamy</string>
 
     <!-- texty v menu -->
     <string id="30901">Filmy</string>
@@ -115,16 +115,16 @@
     <string id="30925">Knihovna</string>
     <string id="30926">Přidat do knihovny (vše)</string>
     <string id="30927">Poslední sledované</string>
-    <string id="30928">TV program na 14 dni</string>
+    <string id="30928">TV program na 14 dní</string>
     <string id="30929">Nově přidané</string>
     <string id="30930">1) Navštivte: [COLOR red]%s[/COLOR]</string>
     <string id="30931">2) Po výzvě zadejte [COLOR red]%s[/COLOR]</string>
-    <string id="30932">Účet už je autorizovany.[CR]Chcete se odhlasit?</string>
-    <string is="30933">Chcete se odhlasit?</string>
+    <string id="30932">Účet už je autorizovaný.[CR]Chcete se odhlasit?</string>
+    <string is="30933">Chcete se odhlásit?</string>
     
     <!-- trakt manager -->
     <string id="30934">Přidat do [B]Sbírky[/B]</string>
-    <string id="30935">Odstránit ze [B]Sbírky[/B]</string>
+    <string id="30935">Odstranit ze [B]Sbírky[/B]</string>
     <string id="30936">Přidat do [B]Seznamu ke shlédnutí[/B]</string>
     <string id="30937">Odebrat ze [B]Seznamu ke shlédnutí[/B]</string>
     <string id="30938">Přidat do [B]nového seznamu[/B]</string>
@@ -138,10 +138,10 @@
     <string id="30943">Moje seznamy</string>
     <string id="30944">Seznam ke shlédnutí</string>
         
-    <string id="30945">Nepodarilo sa prihlásiť na WebShare</string>
-    <string id="30946">Chcete otvoriť nastavenia?</string>
-    <string id="30947">Nemate aktivne VIP na WebShare</string>
-    <string id="30948">Zbývá ti už jen %s dní s VIP na WebShare VIP</string>
+    <string id="30945">Nepodařilo se přihlásit na WebShare</string>
+    <string id="30946">Chcete otevřít nastavení?</string>
+    <string id="30947">Nemáte aktivní VIP na WebShare</string>
+    <string id="30948">Zbývá už jen %s dní na WebShare VIP</string>
     <string id="30949">Vybrat stream</string>
     <string id="30950">Novinky</string>
     <string id="30951">Lidé (filmy)</string>
@@ -150,7 +150,7 @@
     <string id="30954">Nová verze pluginu</string>
     <string id="30955">Byla nahrána nová verze pluginu (%s). Zásuvný modul musí být aktualizován tak, aby fungoval správně. Pokud máte automatickou aktualizaci, můžete se aktualizovat kliknutím na tlačítko OK. Pokud se tak nestane, aktualizujte plugin ručně.</string>
     <string id="30956">Práve sledované</string>
-    <string id="30957">Příliš mnoho požadavků, prosím počkejte (1 min) a opakujte akci.</string>
+    <string id="30957">Příliš mnoho požadavků, prosím počkejte (1 min.) a opakujte akci.</string>
     
     <string id="30958">Historie</string>
     <string id="30959">Ohodnocené filmy</string>
@@ -159,42 +159,42 @@
     <string id="30962">Shlédnuté seriály</string>
     <string id="30963">Přátelé</string>
     <string id="30964">Oblíbené seznamy</string>
-    <string id="30965">Populárne seznamy</string>
-    <string id="30966">Populárne seznamy za týden</string>
-    <string id="30968">Vyber zoznam, do ktorého chceš pridať položky</string>
-    <string id="30969">Zoznam bol pridaný</string>
-    <string id="30970">Chceš naklonovať zoznam medzi svoje zoznamy?</string>
-    <string id="30972">Naozaj chceš odstrániť zoznam</string>
-    <string id="30973">Sezman byl odstraňen</string>
-    <string id="30974">Zoznam odobratý z obľúbených</string>
-    <string id="30975">Zoznam pridaný do obľúbených</string>
-    <string id="30976">Zoznam bol naklonovaný</string>
-    <string id="30977">Odobrať zoznam z obľúbených</string>
-    <string id="30978">Pridať zoznam do obľúbených</string>
-    <string id="30979">Odstrániť zoznam</string>
-    <string id="30980">Klonovať zoznam</string>
+    <string id="30965">Populární seznamy</string>
+    <string id="30966">Populární seznamy za týden</string>
+    <string id="30968">Vyberte seznam, do kterého chcete přidat položky</string>
+    <string id="30969">Seznam byl přidán</string>
+    <string id="30970">Chcete naklonovat playlist mezi své seznamy?</string>
+    <string id="30972">Opravdu chcete odstranit seznam?</string>
+    <string id="30973">Seznam byl odstraněn</string>
+    <string id="30974">Seznam odebraný z oblíbených</string>
+    <string id="30975">Seznam přidaný do oblíbených</string>
+    <string id="30976">Seznam byl naklonován</string>
+    <string id="30977">Odebrat seznam z oblíbených</string>
+    <string id="30978">Přidat seznam do oblíbených</string>
+    <string id="30979">Odstranit seznam</string>
+    <string id="30980">Klonovat seznam</string>
     <string id="30981">Importovat do seznamu</string>
-    <string id="30982">ďalšia strana</string>
+    <string id="30982">další strana</string>
 
-    <string id="30987">Hodnotenie odoslané (%d)</string>
-    <string id="30988">Hodnotenie odstránené</string>
-    <string id="30989">Ohodnotiť</string>
-    <string id="30990">Odstrániť hodnotenie</string>
-    <string id="30991"> 1 - Najhoršie</string>
-    <string id="30992"> 2 - Veľmi zlé</string>
-    <string id="30993"> 3 - Zlé</string>
-    <string id="30994"> 4 - Podpriemerné</string>
-    <string id="30995"> 5 - Priemerné</string>
-    <string id="30996"> 6 - Prijateľné</string>
+    <string id="30987">Hodnocení odeslané (%d)</string>
+    <string id="30988">Hodnocení odstraněné</string>
+    <string id="30989">Ohodnotit</string>
+    <string id="30990">Odstranit hodnocení</string>
+    <string id="30991"> 1 - Nejhorší</string>
+    <string id="30992"> 2 - Velmi špatné</string>
+    <string id="30993"> 3 - Špatné</string>
+    <string id="30994"> 4 - Podprůměrné</string>
+    <string id="30995"> 5 - Průměrné</string>
+    <string id="30996"> 6 - Přijatelné</string>
     <string id="30997"> 7 - Dobré</string>
-    <string id="30998"> 8 - Veľmi dobré</string>
+    <string id="30998"> 8 - Velmi dobré</string>
     <string id="30999"> 9 - Výborné</string>
-    <string id="31000">10 - Najlepšie</string>
+    <string id="31000">10 - Nejlepší</string>
 
     <!-- dni v tyzdni -->
     <string id="30911">Pondělí</string>
     <string id="30912">Úterý</string>    
-    <string id="30913">Strěda</string>    
+    <string id="30913">Středa</string>    
     <string id="30914">Čtvrtek</string>    
     <string id="30915">Pátek</string>    
     <string id="30916">Sobota</string>    
@@ -215,7 +215,7 @@
     <string id="32488">Hudební</string>
     <string id="36570">IMAX</string>
     <string id="32029">Katastrofický</string>
-    <string id="31003">Komédie</string>
+    <string id="31003">Komedie</string>
     <string id="38861">Krátkometrážní</string>
     <string id="31002">Krimi</string>
     <string id="47830">Lotkové</string>
