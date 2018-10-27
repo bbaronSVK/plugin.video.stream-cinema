@@ -613,7 +613,9 @@ class StreamCinemaContentProvider(ContentProvider):
                     sctop.player.scid = itm['id']
                     sctop.player.action(data)
                 except Exception as e:
-                    util.debug('[SC] nepodarilo sa vykonat akciu "start" %s | %s' % (str(e), str(traceback.format_exc())))
+                    util.debug(
+                        '[SC] nepodarilo sa vykonat akciu "start" %s | %s' %
+                        (str(e), str(traceback.format_exc())))
 
                 try:
                     if itm['subs'] is not None and "webshare.cz" in itm['subs']:
