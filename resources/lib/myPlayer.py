@@ -568,6 +568,7 @@ class MyPlayer(xbmc.Player):
 
     def action(self, data):
         if self.scid is None:
+            util.debug("[SC] nemame scid")
             return
         url = "%s/Stats" % (sctop.BASE_URL)
         data.update({'est': self.estimateFinishTime})

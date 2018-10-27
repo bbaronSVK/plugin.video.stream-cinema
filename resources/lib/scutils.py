@@ -54,6 +54,8 @@ class KODISCLib(xbmcprovider.XBMCMultiResolverContentProvider):
         self.provider.cache = self.cache
         self.timer = 0
         self._checkHTTPS()
+        if sctop.player is None:
+            sctop.player = myPlayer.MyPlayer(parent=self)
 
     def _checkHTTPS(self):
         '''
@@ -1028,7 +1030,7 @@ class KODISCLib(xbmcprovider.XBMCMultiResolverContentProvider):
                                               json.dumps(ids))
             xbmcgui.Window(10000).setProperty('%s.stream' % sctop.__scriptid__,
                                               json.dumps(stream))
-            self.win.setProperty('scid', stream['id'])
+            self.win.setProperty('scid', str(stream['id']))
 
             if 'headers' in stream.keys():
                 headerStr = '|' + urllib.urlencode(stream['headers'])
@@ -1088,8 +1090,8 @@ class KODISCLib(xbmcprovider.XBMCMultiResolverContentProvider):
             xbmcplugin.setResolvedUrl(int(sys.argv[1]), True, li)
         else:
             li = xbmcgui.ListItem(path=item['url'])
-            xbmcplugin.setResolvedUrl(int(sys.argv[1]), False, li)
-            util.debug('[SC] ERR play strem %s' % str(stream))
+            xbmcplugin.setResolvedUrl(int(sys.argv[1]), True, li)
+            util.debug('[SC] play external stream %s' % str(stream))
             pass
 
     def _settings(self):

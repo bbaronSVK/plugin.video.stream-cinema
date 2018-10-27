@@ -605,6 +605,17 @@ class StreamCinemaContentProvider(ContentProvider):
                     pass
                 itm['url'] = self.ws.resolve(ident)
                 try:
+                    data = {
+                        'scid': itm['id'],
+                        'action': 'start',
+                    }
+                    util.debug("[SC] prehravanie %s" % str(data))
+                    sctop.player.scid = itm['id']
+                    sctop.player.action(data)
+                except Exception as e:
+                    util.debug('[SC] nepodarilo sa vykonat akciu "start" %s | %s' % (str(e), str(traceback.format_exc())))
+
+                try:
                     if itm['subs'] is not None and "webshare.cz" in itm['subs']:
                         from urlparse import urlparse
                         import re
@@ -642,7 +653,8 @@ class StreamCinemaContentProvider(ContentProvider):
         if addparams is not None and re.search('resume:false',
                                                sys.argv.get(3)):
             sctop.win.setProperty('sc.resume', 'false')
-        item['url'] = self._url(item['url'])
+        if 'https://' not in item['url'] and 'http://' not in item['url']:
+            item['url'] = self._url(item['url'])
         if sctop.BASE_URL in item['url']:
             try:
                 data = self._json(item['url'])
