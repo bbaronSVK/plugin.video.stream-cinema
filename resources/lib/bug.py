@@ -21,14 +21,13 @@
 import sys
 import traceback as tb
 import random
-
+import inspect
 import xbmcaddon
 import xbmcplugin
 import xbmc
 from xbmcvfs import File as F
 
 import buggalo_client as client
-import buggalo_gui as gui
 
 from sctop import submiturl
 
@@ -122,6 +121,9 @@ def onExceptionRaised(extraData=None):
     if set is not None:
         data['addon']['set'] = str(sett)
 
-    d = gui.BuggaloDialog(SUBMIT_URL, GMAIL_RECIPIENT, heading, data)
-    d.doModal()
-    del d
+    try:
+        frames = inspect.trace()
+        data['addinfo'] = frames
+    except Exception as e:
+        pass
+    client.submitData(SUBMIT_URL, data)

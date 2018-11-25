@@ -154,16 +154,22 @@ class MyPlayer(xbmc.Player):
 
     def tryALang(self, lang):
         if lang == 'SK':
-            alist = ['slo', 'sk', 'slk']
+            alist = ['slo', 'sk', 'slk', 'SK']
         elif lang == 'CZ':
-            alist = ['cze', 'cz', 'ces']
+            alist = ['cze', 'cz', 'ces', 'CZ']
         elif lang == 'EN':
-            alist = ['eng', 'en']
+            alist = ['eng', 'en', 'EN']
         else:
             util.debug("[SC] iny jazyk")
             return False
 
-        streams = self.getAvailableAudioStreams()
+        try:
+            streams = json.loads(self.win.getProperty('linfo'))
+            util.debug('[SC] audio jazyk zo servera: %s' % str(streams))
+        except Exception:
+            streams = self.getAvailableAudioStreams()
+            util.debug('[SC] audio jazyk zo suboru: %s' % str(streams))
+
         util.debug("[SC] zoznam audio: %s | %s" % (str(alist), str(streams)))
         for i in alist:
             if i in streams:

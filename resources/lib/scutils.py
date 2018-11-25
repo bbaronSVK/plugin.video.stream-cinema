@@ -2073,10 +2073,12 @@ class KODISCLib(xbmcprovider.XBMCMultiResolverContentProvider):
                 if ret is not False:
                     util.debug("[SC] dialog resolved url: %s" % str(
                         resolved[ret]['url']))
+                    sctop.win.setProperty('linfo', json.dumps(resolved[ret]['linfo']))
                     return resolved[ret]
                 else:
                     util.debug('[SC] None.........')
                     return None
+            sctop.win.setProperty('linfo', json.dumps(resolved[0]['linfo']))
             return resolved[0]
 
         try:

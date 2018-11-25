@@ -642,7 +642,6 @@ class StreamCinemaContentProvider(ContentProvider):
                            (str(e), str(traceback.format_exc())))
                 bug.onExceptionRaised()
                 pass
-
         itm['title'] = self.parent.encode(itm['title'])
 
         return itm
