@@ -200,14 +200,16 @@ class Skin(BaseSkin):
     Defines parameters that control
     the appearance of PyXBMCt windows and controls.
     """
+
     def __init__(self):
         sdir = xbmc.getSkinDir()
         if 'estuary' in sdir:
             self._estuary = True
         else:
             self._estuary = False
-        self._texture_dir = os.path.join(Addon('script.stream-cinema-wizard').getAddonInfo('path'),
-                                         'resources' , 'lib', 'pyxbmct', 'textures')
+        self._texture_dir = os.path.join(
+            Addon('script.stream-cinema-wizard').getAddonInfo('path'),
+            'resources', 'lib', 'pyxbmct', 'textures')
 
     @property
     def estuary(self):
@@ -328,11 +330,13 @@ class Skin(BaseSkin):
 
     @property
     def close_button_focus(self):
-        return os.path.join(self.images, 'AddonWindow', 'DialogCloseButton-focus.png')
+        return os.path.join(self.images, 'AddonWindow',
+                            'DialogCloseButton-focus.png')
 
     @property
     def close_button_no_focus(self):
-        return os.path.join(self.images, 'AddonWindow', 'DialogCloseButton.png')
+        return os.path.join(self.images, 'AddonWindow',
+                            'DialogCloseButton.png')
 
     @property
     def main_bg_img(self):
