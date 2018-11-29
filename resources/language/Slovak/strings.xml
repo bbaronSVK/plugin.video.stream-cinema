@@ -6,7 +6,7 @@
     <string id="30102">Heslo</string>
     <string id="30103">Trakt</string>
     <string id="30104">Autorizácia...</string>
-    <string id="30105">heslo na webshare nesmie obsahovať diakritiku a špeciálne znaky</string>
+    <string id="30105">heslo na webshare nesmie obsahovať diakritiku ani špeciálne znaky</string>
     <string id="30106">zaregistrovať sa môžete na webshare.cz</string>
     <string id="30107">Spustiť test pripojenia...</string>
     <string id="30109">stream-cinema.online</string>
@@ -74,9 +74,9 @@
     <string id="30609">Ponúkať nasledujúcu epizódu</string>
     <string id="30610">Vyradiť 3D stream</string>
     
-    <string id="30070">Vyľadávanie</string>
+    <string id="30070">Vyhľadávanie</string>
     <string id="30700">Povoliť históriu</string>
-    <string id="30701">Počet položiek v historií</string>
+    <string id="30701">Počet položiek v histórií</string>
 
     <string id="30080">Trakt.tv</string>
     <string id="30800">Používať zbierky</string>
@@ -205,7 +205,7 @@
     <string id="31128">Animovaný</string>
     <string id="31210">Dobrodružný</string>
     <string id="32795">Dokumentárny</string>
-    <string id="31005">Drama</string>
+    <string id="31005">Dráma</string>
     <string id="36160">Erotický</string>
     <string id="90991">Experimentálne</string>
     <string id="31211">Fantasy</string>
@@ -288,7 +288,7 @@
     <string id="95010">Kazachstan</string>
     <string id="36470">Keňa</string>
     <string id="35397">Kolumbia</string>
-    <string id="94782">Lichtenštejnsko</string>
+    <string id="94782">Lichtenštajnsko</string>
     <string id="39282">Litva</string>
     <string id="94247">Lotyšsko</string>
     <string id="35917">Luxembursko</string>
@@ -340,6 +340,6 @@
     <string id="31150">Veľká Británia</string>
     <string id="49263">Venezuela</string>
     <string id="84582">Vietnam</string>
-    <string id="49591">Východné Německo</string>
-    <string id="32966">Západné Německo</string>
+    <string id="49591">Východné Nemecko</string>
+    <string id="32966">Západné Nemecko</string>
 </strings>
