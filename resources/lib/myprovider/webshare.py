@@ -30,6 +30,7 @@ import xbmcgui
 import xbmc
 import json
 
+
 class Webshare():
     def __init__(self, username=None, password=None, cache=None):
         self.username = username.encode('utf-8')
