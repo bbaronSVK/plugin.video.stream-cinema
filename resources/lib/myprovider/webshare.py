@@ -25,9 +25,10 @@ from provider import ResolveException
 import traceback
 import urlparse
 import util
-from resources.lib.sctop import post, checkSupportHTTPS, getSettingAsBool, setSetting, getSetting
+from resources.lib.sctop import post, checkSupportHTTPS, getSettingAsBool, setSetting, getSetting, infoLabel
 import xbmcgui
-
+import xbmc
+import json
 
 class Webshare():
     def __init__(self, username=None, password=None, cache=None):
@@ -56,7 +57,7 @@ class Webshare():
         headers = {
             'X-Requested-With': 'XMLHttpRequest',
             'Accept': 'text/xml; charset=UTF-8',
-            'User-Agent': 'Stream-Cinema',
+            'User-Agent': util.UA,
             'Referer': self.base_url
         }
         req = base.copy()
@@ -270,11 +271,17 @@ class Webshare():
                                    self.username.encode('utf-8'))).hexdigest())
         pass
 
-    def resolve(self, ident):
-        headers, req = self._create_request('/', {
+    def resolve(self, ident, download_type='video_stream'):
+        params = {
             'ident': ident,
-            'wst': self.token
-        })
+            'wst': self.token,
+            'download_type': download_type,
+            'device_uuid': getSetting('uid'),
+            'device_res_x': infoLabel('System.ScreenWidth'),
+            'device_res_y': infoLabel('System.ScreenHeight'),
+        }
+
+        headers, req = self._create_request('/', params)
         util.info(headers)
         util.info(req)
         try:
