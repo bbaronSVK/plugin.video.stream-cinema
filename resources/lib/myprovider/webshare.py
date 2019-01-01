@@ -272,15 +272,19 @@ class Webshare():
                                    self.username.encode('utf-8'))).hexdigest())
         pass
 
-    def resolve(self, ident, download_type='video_stream'):
+    def resolve(self, ident, download_type=None):
         params = {
             'ident': ident,
-            'wst': self.token,
-            'download_type': download_type,
-            'device_uuid': getSetting('uid'),
-            'device_res_x': infoLabel('System.ScreenWidth'),
-            'device_res_y': infoLabel('System.ScreenHeight'),
+            'wst': self.token
         }
+
+        if None is not download_type:
+            params.update({
+                'download_type': download_type,
+                'device_uuid': getSetting('uid'),
+                'device_res_x': infoLabel('System.ScreenWidth'),
+                'device_res_y': infoLabel('System.ScreenHeight'),
+            })
 
         headers, req = self._create_request('/', params)
         util.info(headers)

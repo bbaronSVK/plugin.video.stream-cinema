@@ -609,11 +609,12 @@ class StreamCinemaContentProvider(ContentProvider):
                         sctop.request(self._url('/Stats/file')))
                     if 'ident' in jsdata:
                         sctop.request(
-                            self.ws.resolve(jsdata['ident'], 'file_download'))
+                            self.ws.resolve(jsdata['ident'])
+                        )
                 except Exception as e:
                     pass
 
-                itm['url'] = self.ws.resolve(ident)
+                itm['url'] = self.ws.resolve(ident, 'video_stream')
                 try:
                     data = {
                         'scid': itm['id'],
