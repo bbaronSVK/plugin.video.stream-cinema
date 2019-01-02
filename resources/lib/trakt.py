@@ -503,20 +503,26 @@ def manager(name, trakt, content):
         for lst in lists:
             key = 'trakt.lists.%s.%s.ids' % (lst['ids']['trakt'], content)
             if relevant:
-                ids = _get_cached_ids(key, '/users/me/lists/%s/items/%s' % (lst['ids']['slug'], content))
+                ids = _get_cached_ids(
+                    key, '/users/me/lists/%s/items/%s' % (lst['ids']['slug'],
+                                                          content))
             if not relevant or trakt not in ids:
-                items.append(((sctop.getString(30939) % lst['name']).encode('utf-8'),
-                        '/users/me/lists/%s/items' % lst['ids']['slug'], key))
+                items.append(
+                    ((sctop.getString(30939) % lst['name']).encode('utf-8'),
+                     '/users/me/lists/%s/items' % lst['ids']['slug'], key))
 
             if not relevant or trakt in ids:
-                items.append(((sctop.getString(30940) % lst['name']).encode('utf-8'),
-                        '/users/me/lists/%s/items/remove' % lst['ids']['slug'], key))
+                items.append(
+                    ((sctop.getString(30940) % lst['name']).encode('utf-8'),
+                     '/users/me/lists/%s/items/remove' % lst['ids']['slug'],
+                     key))
 
         items += [(sctop.getString(30938).encode('utf-8'),
                    '/users/me/lists/%s/items')]
 
         if relevant:
-            items.append((sctop.getString(30811).encode('utf-8'), 'clear_cache'))
+            items.append((sctop.getString(30811).encode('utf-8'),
+                          'clear_cache'))
 
         select = sctop.selectDialog([i[0] for i in items],
                                     sctop.getString(30941).encode('utf-8'))
@@ -588,14 +594,14 @@ def manager(name, trakt, content):
                     sctop.cache.set(key, None, expiration=ttl)
 
             result = getTrakt('/users/me/lists')
-            lists  = json.loads(result)
+            lists = json.loads(result)
             for l in lists:
                 for c in contents:
                     key = 'trakt.lists.%s.%s.ids' % (l['ids']['trakt'], c)
                     sctop.cache.set(key, None, expiration=ttl)
 
             message = sctop.getString(30812).encode('utf-8')
-            name    = sctop.getString(30941).encode('utf-8')
+            name = sctop.getString(30941).encode('utf-8')
         else:
             result = getTrakt(items[select][1], post=post)
             key = items[select][2]
@@ -603,7 +609,7 @@ def manager(name, trakt, content):
                 ids = sctop.cache.get(key)
                 if type(ids) is list:
                     if items[select][1][-7:] == '/remove':
-                        ids = [ i for i in ids if i != trakt ]
+                        ids = [i for i in ids if i != trakt]
                     else:
                         ids.append(trakt)
                     sctop.cache.set(key, ids)
@@ -626,12 +632,17 @@ def listAppendToCustom(user, list_id):
     dst_list = lists[select]
     dst_items = _getListItemsForImport(user, list_id)
     result, code, info = getTrakt(
-        '/users/me/lists/%s/items' % dst_list[0], post=dst_items, output="info")
+        '/users/me/lists/%s/items' % dst_list[0],
+        post=dst_items,
+        output="info")
     if code == 201:
         sctop.infoDialog("%s" % dst_list[1],
                          sctop.getString(30969).encode("utf-8"))
         for c in ['shows', 'movies']:
-            sctop.cache.set('trakt.lists.%s.%s' % (dst_list[2], c), None, expiration=timedelta())
+            sctop.cache.set(
+                'trakt.lists.%s.%s' % (dst_list[2], c),
+                None,
+                expiration=timedelta())
     else:
         util.debug(
             '[SC] import to %s failed. %d, %s' % (dst_list[0], code, result))
@@ -915,6 +926,7 @@ def _getListItemsForImport(user, list_id):
         })
     return result
 
+
 def _get_cached_ids(key, url):
     ids = sctop.cache.get(key)
     if type(ids) is not list:
@@ -922,6 +934,7 @@ def _get_cached_ids(key, url):
         ids = [i[i['type']]['ids']['trakt'] for i in json.loads(result)]
         sctop.cache.set(key, ids)
     return ids
+
 
 def _getUserName(user):
     return user['name'] if user['name'] else user['username']
