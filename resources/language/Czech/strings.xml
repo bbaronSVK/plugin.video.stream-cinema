@@ -89,6 +89,7 @@
     <string id="30807">Populární playlisty pod mými seznamy</string>
     <string id="30808">Zobrazit populární seznamy za týden</string>
     <string id="30809">Populární playlisty za týden pod mými seznamy</string>
+    <string id="30810">Zobraziť len relevantné akcie v Správcovi Traktu</string>
 
     <!-- texty v menu -->
     <string id="30901">Filmy</string>
@@ -129,6 +130,8 @@
     <string id="30938">Přidat do [B]nového seznamu[/B]</string>
     <string id="30939">Přidat do [B]%s[/B]</string>
     <string id="30940">Odebrat ze [B]%s[/B]</string>
+    <string id="30811">Vyčistit paměť Správce Traktu</string>
+    <string id="30812">Paměť vyčištena</string>
     
     <string id="30941">Správce Traktu</string>
     
