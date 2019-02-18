@@ -1,3 +1,9 @@
+[B]1.3.13[/B]
+- resolver (cloudflare ochrana)
+- speedtest (mera aj z webshare.cz)
+- statistiky (neposiela donemoty requesty na API)
+- opravene oznacovanie videnych/nevydenych filmov/epizod v KODI 18
+
 [B]1.3.8[/B]
 - upravena praca s ws tokenom
 - prenasanie nastavenia http(s) na webshare

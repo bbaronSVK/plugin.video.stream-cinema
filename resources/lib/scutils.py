@@ -30,7 +30,7 @@ from dialogselect import DialogSelect
 from collections import defaultdict
 from provider import ResolveException
 from datetime import timedelta
-
+from urlparse import urlparse, parse_qs, urlunsplit
 
 class KODISCLib(xbmcprovider.XBMCMultiResolverContentProvider):
     last_run = 0
@@ -818,43 +818,62 @@ class KODISCLib(xbmcprovider.XBMCMultiResolverContentProvider):
                     g(30559),
                     g(30560)
                 ]
-                ret = [1500, 2000]
-                run = 4
+                run = 8
+
                 try:
-                    ret = sctop.dialog.multiselect(
-                        g(30501), x, preselect=[5, 6])
+                    ret = sctop.dialog.select(
+                        g(30501), x)
                 except:
-                    try:
-                        xret = sctop.dialog.select(g(30501), x)
-                        run = 8
-                        ret = [xret]
-                    except:
-                        pass
+                    ret = 2000
+                    pass
+
                 _files = [
                     0, 350, 500, 750, 1000, 1500, 2000, 2500, 3000, 3500, 4000
                 ]
-                out = []
-                for i in ret:
-                    out.append(_files[i])
-                if len(out) < 1:
-                    out = [1500, 2000]
+                # https://webshare.cz/#/group/4le11t36i5/
+                _idents = [
+                    '',
+                    '5ac4wB1iU7',
+                    '73d43j1aDy',
+                    '12r20P3ir2',
+                    '14b1Bc3lg2',
+                    '4P448o4pr5',
+                    'Ik6qg55c6h',
+                    '6j22Kr6L7h',
+                    '1gr7fX6oE7',
+                    '4Xs60K66ei',
+                    '6g03G1Dl1p'
+                ]
+                out = [_files[ret]]
                 from speedtest import speedTest, pretty_speed
                 pg = sctop.progressDialog
                 pg.create(g(30050))
                 pg.update(0)
-                '''
-                wspeedtest = speedTest('speedtest.webshare.cz', run, out)
-                pg.update(10, wspeedtest.host)
-                wsdown = wspeedtest.download()
-                pg.update(50)
-                '''
+
+                # https://vip.3.dl.webshare.cz
+                try:
+                    from myprovider.webshare import Webshare as ws
+                    w = ws(sctop.getSetting('wsuser'), sctop.getSetting('wspass'))
+                    r = w.resolve(_idents[ret])
+                    o = urlparse(r)
+                    pg.update(10)
+                    wspeedtest = speedTest(None, run, out, 'http' if 'http://' in o[0] else 'https')
+                    pg.update(10, 'webshare.cz')
+                    urls = [{'host':o[1], 'url': o[2]} for i in range(run)]
+                    wsdown = wspeedtest.download(urls=urls)
+                    pg.update(50)
+                except Exception as e:
+                    wsdown = 0
+                    util.debug("[SC] ERROR: %s" % str(traceback.format_exc()))
+
                 speedtest = speedTest(None, run, out)
                 pg.update(60, speedtest.host)
                 bedown = speedtest.download()
                 pg.update(100)
                 pg.close()
-                sctop.setSetting('bitrate', int(bedown))
-                sctop.setSetting('bitrateformated', str(pretty_speed(bedown)))
+                if wsdown > 100:
+                    sctop.setSetting('bitrate', int(wsdown))
+                    sctop.setSetting('bitrateformated', str(pretty_speed(wsdown)))
                 if str(params.get('wizard', '')) == '1':
                     sctop.win.setProperty(
                         'scwizard',
@@ -871,7 +890,7 @@ class KODISCLib(xbmcprovider.XBMCMultiResolverContentProvider):
                     return
                 sctop.dialog.ok(
                     g(30050),
-                    "%s: %s" % (speedtest.host, str(pretty_speed(bedown))), '')
+                    "%s: %s" % ('webshare.cz', str(pretty_speed(wsdown))), "%s: %s" % (speedtest.host, str(pretty_speed(bedown))))
                 sctop.openSettings('1.0')
             if action == 'play-force':
                 self.force = True
@@ -1012,7 +1031,7 @@ class KODISCLib(xbmcprovider.XBMCMultiResolverContentProvider):
 
     @bug.buggalo_try_except({'method': 'scutils.play'})
     def play(self, item):
-        util.debug("PLAY ITEM: %s" % str(item))
+        util.debug("[SC] PLAY ITEM: %s" % str(item))
         if 'info' in item and 'force' in item['info'] or 'force' in item:
             self.force = True
         stream = self.resolve(item['url'])
@@ -1054,7 +1073,7 @@ class KODISCLib(xbmcprovider.XBMCMultiResolverContentProvider):
 
             self.setUniq(li, stream)
 
-            util.debug("INFO: %s" % str(self._extract_infolabels(stream)))
+            util.debug("[SC] INFO: %s" % str(self._extract_infolabels(stream)))
 
             if len(il) > 0:  # only set when something was extracted
                 li.setInfo('video', il)
@@ -1076,14 +1095,15 @@ class KODISCLib(xbmcprovider.XBMCMultiResolverContentProvider):
                 pass
 
             try:
-                li.setContentLookup(False)
                 li.setMimeType('application/octet-stream')
+                li.setContentLookup(False)
             except Exception as e:
                 util.debug(
                     "[SC] err content lookup %s" % str(traceback.format_exc()))
-                pass
+
             self.win.setProperty(sctop.__scriptid__, sctop.__scriptid__)
             util.debug("[SC] mozem zacat prehravat %s" % str(stream))
+
             if self.force == True:
                 return xbmc.Player().play(stream['url'], li, False, -1)
             util.debug("[SC] setResolvedUrl")
@@ -1122,6 +1142,9 @@ class KODISCLib(xbmcprovider.XBMCMultiResolverContentProvider):
                     infoLabels[label] = item[label]
                 else:
                     infoLabels[label] = util.decode_html(item[label])
+        if trakt.getTraktCredentialsInfo() != True:
+            return infoLabels
+
         try:
             if item.get('imdb') and int(
                     item.get('imdb')) > 0 and item.get('season') is None:
@@ -1480,7 +1503,8 @@ class KODISCLib(xbmcprovider.XBMCMultiResolverContentProvider):
                         'action': 'ping',
                         'prog': sctop.player.timeRatio()
                     }
-                    sctop.player.action(data)
+                    if bool(xbmc.getCondVisibility("!Player.Paused")) is True:
+                        sctop.player.action(data)
 
                 util.debug(
                     "[SC] upNext [%s] " %

@@ -7,6 +7,7 @@ import sctop
 import math
 import os
 from datetime import datetime, timedelta
+from time import time
 import bug
 import util
 import traceback
@@ -36,6 +37,7 @@ class MyPlayer(xbmc.Player):
             self.stream = None
             self.upNextEnable = True
             self.libItem = None
+            xbmcgui.Window(10000).setProperty('sc.lastAction', '')
         except Exception:
             util.debug("[SC] Chyba MyPlayer: %s" % str(traceback.format_exc()))
 
@@ -451,6 +453,7 @@ class MyPlayer(xbmc.Player):
             return
         util.debug("[SC] Skoncilo sa prehravat")
         self.setWatched()
+        xbmcgui.Window(10000).setProperty('sc.lastAction', '')
         data = {'scid': self.scid, 'action': 'end'}
         self.action(data)
         self.itemDBID = None
@@ -464,6 +467,7 @@ class MyPlayer(xbmc.Player):
         if self.scid is None:
             return
         util.debug("[SC] Stoplo sa prehravanie")
+        xbmcgui.Window(10000).setProperty('sc.lastAction', '')
         data = {'scid': self.scid, 'action': 'stop', 'prog': self.timeRatio()}
 
         util.debug("[SC] DATA: %s" % str(data))
@@ -576,38 +580,45 @@ class MyPlayer(xbmc.Player):
         if self.scid is None:
             util.debug("[SC] nemame scid")
             return
-        url = "%s/Stats" % (sctop.BASE_URL)
+        if data.get('action', None) is None:
+            util.debug("[SC] nemame action")
+            return
+        url = "%s/Stats?action=%s" % (sctop.BASE_URL, data.get('action', 'None'))
         data.update({'est': self.estimateFinishTime})
         data.update({'se': self.se, 'ep': self.ep})
         data.update({'ver': sctop.addonInfo('version')})
-        try:
-            data.update({
-                'state': bool(xbmc.getCondVisibility("!Player.Paused"))
-            })
-            data.update({
-                'ws': xbmcgui.Window(10000).getProperty('ws.ident'),
-                'vip': xbmcgui.Window(10000).getProperty('ws.vip')
-            })
-            data.update({'vd': xbmcgui.Window(10000).getProperty('ws.days')})
-            data.update({'skin': xbmc.getSkinDir()})
-            if 'bitrate' in self.stream:
-                util.debug("[SC] action bitrate")
-                data.update({'bt': self.stream['bitrate']})
-            else:
-                util.debug("[SC] action no bitrate")
-        except:
-            pass
-        try:
-            if self.itemDuration > 0:
-                data.update({'dur': self.itemDuration})
-        except Exception:
-            pass
-        util.debug("[SC] action: %s" % str(data))
-        url = self.parent.provider._url(url)
-        try:
-            sctop.post_json(url, data, {'X-UID': sctop.uid})
-        except:
-            pass
+        lastAction = xbmcgui.Window(10000).getProperty('sc.lastAction')
+        util.debug('[SC] lastAction: %s' % (str(lastAction)))
+        if lastAction == "" or time() - float(lastAction) > 5:
+            xbmcgui.Window(10000).setProperty('sc.lastAction', str(time()))
+            try:
+                data.update({
+                    'state': bool(xbmc.getCondVisibility("!Player.Paused"))
+                })
+                data.update({
+                    'ws': xbmcgui.Window(10000).getProperty('ws.ident'),
+                    'vip': xbmcgui.Window(10000).getProperty('ws.vip')
+                })
+                data.update({'vd': xbmcgui.Window(10000).getProperty('ws.days')})
+                data.update({'skin': xbmc.getSkinDir()})
+                if 'bitrate' in self.stream:
+                    util.debug("[SC] action bitrate")
+                    data.update({'bt': self.stream['bitrate']})
+                else:
+                    util.debug("[SC] action no bitrate")
+            except:
+                pass
+            try:
+                if self.itemDuration > 0:
+                    data.update({'dur': self.itemDuration})
+            except Exception:
+                pass
+            util.debug("[SC] action: %s" % str(data))
+            url = self.parent.provider._url(url)
+            try:
+                sctop.post_json(url, data, {'X-UID': sctop.uid})
+            except:
+                pass
 
     def upNext(self):
         util.debug("[SC] upNext: start")
