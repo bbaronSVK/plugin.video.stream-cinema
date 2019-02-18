@@ -32,6 +32,7 @@ from provider import ResolveException
 from datetime import timedelta
 from urlparse import urlparse, parse_qs, urlunsplit
 
+
 class KODISCLib(xbmcprovider.XBMCMultiResolverContentProvider):
     last_run = 0
     sleep_time = 1000 * 1 * 60
@@ -821,8 +822,7 @@ class KODISCLib(xbmcprovider.XBMCMultiResolverContentProvider):
                 run = 8
 
                 try:
-                    ret = sctop.dialog.select(
-                        g(30501), x)
+                    ret = sctop.dialog.select(g(30501), x)
                 except:
                     ret = 2000
                     pass
@@ -832,17 +832,9 @@ class KODISCLib(xbmcprovider.XBMCMultiResolverContentProvider):
                 ]
                 # https://webshare.cz/#/group/4le11t36i5/
                 _idents = [
-                    '',
-                    '5ac4wB1iU7',
-                    '73d43j1aDy',
-                    '12r20P3ir2',
-                    '14b1Bc3lg2',
-                    '4P448o4pr5',
-                    'Ik6qg55c6h',
-                    '6j22Kr6L7h',
-                    '1gr7fX6oE7',
-                    '4Xs60K66ei',
-                    '6g03G1Dl1p'
+                    '', '5ac4wB1iU7', '73d43j1aDy', '12r20P3ir2', '14b1Bc3lg2',
+                    '4P448o4pr5', 'Ik6qg55c6h', '6j22Kr6L7h', '1gr7fX6oE7',
+                    '4Xs60K66ei', '6g03G1Dl1p'
                 ]
                 out = [_files[ret]]
                 from speedtest import speedTest, pretty_speed
@@ -853,13 +845,16 @@ class KODISCLib(xbmcprovider.XBMCMultiResolverContentProvider):
                 # https://vip.3.dl.webshare.cz
                 try:
                     from myprovider.webshare import Webshare as ws
-                    w = ws(sctop.getSetting('wsuser'), sctop.getSetting('wspass'))
+                    w = ws(
+                        sctop.getSetting('wsuser'), sctop.getSetting('wspass'))
                     r = w.resolve(_idents[ret])
                     o = urlparse(r)
                     pg.update(10)
-                    wspeedtest = speedTest(None, run, out, 'http' if 'http://' in o[0] else 'https')
+                    wspeedtest = speedTest(
+                        None, run, out, 'http'
+                        if 'http://' in o[0] else 'https')
                     pg.update(10, 'webshare.cz')
-                    urls = [{'host':o[1], 'url': o[2]} for i in range(run)]
+                    urls = [{'host': o[1], 'url': o[2]} for i in range(run)]
                     wsdown = wspeedtest.download(urls=urls)
                     pg.update(50)
                 except Exception as e:
@@ -873,7 +868,8 @@ class KODISCLib(xbmcprovider.XBMCMultiResolverContentProvider):
                 pg.close()
                 if wsdown > 100:
                     sctop.setSetting('bitrate', int(wsdown))
-                    sctop.setSetting('bitrateformated', str(pretty_speed(wsdown)))
+                    sctop.setSetting('bitrateformated',
+                                     str(pretty_speed(wsdown)))
                 if str(params.get('wizard', '')) == '1':
                     sctop.win.setProperty(
                         'scwizard',
@@ -890,7 +886,8 @@ class KODISCLib(xbmcprovider.XBMCMultiResolverContentProvider):
                     return
                 sctop.dialog.ok(
                     g(30050),
-                    "%s: %s" % ('webshare.cz', str(pretty_speed(wsdown))), "%s: %s" % (speedtest.host, str(pretty_speed(bedown))))
+                    "%s: %s" % ('webshare.cz', str(pretty_speed(wsdown))),
+                    "%s: %s" % (speedtest.host, str(pretty_speed(bedown))))
                 sctop.openSettings('1.0')
             if action == 'play-force':
                 self.force = True

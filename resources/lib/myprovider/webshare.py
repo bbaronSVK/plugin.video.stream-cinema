@@ -273,10 +273,7 @@ class Webshare():
         pass
 
     def resolve(self, ident, download_type=None):
-        params = {
-            'ident': ident,
-            'wst': self.token
-        }
+        params = {'ident': ident, 'wst': self.token}
 
         if None is not download_type:
             params.update({

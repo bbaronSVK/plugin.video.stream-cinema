@@ -583,7 +583,8 @@ class MyPlayer(xbmc.Player):
         if data.get('action', None) is None:
             util.debug("[SC] nemame action")
             return
-        url = "%s/Stats?action=%s" % (sctop.BASE_URL, data.get('action', 'None'))
+        url = "%s/Stats?action=%s" % (sctop.BASE_URL, data.get(
+            'action', 'None'))
         data.update({'est': self.estimateFinishTime})
         data.update({'se': self.se, 'ep': self.ep})
         data.update({'ver': sctop.addonInfo('version')})
@@ -593,13 +594,18 @@ class MyPlayer(xbmc.Player):
             xbmcgui.Window(10000).setProperty('sc.lastAction', str(time()))
             try:
                 data.update({
-                    'state': bool(xbmc.getCondVisibility("!Player.Paused"))
+                    'state':
+                    bool(xbmc.getCondVisibility("!Player.Paused"))
                 })
                 data.update({
-                    'ws': xbmcgui.Window(10000).getProperty('ws.ident'),
-                    'vip': xbmcgui.Window(10000).getProperty('ws.vip')
+                    'ws':
+                    xbmcgui.Window(10000).getProperty('ws.ident'),
+                    'vip':
+                    xbmcgui.Window(10000).getProperty('ws.vip')
                 })
-                data.update({'vd': xbmcgui.Window(10000).getProperty('ws.days')})
+                data.update({
+                    'vd': xbmcgui.Window(10000).getProperty('ws.days')
+                })
                 data.update({'skin': xbmc.getSkinDir()})
                 if 'bitrate' in self.stream:
                     util.debug("[SC] action bitrate")

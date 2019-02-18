@@ -608,9 +608,7 @@ class StreamCinemaContentProvider(ContentProvider):
                     jsdata = json.loads(
                         sctop.request(self._url('/Stats/file')))
                     if 'ident' in jsdata:
-                        sctop.request(
-                            self.ws.resolve(jsdata['ident'])
-                        )
+                        sctop.request(self.ws.resolve(jsdata['ident']))
                 except Exception as e:
                     pass
 

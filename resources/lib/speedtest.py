@@ -31,7 +31,7 @@ class speedTest():
         'Java/1.6.0_12',
     }
 
-    def __init__(self, host=None, runs=3, size=[1500, 2000], type = 'http'):
+    def __init__(self, host=None, runs=3, size=[1500, 2000], type='http'):
         self._host = host
         self.type = type
         self.runs = runs
@@ -53,7 +53,8 @@ class speedTest():
 
     def connect(self, url):
         try:
-            connection = HTTPConnection(url) if self.type == 'http' else HTTPSConnection(url)
+            connection = HTTPConnection(
+                url) if self.type == 'http' else HTTPSConnection(url)
             connection.connect()
             return connection
         except:
@@ -78,7 +79,8 @@ class speedTest():
                 thread = Thread(
                     target=self.downloadthread,
                     args=(connections[run],
-                          '%s?x=%d' % (current_file, int(time() * 1000)) if urls is None else urls[run]['url']))
+                          '%s?x=%d' % (current_file, int(time() * 1000))
+                          if urls is None else urls[run]['url']))
                 thread.run_number = run + 1
                 thread.start()
                 threads.append(thread)
