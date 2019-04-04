@@ -1,5 +1,0 @@
-\.git
-\.gitignore
-.codeclimate
-.pep8
-.styleci.yml
