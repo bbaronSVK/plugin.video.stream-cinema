@@ -89,6 +89,7 @@
     <string id="30807">Popular Lists below your lists</string>
     <string id="30808">Display Trending Lists</string>
     <string id="30809">Trending Lists below your lists</string>
+    <string id="30810">Show only relevant actions in Trakt Manager</string>
     
     <!-- texty v menu -->
     <string id="30901">Movies</string>
@@ -129,6 +130,8 @@
     <string id="30938">Add to [B]new List[/B]</string>
     <string id="30939">Add to [B]%s[/B]</string>
     <string id="30940">Remove from [B]%s[/B]</string>
+    <string id="30811">Clear Trakt Manager's cache</string>
+    <string id="30812">Cache cleared</string>
     
     <string id="30941">Trakt Manager</string>
     

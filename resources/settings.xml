@@ -103,5 +103,7 @@
         <setting type="sep"/>
         <setting label="30808" id="trakt.trending" type="bool" defult="true"/>
         <setting label="30809" id="trakt.trending-below" type="bool" default="false" visible="eq(-1,true)"/>
+        <setting type="sep"/>
+        <setting label="30810" id="trakt.relevant_menu" type="bool" default="false" />
     </category>
 </settings>
