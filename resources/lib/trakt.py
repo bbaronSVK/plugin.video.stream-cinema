@@ -469,7 +469,7 @@ def manager(name, trakt, content):
         if sctop.getSettingAsBool('trakt.collections'):
             key = 'trakt.collection.%s.ids' % content
             if relevant:
-                ids = _get_cached_ids(key, '/uses/me/collection/%s' % content)
+                ids = _get_cached_ids(key, '/users/me/collection/%s' % content)
 
             if not relevant or trakt not in ids:
                 items = [(sctop.getString(30934).encode('utf-8'),
