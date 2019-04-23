@@ -53,13 +53,12 @@ class StreamCinemaContentProvider(ContentProvider):
     subs = None
 
     def __init__(self, username=None, password=None, filter=None, uid=None):
-        ContentProvider.__init__(
-            self,
-            name='czsklib',
-            base_url=sctop.BASE_URL,
-            username=username,
-            password=password,
-            filter=filter)
+        ContentProvider.__init__(self,
+                                 name='czsklib',
+                                 base_url=sctop.BASE_URL,
+                                 username=username,
+                                 password=password,
+                                 filter=filter)
 
         self.tr = tracker.TrackerInfo().getSystemInfo()
         self.uid = uid
@@ -179,8 +178,8 @@ class StreamCinemaContentProvider(ContentProvider):
             '''
 
         if cl is False and "setPluginCategory" in data:
-            xbmcplugin.setPluginCategory(
-                int(sys.argv[1]), data["setPluginCategory"])
+            xbmcplugin.setPluginCategory(int(sys.argv[1]),
+                                         data["setPluginCategory"])
 
         if cl is False and "addSortMethod" in data:
             xbmcplugin.addSortMethod(
@@ -188,19 +187,18 @@ class StreamCinemaContentProvider(ContentProvider):
 
         if cl is False and data.get('addSortMethods'):
             for m in data.get("addSortMethods"):
-                xbmcplugin.addSortMethod(
-                    int(sys.argv[1]), sctop.sortmethod[int(m)])
+                xbmcplugin.addSortMethod(int(sys.argv[1]),
+                                         sctop.sortmethod[int(m)])
 
         if cl is False and "setPluginFanart" in data:
-            xbmcplugin.setPluginFanart(
-                int(sys.argv[1]), data["setPluginFanart"])
+            xbmcplugin.setPluginFanart(int(sys.argv[1]),
+                                       data["setPluginFanart"])
 
         if cl is False and "version" in data:
-            util.info("[SC] kontrola verzie: %s %s" % (str(
-                sctop.addonInfo('version')), data["version"]))
-            if sctop.addonInfo(
-                    'version') != data["version"] and sctop.getSetting(
-                        'ver') != data['version']:
+            util.info("[SC] kontrola verzie: %s %s" %
+                      (str(sctop.addonInfo('version')), data["version"]))
+            if sctop.addonInfo('version') != data[
+                    "version"] and sctop.getSetting('ver') != data['version']:
                 try:
                     sctop.dialog.ok(
                         sctop.getString(30954),
@@ -230,8 +228,8 @@ class StreamCinemaContentProvider(ContentProvider):
                 ctr = xel.getControl(xel.getFocusId())
                 ctr.selectItem(int(data['focus']))
             except Exception as e:
-                util.debug(
-                    "[SC] error focus :-( %s" % str(traceback.format_exc()))
+                util.debug("[SC] error focus :-( %s" %
+                           str(traceback.format_exc()))
                 pass
 
     @bug.buggalo_try_except({'method': 'scinema.categories'})
@@ -244,8 +242,8 @@ class StreamCinemaContentProvider(ContentProvider):
         return self.items(url)
 
     def _oldapi(self):
-        xbmc.executebuiltin(
-            "Container.Update(plugin://%s)" % (sctop.__scriptid__))
+        xbmc.executebuiltin("Container.Update(plugin://%s)" %
+                            (sctop.__scriptid__))
 
     @bug.buggalo_try_except({'method': 'scinema.get_data_cached'})
     def get_data_cached(self, url, post=False):
@@ -303,16 +301,16 @@ class StreamCinemaContentProvider(ContentProvider):
             return ret
         except Exception as e:
             inet = sctop.getCondVisibility('System.InternetState')
-            util.debug(
-                "[SC] inet scinema status: %s | %s" % (str(inet), str(e)))
+            util.debug("[SC] inet scinema status: %s | %s" %
+                       (str(inet), str(e)))
             if inet is False or inet == 0:
                 HANDLE = int(sys.argv[1])
                 xbmcplugin.endOfDirectory(HANDLE, succeeded=False)
                 sctop.dialog.ok("internet",
                                 'Skontrolujte pripojenie na internet')
                 return False
-            util.error('[SC] ERROR URL: --------- %s --------' % str(
-                traceback.format_exc()))
+            util.error('[SC] ERROR URL: --------- %s --------' %
+                       str(traceback.format_exc()))
             if code is None:
                 sctop.dialog.ok("error", url)
             return False
@@ -567,19 +565,18 @@ class StreamCinemaContentProvider(ContentProvider):
             return None
         if itm.get('provider') == 'plugin.video.online-files':
             if sctop.getSetting('wsuser') == "":
-                res = sctop.yesnoDialog(
-                    sctop.getString(30945), sctop.getString(30946), "")
+                res = sctop.yesnoDialog(sctop.getString(30945),
+                                        sctop.getString(30946), "")
                 if res == True:
                     sctop.openSettings('201.101')
                     return None
             try:
                 from myprovider.webshare import Webshare as wx
-                self.ws = wx(
-                    sctop.getSetting('wsuser'), sctop.getSetting('wspass'),
-                    self.cache)
+                self.ws = wx(sctop.getSetting('wsuser'),
+                             sctop.getSetting('wspass'), self.cache)
                 if not self.ws.login():
-                    res = sctop.yesnoDialog(
-                        sctop.getString(30945), sctop.getString(30946), "")
+                    res = sctop.yesnoDialog(sctop.getString(30945),
+                                            sctop.getString(30946), "")
                     if res == True:
                         sctop.openSettings('201.101')
                     return None
@@ -588,13 +585,12 @@ class StreamCinemaContentProvider(ContentProvider):
                     util.debug("[SC] udata: %s" % str(udata))
                     if udata == False:
                         util.debug("[SC] NIEJE VIP ucet")
-                        sctop.infoDialog(
-                            sctop.getString(30947), icon="WARNING")
+                        sctop.infoDialog(sctop.getString(30947),
+                                         icon="WARNING")
                         sctop.sleep(5000)
                     elif int(udata) <= 14:
-                        sctop.infoDialog(
-                            sctop.getString(30948) % str(udata),
-                            icon="WARNING")
+                        sctop.infoDialog(sctop.getString(30948) % str(udata),
+                                         icon="WARNING")
                         util.debug("[SC] VIP ucet konci")
 
                 try:
@@ -605,8 +601,8 @@ class StreamCinemaContentProvider(ContentProvider):
                     pass
 
                 try:
-                    jsdata = json.loads(
-                        sctop.request(self._url('/Stats/file')))
+                    jsdata = json.loads(sctop.request(
+                        self._url('/Stats/file')))
                     if 'ident' in jsdata:
                         sctop.request(self.ws.resolve(jsdata['ident']))
                 except Exception as e:
@@ -632,15 +628,15 @@ class StreamCinemaContentProvider(ContentProvider):
                         import re
                         o = urlparse(itm['subs'])
                         g = re.split('/', o[2] if o[5] == '' else o[5])
-                        util.debug("[SC] webshare titulky: %s | %s" % (str(
-                            g[2]), itm['subs']))
+                        util.debug("[SC] webshare titulky: %s | %s" %
+                                   (str(g[2]), itm['subs']))
                         url = self.ws.resolve(g[2], 'file_download')
                         itm['subs'] = url
                         content = sctop.request(url)
                         itm['subs'] = self.parent.saveSubtitle(
                             content, 'cs', False)
-                        util.debug(
-                            "[SC] posielam URL na titulky: %s" % itm['subs'])
+                        util.debug("[SC] posielam URL na titulky: %s" %
+                                   itm['subs'])
                 except Exception as e:
                     util.debug("[SC] chyba WS titlkov... %s | %s" %
                                (str(e), str(traceback.format_exc())))

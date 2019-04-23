@@ -185,14 +185,15 @@ class SimpleCache(object):
         '''get reference to our sqllite _database - performs basic integrity check'''
         addon = xbmcaddon.Addon(ADDON_ID)
         dbpath = addon.getAddonInfo('profile')
-        dbfile = xbmc.translatePath(
-            "%s/simplecache.db" % dbpath).decode('utf-8')
+        dbfile = xbmc.translatePath("%s/simplecache.db" %
+                                    dbpath).decode('utf-8')
         if not xbmcvfs.exists(dbpath):
             xbmcvfs.mkdirs(dbpath)
         del addon
         try:
-            connection = sqlite3.connect(
-                dbfile, timeout=30, isolation_level=None)
+            connection = sqlite3.connect(dbfile,
+                                         timeout=30,
+                                         isolation_level=None)
             connection.execute('SELECT * FROM simplecache LIMIT 1')
             return connection
         except Exception as error:
@@ -200,8 +201,9 @@ class SimpleCache(object):
             if xbmcvfs.exists(dbfile):
                 xbmcvfs.delete(dbfile)
             try:
-                connection = sqlite3.connect(
-                    dbfile, timeout=30, isolation_level=None)
+                connection = sqlite3.connect(dbfile,
+                                             timeout=30,
+                                             isolation_level=None)
                 connection.execute("""CREATE TABLE IF NOT EXISTS simplecache(
                     id TEXT UNIQUE, expires INTEGER, data TEXT, checksum INTEGER)"""
                                    )

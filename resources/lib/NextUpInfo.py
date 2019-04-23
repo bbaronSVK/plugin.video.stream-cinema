@@ -138,13 +138,14 @@ class NextUpInfo(xbmcgui.WindowXMLDialog):
         try:
             fanartControl = self.getControl(3005)
             if fanartControl != None:
-                util.debug("[SC] upNext fanart: %s" % fanartimage.replace(
-                    'thetvdb.com', 'stream-cinema.online'))
+                util.debug(
+                    "[SC] upNext fanart: %s" %
+                    fanartimage.replace('thetvdb.com', 'stream-cinema.online'))
                 fanartControl.setImage(
                     fanartimage.replace('thetvdb.com', 'stream-cinema.online'))
             else:
-                util.debug(
-                    "[SC] upNext fanart: NEMAME CONTROL %s" % fanartimage)
+                util.debug("[SC] upNext fanart: NEMAME CONTROL %s" %
+                           fanartimage)
         except:
             pass
 

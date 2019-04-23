@@ -83,11 +83,10 @@ class Webshare():
             headers, req = self._create_request('/', {'wst': self.token})
             try:
                 util.info('[SC] userData menim nastavenie http(s)')
-                data = post(
-                    self._url('api/toggle_https_download/'),
-                    req,
-                    headers=headers,
-                    output="content")
+                data = post(self._url('api/toggle_https_download/'),
+                            req,
+                            headers=headers,
+                            output="content")
                 util.debug('[SC] zmena: %s' % str(data))
             except:
                 self.clearToken()
@@ -117,11 +116,10 @@ class Webshare():
                 # get salt
                 headers, req = self._create_request(
                     '', {'username_or_email': self.username})
-                data = post(
-                    self._url('api/salt/'),
-                    req,
-                    headers=headers,
-                    output="content")
+                data = post(self._url('api/salt/'),
+                            req,
+                            headers=headers,
+                            output="content")
                 util.info('[SC] salt: %s' % str(data))
                 xml = ET.fromstring(str(data))
                 if not xml.find('status').text == 'OK':
@@ -134,18 +132,16 @@ class Webshare():
                     salt = ''
                 # create hashes
                 password = hashlib.sha1(
-                    md5crypt(
-                        self.password.encode('utf-8'),
-                        salt.encode('utf-8'))).hexdigest()
+                    md5crypt(self.password.encode('utf-8'),
+                             salt.encode('utf-8'))).hexdigest()
                 digest = hashlib.md5(
                     self.username.encode('utf-8') + ':Webshare:' +
                     self.password.encode('utf-8')).hexdigest()
                 util.debug('[SC] pass: %s | [%s] digest: %s' %
                            (password,
                             str(
-                                md5crypt(
-                                    self.password.encode('utf-8'),
-                                    salt.encode('utf-8'))), digest))
+                                md5crypt(self.password.encode('utf-8'),
+                                         salt.encode('utf-8'))), digest))
                 # login
                 headers, req = self._create_request(
                     '', {
@@ -154,11 +150,10 @@ class Webshare():
                         'digest': digest,
                         'keep_logged_in': 1
                     })
-                data = post(
-                    self._url('api/login/'),
-                    req,
-                    headers=headers,
-                    output="content")
+                data = post(self._url('api/login/'),
+                            req,
+                            headers=headers,
+                            output="content")
                 xml = ET.fromstring(data)
                 if not xml.find('status').text == 'OK':
                     self.clearToken()
@@ -183,11 +178,10 @@ class Webshare():
                 headers, req = self._create_request('/', {'wst': self.token})
                 try:
                     util.info('[SC] userData')
-                    data = post(
-                        self._url('api/user_data/'),
-                        req,
-                        headers=headers,
-                        output="content")
+                    data = post(self._url('api/user_data/'),
+                                req,
+                                headers=headers,
+                                output="content")
                 except:
                     self.clearToken()
                     return False
@@ -201,8 +195,8 @@ class Webshare():
                 return False
             if all == True:
                 return xml
-            util.debug("[SC] userInfo: %s %s" % (xml.find('ident').text,
-                                                 xml.find('vip').text))
+            util.debug("[SC] userInfo: %s %s" %
+                       (xml.find('ident').text, xml.find('vip').text))
             if xml.find('vip').text == '1':
                 xbmcgui.Window(10000).setProperty('ws.vip', '1')
                 xbmcgui.Window(10000).setProperty('ws.ident',
@@ -219,11 +213,10 @@ class Webshare():
         util.info("[SC] logout")
         headers, req = self._create_request('/', {'wst': self.token})
         try:
-            post(
-                self._url('api/logout/'),
-                req,
-                headers=headers,
-                output="content")
+            post(self._url('api/logout/'),
+                 req,
+                 headers=headers,
+                 output="content")
         except:
             util.debug("[SC] chyba logout")
             pass
@@ -287,16 +280,15 @@ class Webshare():
         util.info(headers)
         util.info(req)
         try:
-            data = post(
-                self._url('api/file_link/'),
-                req,
-                headers=headers,
-                output="content")
+            data = post(self._url('api/file_link/'),
+                        req,
+                        headers=headers,
+                        output="content")
             xml = ET.fromstring(data)
             if not xml.find('status').text == 'OK':
                 self.clearToken()
-                util.error(
-                    '[SC] Server returned error status, response: %s' % data)
+                util.error('[SC] Server returned error status, response: %s' %
+                           data)
                 raise ResolveException(xml.find('message').text)
             return xml.find('link').text
         except Exception as e:

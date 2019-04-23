@@ -47,8 +47,8 @@ except:
     pass
 
 k = KODISCLib(
-    StreamCinemaContentProvider(
-        username=__set__('wsuser'), password=__set__('wspass'), uid=uid),
-    settings, __addon__).service()
+    StreamCinemaContentProvider(username=__set__('wsuser'),
+                                password=__set__('wspass'),
+                                uid=uid), settings, __addon__).service()
 del k
 util.info('[SC] DONE service.py')

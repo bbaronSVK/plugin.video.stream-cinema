@@ -27,8 +27,7 @@ class speedTest():
         'Mozilla/5.0 (Macintosh; Intel Mac OS X 10.10; rv:41.0) Gecko/20100101 Firefox/41.0',
         'Windows':
         'Mozilla/5.0 (Windows NT 6.3; WOW64; rv:41.0) Gecko/20100101 Firefox/41.0',
-        'Java':
-        'Java/1.6.0_12',
+        'Java': 'Java/1.6.0_12',
     }
 
     def __init__(self, host=None, runs=3, size=[1500, 2000], type='http'):
@@ -76,11 +75,10 @@ class speedTest():
         for current_file in self.DOWNLOAD_FILES:
             threads = []
             for run in range(self.runs):
-                thread = Thread(
-                    target=self.downloadthread,
-                    args=(connections[run],
-                          '%s?x=%d' % (current_file, int(time() * 1000))
-                          if urls is None else urls[run]['url']))
+                thread = Thread(target=self.downloadthread,
+                                args=(connections[run], '%s?x=%d' %
+                                      (current_file, int(time() * 1000))
+                                      if urls is None else urls[run]['url']))
                 thread.run_number = run + 1
                 thread.start()
                 threads.append(thread)
@@ -95,8 +93,8 @@ class speedTest():
         total_ms = (time() - total_start_time) * 1000
         for connection in connections:
             connection.close()
-        util.info('[SC] Took %d ms to download %d bytes' % (total_ms,
-                                                            total_downloaded))
+        util.info('[SC] Took %d ms to download %d bytes' %
+                  (total_ms, total_downloaded))
         return total_downloaded * 8000 / total_ms
 
     def ping(self, server=None):

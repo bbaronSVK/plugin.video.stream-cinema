@@ -78,8 +78,8 @@ class MyPlayer(xbmc.Player):
             )
             if self.se is not None and self.se.isdigit(
             ) and self.ep is not None and self.ep.isdigit():
-                util.debug(
-                    "[SC] serial [%s]x[%s]" % (str(self.se), str(self.ep)))
+                util.debug("[SC] serial [%s]x[%s]" %
+                           (str(self.se), str(self.ep)))
                 trakt.markEpisodeAsWatchedT(self.ids, self.se, self.ep)
             else:
                 util.debug("[SC] film")
@@ -129,8 +129,8 @@ class MyPlayer(xbmc.Player):
                     "id": 1
                 }
                 ret = self.executeJSON(metaReq)
-                util.debug(
-                    "[SC] resumepoint: %s %s" % (str(metaReq), str(ret)))
+                util.debug("[SC] resumepoint: %s %s" %
+                           (str(metaReq), str(ret)))
             elif self.itemType == 'movie':
                 metaReq = {
                     "jsonrpc": "2.0",
@@ -145,8 +145,8 @@ class MyPlayer(xbmc.Player):
                     "id": 1
                 }
                 ret = self.executeJSON(metaReq)
-                util.debug(
-                    "[SC] resumepoint: %s %s" % (str(metaReq), str(ret)))
+                util.debug("[SC] resumepoint: %s %s" %
+                           (str(metaReq), str(ret)))
             '''resume = self.parent.getResumePoint()
             resume.update({self.itemDBID: seconds})
             self.parent.setResumePoint(resume)'''
@@ -175,8 +175,8 @@ class MyPlayer(xbmc.Player):
         util.debug("[SC] zoznam audio: %s | %s" % (str(alist), str(streams)))
         for i in alist:
             if i in streams:
-                util.debug(
-                    "[SC] mame audio: %s pre jazyk %s" % (str(i), str(lang)))
+                util.debug("[SC] mame audio: %s pre jazyk %s" %
+                           (str(i), str(lang)))
                 stream_number = streams.index(i)
                 self.setAudioStream(stream_number)
                 return True
@@ -368,23 +368,18 @@ class MyPlayer(xbmc.Player):
                             if 'tvshowid' in m:
                                 self.itemDBID = int(m['tvshowid'])
                                 res = self.executeJSON({
-                                    'jsonrpc':
-                                    '2.0',
-                                    'method':
-                                    'VideoLibrary.GetEpisodes',
+                                    'jsonrpc': '2.0',
+                                    'method': 'VideoLibrary.GetEpisodes',
                                     'params': {
-                                        'tvshowid':
-                                        int(m['tvshowid']),
-                                        'season':
-                                        int(season),
+                                        'tvshowid': int(m['tvshowid']),
+                                        'season': int(season),
                                         'properties':
                                         ['episode', 'file', 'resume'],
                                         'sort': {
                                             'method': 'episode'
                                         }
                                     },
-                                    'id':
-                                    1
+                                    'id': 1
                                 })
                                 util.info("[SC] tvshow json: %s" % str(res))
                                 for e in res['result']['episodes']:
@@ -395,8 +390,8 @@ class MyPlayer(xbmc.Player):
                                 break
 
             except Exception:
-                util.debug(
-                    "[SC] Chyba JSONRPC: %s" % str(traceback.format_exc()))
+                util.debug("[SC] Chyba JSONRPC: %s" %
+                           str(traceback.format_exc()))
                 pass
 
             res = self.executeJSON({
@@ -497,10 +492,10 @@ class MyPlayer(xbmc.Player):
             self.watchedTime = self.getTime()
             self.itemDuration = self.getTotalTime()
         try:
-            util.debug("[SC] watched %f duration %f" % (self.watchedTime,
-                                                        self.itemDuration))
-            return float(
-                "%.3f" % (self.watchedTime / math.floor(self.itemDuration)))
+            util.debug("[SC] watched %f duration %f" %
+                       (self.watchedTime, self.itemDuration))
+            return float("%.3f" %
+                         (self.watchedTime / math.floor(self.itemDuration)))
         except Exception as e:
             util.debug("[SC] timeRatio error")
             util.debug(e)
@@ -593,19 +588,14 @@ class MyPlayer(xbmc.Player):
         if lastAction == "" or time() - float(lastAction) > 5:
             xbmcgui.Window(10000).setProperty('sc.lastAction', str(time()))
             try:
+                data.update(
+                    {'state': bool(xbmc.getCondVisibility("!Player.Paused"))})
                 data.update({
-                    'state':
-                    bool(xbmc.getCondVisibility("!Player.Paused"))
+                    'ws': xbmcgui.Window(10000).getProperty('ws.ident'),
+                    'vip': xbmcgui.Window(10000).getProperty('ws.vip')
                 })
-                data.update({
-                    'ws':
-                    xbmcgui.Window(10000).getProperty('ws.ident'),
-                    'vip':
-                    xbmcgui.Window(10000).getProperty('ws.vip')
-                })
-                data.update({
-                    'vd': xbmcgui.Window(10000).getProperty('ws.days')
-                })
+                data.update(
+                    {'vd': xbmcgui.Window(10000).getProperty('ws.days')})
                 data.update({'skin': xbmc.getSkinDir()})
                 if 'bitrate' in self.stream:
                     util.debug("[SC] action bitrate")
@@ -637,11 +627,12 @@ class MyPlayer(xbmc.Player):
             totalTime = xbmc.Player().getTotalTime()
 
             if self.itemType == 'episode':
-                util.debug("[SC] upNext: mame serial %sx%s" % (str(self.se),
-                                                               str(self.ep)))
+                util.debug("[SC] upNext: mame serial %sx%s" %
+                           (str(self.se), str(self.ep)))
                 provider = self.parent.provider
-                url = provider._url('/upNext/%s/%s/%s' % (str(
-                    self.scid), str(self.se), str(self.ep)))
+                url = provider._url(
+                    '/upNext/%s/%s/%s' %
+                    (str(self.scid), str(self.se), str(self.ep)))
                 util.debug("[SC] upNext URL: %s" % str(url))
                 data = provider._json(url)
                 util.debug("[SC] upNext data: %s" % str(data))

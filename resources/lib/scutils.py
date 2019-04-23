@@ -116,8 +116,9 @@ class KODISCLib(xbmcprovider.XBMCMultiResolverContentProvider):
 
     def endOfDirectory(self, succeeded=True, cacheToDisc=True):
         #util.debug("[SC] endOfDirectory %s %s" % (str(succeeded), str(cacheToDisc)))
-        return xbmcplugin.endOfDirectory(
-            int(sys.argv[1]), succeeded=succeeded, cacheToDisc=cacheToDisc)
+        return xbmcplugin.endOfDirectory(int(sys.argv[1]),
+                                         succeeded=succeeded,
+                                         cacheToDisc=cacheToDisc)
 
     @bug.buggalo_try_except({'method': 'scutils.add_item_to_library'})
     def add_item_to_library(self, item_path, item_url):
@@ -177,8 +178,8 @@ class KODISCLib(xbmcprovider.XBMCMultiResolverContentProvider):
         dialog = xbmcgui.DialogProgress()
         dialog.create('Stream Cinema CZ & SK', 'Add all to library')
 
-        data = self.provider._json(
-            "%s/Lib/%s" % (sctop.BASE_URL, params['id']))
+        data = self.provider._json("%s/Lib/%s" %
+                                   (sctop.BASE_URL, params['id']))
         page = 1
         while data is not None:
             dialog.update(0)
@@ -231,8 +232,8 @@ class KODISCLib(xbmcprovider.XBMCMultiResolverContentProvider):
                     data = None
                 else:
                     data = self.provider._json(
-                        "%s/Lib/%s/?p=%s" % (sctop.BASE_URL, params['id'],
-                                             str(page)))
+                        "%s/Lib/%s/?p=%s" %
+                        (sctop.BASE_URL, params['id'], str(page)))
             else:
                 data = None
 
@@ -271,9 +272,8 @@ class KODISCLib(xbmcprovider.XBMCMultiResolverContentProvider):
             util.debug("[SC] add_item_trakt: %s" % str(params))
             user = params['tu'] if 'tu' in params else 'me'
             __, ids, __ = trakt.getList(params['tl'], user=user)
-            data = self.provider._json(
-                self.provider._url("/Search/getTrakt"),
-                {'ids': json.dumps(ids)})
+            data = self.provider._json(self.provider._url("/Search/getTrakt"),
+                                       {'ids': json.dumps(ids)})
             if 'menu' in data:
                 error = False
                 new = False
@@ -293,8 +293,8 @@ class KODISCLib(xbmcprovider.XBMCMultiResolverContentProvider):
                     try:
                         dialog.update(int(perc), "%s" % (i['title']))
                     except Exception:
-                        util.debug(
-                            '[SC] ERR: %s' % str(traceback.format_exc()))
+                        util.debug('[SC] ERR: %s' %
+                                   str(traceback.format_exc()))
                         pass
                     (e, n) = self.add_item({
                         'notify': False,
@@ -307,8 +307,8 @@ class KODISCLib(xbmcprovider.XBMCMultiResolverContentProvider):
                     self.showNotification(self.getString(30901), 'New content')
                     xbmc.executebuiltin('UpdateLibrary(video)')
                 elif not error:
-                    self.showNotification(
-                        self.getString(30901), 'No new content')
+                    self.showNotification(self.getString(30901),
+                                          'No new content')
                 elif error:
                     self.showNotification('Failed, Please check kodi logs',
                                           'Linking')
@@ -332,8 +332,8 @@ class KODISCLib(xbmcprovider.XBMCMultiResolverContentProvider):
         error = False
         new_items = False
         if data is None:
-            data = self.provider._json(
-                "%s/Lib/%s" % (sctop.BASE_URL, params['id']))
+            data = self.provider._json("%s/Lib/%s" %
+                                       (sctop.BASE_URL, params['id']))
 
         if data is None or 'title' not in data:
             return (True, False)
@@ -347,8 +347,8 @@ class KODISCLib(xbmcprovider.XBMCMultiResolverContentProvider):
             item_path = os.path.join(
                 item_dir, self.normalize_filename(data['title']),
                 self.normalize_filename(data['title'] + '.strm'))
-            (error, new_items) = self.add_item_to_library(
-                item_path, self._link(data))
+            (error,
+             new_items) = self.add_item_to_library(item_path, self._link(data))
         else:
             if not ('notify' in params):
                 self.showNotification(data['title'], 'Checking new content')
@@ -404,8 +404,8 @@ class KODISCLib(xbmcprovider.XBMCMultiResolverContentProvider):
     def canCheck(self, last_run):
         next_check = last_run + (
             (sctop.getSettingAsInt('refresh_time')) * 3600 * 24) + 3600
-        util.debug(
-            "[SC] can check: %d %d" % (int(next_check), int(time.time())))
+        util.debug("[SC] can check: %d %d" %
+                   (int(next_check), int(time.time())))
         return next_check < time.time()
 
     def sinput(self, edit):
@@ -428,11 +428,10 @@ class KODISCLib(xbmcprovider.XBMCMultiResolverContentProvider):
                 params['action'] in [
                 'csearch-remove', 'csearch-edit'
         ]:
-            self.addList(
-                params['id'],
-                params['title'],
-                max=sctop.getSettingAsInt("searchHistoryNum"),
-                removeonly=True)
+            self.addList(params['id'],
+                         params['title'],
+                         max=sctop.getSettingAsInt("searchHistoryNum"),
+                         removeonly=True)
             if params['action'] == 'csearch-remove':
                 xbmc.executebuiltin('Container.Refresh')
                 return
@@ -445,10 +444,9 @@ class KODISCLib(xbmcprovider.XBMCMultiResolverContentProvider):
                 'title' in params and params['title'] == '#'
         ) or sctop.getSettingAsBool("searchHistory") is False or edit is True:
             what = self.sinput(params['title'])
-            self.addList(
-                params['id'],
-                what,
-                max=sctop.getSettingAsInt("searchHistoryNum"))
+            self.addList(params['id'],
+                         what,
+                         max=sctop.getSettingAsInt("searchHistoryNum"))
             params['action'] = 'csearch'
             params['csearch'] = what
             params['title'] = what
@@ -523,8 +521,8 @@ class KODISCLib(xbmcprovider.XBMCMultiResolverContentProvider):
                                 try:
                                     dialog.update(int(perc))
                                 except Exception:
-                                    util.debug('[SC] ERR: %s' % str(
-                                        traceback.format_exc()))
+                                    util.debug('[SC] ERR: %s' %
+                                               str(traceback.format_exc()))
                                     pass
 
                             util.debug("[SC] sub id: %s" % str(iid))
@@ -651,16 +649,17 @@ class KODISCLib(xbmcprovider.XBMCMultiResolverContentProvider):
             if (stream['subs'] == '' or stream['subs'] is None)\
                     and stream['lang'].strip()[:2] not in ['CZ', 'SK']:
                 stream['subs'] = self.findSubtitles(stream)
-            if stream['subs'] == '' or stream['subs'] == 'internal' or stream['subs'] == 'disabled':
+            if stream['subs'] == '' or stream['subs'] == 'internal' or stream[
+                    'subs'] == 'disabled':
                 stream.remove('subs')
             if not stream['subs'] == '' and stream['subs'] is not None:
                 sctop.download(stream['subs'], downloads, name + '.srt',
                                stream['headers'])
             from threading import Thread
             util.debug("[SC] mame co stahovat: %s" % str(stream))
-            worker = Thread(
-                target=sctop.download,
-                args=(stream['url'], downloads, name, stream['headers']))
+            worker = Thread(target=sctop.download,
+                            args=(stream['url'], downloads, name,
+                                  stream['headers']))
             worker.start()
 
     @bug.buggalo_try_except({'method': 'scutils.run_custom'})
@@ -679,8 +678,8 @@ class KODISCLib(xbmcprovider.XBMCMultiResolverContentProvider):
                     sctop.notification('Webshare.cz',
                                        sctop.__language__(30112))
                 except:
-                    util.debug(
-                        '[SC] ERR ws logout: %s' % str(traceback.format_exc()))
+                    util.debug('[SC] ERR ws logout: %s' %
+                               str(traceback.format_exc()))
                     pass
             if action == 'remove-from-sub':
                 subs = self.getSubs()
@@ -715,10 +714,8 @@ class KODISCLib(xbmcprovider.XBMCMultiResolverContentProvider):
             if action == 'last':
                 self.list(
                     self.provider.items(
-                        self.provider._url("/Last/?%s" % urllib.urlencode({
-                            'ids':
-                            json.dumps(self.getList(params['id']))
-                        }))))
+                        self.provider._url("/Last/?%s" % urllib.urlencode(
+                            {'ids': json.dumps(self.getList(params['id']))}))))
                 return self.endOfDirectory()
 
             if action[0:5] == 'trakt':
@@ -752,8 +749,9 @@ class KODISCLib(xbmcprovider.XBMCMultiResolverContentProvider):
                     util.debug("[SC] params: %s" % str(params))
                     content = None if 'content' not in params else params[
                         'content']
-                    content_type, ids, ratings = trakt.getList(
-                        params['id'], content, user=trakt_user)
+                    content_type, ids, ratings = trakt.getList(params['id'],
+                                                               content,
+                                                               user=trakt_user)
                     if len(ids) > 0:
                         data = self.provider._json("/Search/getTrakt",
                                                    {'ids': json.dumps(ids)})
@@ -845,14 +843,14 @@ class KODISCLib(xbmcprovider.XBMCMultiResolverContentProvider):
                 # https://vip.3.dl.webshare.cz
                 try:
                     from myprovider.webshare import Webshare as ws
-                    w = ws(
-                        sctop.getSetting('wsuser'), sctop.getSetting('wspass'))
+                    w = ws(sctop.getSetting('wsuser'),
+                           sctop.getSetting('wspass'))
                     r = w.resolve(_idents[ret])
                     o = urlparse(r)
                     pg.update(10)
                     wspeedtest = speedTest(
-                        None, run, out, 'http'
-                        if 'http://' in o[0] else 'https')
+                        None, run, out,
+                        'http' if 'http://' in o[0] else 'https')
                     pg.update(10, 'webshare.cz')
                     urls = [{'host': o[1], 'url': o[2]} for i in range(run)]
                     wsdown = wspeedtest.download(urls=urls)
@@ -1005,22 +1003,20 @@ class KODISCLib(xbmcprovider.XBMCMultiResolverContentProvider):
                 self.render_dir(item)
             elif item['type'] == 'next':
                 params.update({'list': item['url']})
-                xbmcutil.add_dir(
-                    xbmcutil.__lang__(30007), params,
-                    xbmcutil.icon('next.png'))
+                xbmcutil.add_dir(xbmcutil.__lang__(30007), params,
+                                 xbmcutil.icon('next.png'))
             elif item['type'] == 'prev':
                 params.update({'list': item['url']})
-                xbmcutil.add_dir(
-                    xbmcutil.__lang__(30008), params,
-                    xbmcutil.icon('prev.png'))
+                xbmcutil.add_dir(xbmcutil.__lang__(30008), params,
+                                 xbmcutil.icon('prev.png'))
             elif item['type'] == 'new':
                 params.update({'list': item['url']})
-                xbmcutil.add_dir(
-                    xbmcutil.__lang__(30012), params, xbmcutil.icon('new.png'))
+                xbmcutil.add_dir(xbmcutil.__lang__(30012), params,
+                                 xbmcutil.icon('new.png'))
             elif item['type'] == 'top':
                 params.update({'list': item['url']})
-                xbmcutil.add_dir(
-                    xbmcutil.__lang__(30013), params, xbmcutil.icon('top.png'))
+                xbmcutil.add_dir(xbmcutil.__lang__(30013), params,
+                                 xbmcutil.icon('top.png'))
             elif item['type'] == 'video':
                 self.render_video(item)
             else:
@@ -1053,8 +1049,8 @@ class KODISCLib(xbmcprovider.XBMCMultiResolverContentProvider):
                 if len(headerStr) > 1:
                     stream['url'] += headerStr
             util.debug('Sending %s to player' % stream['url'])
-            li = xbmcgui.ListItem(
-                path=stream['url'], iconImage='DefaulVideo.png')
+            li = xbmcgui.ListItem(path=stream['url'],
+                                  iconImage='DefaulVideo.png')
             util.debug("PLAY::LI::" + str(stream))
             il = self._extract_infolabels(stream)
             if 'dtitle' in item['info']:
@@ -1081,11 +1077,13 @@ class KODISCLib(xbmcprovider.XBMCMultiResolverContentProvider):
                 #util.debug(stream)
                 stream['subs'] = self.findSubtitles(stream)
 
-            if stream['subs'] == '' or stream['subs'] == 'internal' or stream['subs'] == 'disabled':
+            if stream['subs'] == '' or stream['subs'] == 'internal' or stream[
+                    'subs'] == 'disabled':
                 stream.remove('subs')
 
             try:
-                if 'subs' in stream and stream['subs'] != '' and stream['subs'] is not None:
+                if 'subs' in stream and stream['subs'] != '' and stream[
+                        'subs'] is not None:
                     #util.debug("Seturnm titulky: " + str(stream['subs']))
                     li.setSubtitles([stream['subs']])
             except:
@@ -1095,8 +1093,8 @@ class KODISCLib(xbmcprovider.XBMCMultiResolverContentProvider):
                 li.setMimeType('application/octet-stream')
                 li.setContentLookup(False)
             except Exception as e:
-                util.debug(
-                    "[SC] err content lookup %s" % str(traceback.format_exc()))
+                util.debug("[SC] err content lookup %s" %
+                           str(traceback.format_exc()))
 
             self.win.setProperty(sctop.__scriptid__, sctop.__scriptid__)
             util.debug("[SC] mozem zacat prehravat %s" % str(stream))
@@ -1235,8 +1233,9 @@ class KODISCLib(xbmcprovider.XBMCMultiResolverContentProvider):
             infoLabels['title'] = ''
         if logo is None:
             logo = ''
-        liz = xbmcgui.ListItem(
-            name, iconImage='DefaultFolder.png', thumbnailImage=logo)
+        liz = xbmcgui.ListItem(name,
+                               iconImage='DefaultFolder.png',
+                               thumbnailImage=logo)
 
         if 'art' in infoLabels.keys():
             liz.setArt(infoLabels['art'])
@@ -1247,8 +1246,8 @@ class KODISCLib(xbmcprovider.XBMCMultiResolverContentProvider):
             pass
 
         try:
-            liz.setInfo(
-                type='Video', infoLabels=self._extract_infolabels(infoLabels))
+            liz.setInfo(type='Video',
+                        infoLabels=self._extract_infolabels(infoLabels))
         except:
             sys.exc_info()
             util.debug("CHYBA")
@@ -1322,8 +1321,11 @@ class KODISCLib(xbmcprovider.XBMCMultiResolverContentProvider):
                         pass
                 menuItems[ctxtitle] = value
         #util.debug("menuItems: %s" % str(menuItems))
-        self.add_video(
-            title, params, item['img'], infoLabels=item, menuItems=menuItems)
+        self.add_video(title,
+                       params,
+                       item['img'],
+                       infoLabels=item,
+                       menuItems=menuItems)
 
     @bug.buggalo_try_except({'method': 'scutils.getTaraktLastActitivy'})
     def getTraktLastActivity(self, typ='movie'):
@@ -1348,8 +1350,8 @@ class KODISCLib(xbmcprovider.XBMCMultiResolverContentProvider):
                 sctop.traktlistlast = alres
                 res = alres.get(typ)
         except:
-            util.debug('[SC] getTraktLastActivity ERR: %s' % str(
-                traceback.format_exc()))
+            util.debug('[SC] getTraktLastActivity ERR: %s' %
+                       str(traceback.format_exc()))
             pass
         #util.debug('[SC] getTraktLastActivity ret: %s' % str(res) )
         return res
@@ -1366,8 +1368,10 @@ class KODISCLib(xbmcprovider.XBMCMultiResolverContentProvider):
         url = sctop._create_plugin_url(params)
         if logo == '' or logo is None:
             logo = self.noImage
-        li = xbmcgui.ListItem(
-            name, path=url, iconImage='DefaultVideo.png', thumbnailImage=logo)
+        li = xbmcgui.ListItem(name,
+                              path=url,
+                              iconImage='DefaultVideo.png',
+                              thumbnailImage=logo)
         li.setInfo(type='Video', infoLabels=_infoLabels)
         mt = sctop.getMediaType()
         #util.debug("[SC] item media type: %s" % mt)
@@ -1418,8 +1422,10 @@ class KODISCLib(xbmcprovider.XBMCMultiResolverContentProvider):
         if len(items) > 0:
             li.addContextMenuItems(items)
         #xbmc.executebuiltin("Container.SetViewMode(515)")
-        return xbmcplugin.addDirectoryItem(
-            handle=int(sys.argv[1]), url=url, listitem=li, isFolder=False)
+        return xbmcplugin.addDirectoryItem(handle=int(sys.argv[1]),
+                                           url=url,
+                                           listitem=li,
+                                           isFolder=False)
 
     @staticmethod
     def encode(string):
@@ -1503,9 +1509,8 @@ class KODISCLib(xbmcprovider.XBMCMultiResolverContentProvider):
                     if bool(xbmc.getCondVisibility("!Player.Paused")) is True:
                         sctop.player.action(data)
 
-                util.debug(
-                    "[SC] upNext [%s] " %
-                    str((totalTime - playTime) <= int(notificationtime)))
+                util.debug("[SC] upNext [%s] " % str(
+                    (totalTime - playTime) <= int(notificationtime)))
                 showupnext = sctop.getSettingAsBool("show_up_next")
                 if showupnext and totalTime > 0 and (
                         totalTime - playTime) <= int(notificationtime):
@@ -1633,8 +1638,8 @@ class KODISCLib(xbmcprovider.XBMCMultiResolverContentProvider):
             except:
                 pass
 
-            server = xmlrpclib.Server(
-                'http://api.opensubtitles.org/xml-rpc', verbose=0)
+            server = xmlrpclib.Server('http://api.opensubtitles.org/xml-rpc',
+                                      verbose=0)
             token = server.LogIn('', '', 'en', 'XBMC_Subtitles_v1')['token']
             util.debug("[SC] TOKEN: %s" % token)
 
@@ -1642,19 +1647,17 @@ class KODISCLib(xbmcprovider.XBMCMultiResolverContentProvider):
             imdbid = re.sub('[^0-9]', '', imdb)
 
             if season is not None and episode is not None:
-                result = server.SearchSubtitles(
-                    token, [{
-                        'sublanguageid': sublanguageid,
-                        'imdbid': imdbid,
-                        'season': season,
-                        'episode': episode
-                    }])['data']
+                result = server.SearchSubtitles(token, [{
+                    'sublanguageid': sublanguageid,
+                    'imdbid': imdbid,
+                    'season': season,
+                    'episode': episode
+                }])['data']
             else:
-                result = server.SearchSubtitles(
-                    token, [{
-                        'sublanguageid': sublanguageid,
-                        'imdbid': imdbid
-                    }])['data']
+                result = server.SearchSubtitles(token, [{
+                    'sublanguageid': sublanguageid,
+                    'imdbid': imdbid
+                }])['data']
 
             try:
                 vidPath = stream['fname'] if 'fname' in stream else stream[
@@ -1674,25 +1677,23 @@ class KODISCLib(xbmcprovider.XBMCMultiResolverContentProvider):
                                (stream['src'].lower(), stream['grp'].lower()))
                     filter += [
                         i for i in result
-                        if i['SubLanguageID'] == lang and stream['src']
-                        .lower() in i['MovieReleaseName'].lower() and
+                        if i['SubLanguageID'] == lang and stream['src'].lower(
+                        ) in i['MovieReleaseName'].lower() and
                         stream['grp'].lower() in i['MovieReleaseName'].lower()
                     ]
                 if 'grp' in stream:
                     util.debug("[SC] skusam vybrat podla GRP %s" %
                                stream['grp'].lower())
                     filter += [
-                        i for i in result
-                        if i['SubLanguageID'] == lang and stream['grp']
-                        .lower() in i['MovieReleaseName'].lower()
+                        i for i in result if i['SubLanguageID'] == lang and
+                        stream['grp'].lower() in i['MovieReleaseName'].lower()
                     ]
                 if 'src' in stream:
                     util.debug("[SC] skusam vybrat podla SRC %s" %
                                stream['src'].lower())
                     filter += [
-                        i for i in result
-                        if i['SubLanguageID'] == lang and stream['src']
-                        .lower() in i['MovieReleaseName'].lower()
+                        i for i in result if i['SubLanguageID'] == lang and
+                        stream['src'].lower() in i['MovieReleaseName'].lower()
                     ]
 
                 filter += [
@@ -1779,8 +1780,9 @@ class KODISCLib(xbmcprovider.XBMCMultiResolverContentProvider):
     def setSubs(self, subs):
         self.subs = subs
         #util.debug("[SC] set subs %s" % str(subs))
-        self.cache.set(
-            "subscription", repr(subs), expiration=timedelta(days=365))
+        self.cache.set("subscription",
+                       repr(subs),
+                       expiration=timedelta(days=365))
 
     @bug.buggalo_try_except({'method': 'scutils.getResumePoint'})
     def getResumePoint(self):
@@ -1867,15 +1869,15 @@ class KODISCLib(xbmcprovider.XBMCMultiResolverContentProvider):
         if bt > 0 and sctop.getSettingAsBool('bitratefilter'):
             tmp = []
             for s in resolved:
-                util.debug("[SC] bitrate video %s vs %s" % (str(
-                    s.get('bitrate', 0)), str(bt)))
+                util.debug("[SC] bitrate video %s vs %s" %
+                           (str(s.get('bitrate', 0)), str(bt)))
                 if int(s.get('bitrate', 0)) <= bt:
-                    util.debug(
-                        "[SC] pridavam BT %s" % str(s.get('bitrate', 0)))
+                    util.debug("[SC] pridavam BT %s" %
+                               str(s.get('bitrate', 0)))
                     tmp.append(s)
                 else:
-                    util.debug(
-                        "[SC] pomaly net pre BT %s" % str(s.get('bitrate', 0)))
+                    util.debug("[SC] pomaly net pre BT %s" %
+                               str(s.get('bitrate', 0)))
             if len(tmp) >= 1:
                 resolved = tmp
 
@@ -1901,8 +1903,9 @@ class KODISCLib(xbmcprovider.XBMCMultiResolverContentProvider):
                     break
                 for a in alist:
                     if a in s['linfo']:
-                        util.debug("[SC] pridavam stream s audio jazykom %s %s"
-                                   % (str(lang), s['lang']))
+                        util.debug(
+                            "[SC] pridavam stream s audio jazykom %s %s" %
+                            (str(lang), s['lang']))
                         tmp.append(s)
             elif 'lang' in s and s['lang'] != '' and s['lang'] == lang:
                 util.debug("[SC] pridavam stream s jazykom %s" % str(lang))
@@ -2077,14 +2080,13 @@ class KODISCLib(xbmcprovider.XBMCMultiResolverContentProvider):
                         listitem.setProperty("pos", str(p))
                         listing.append(listitem)
 
-                    dialog = DialogSelect(
-                        "DialogSelect.xml",
-                        "",
-                        listing=listing,
-                        windowtitle=resolved[0]['title'],
-                        multiselect=False,
-                        getmorebutton=False,
-                        richlayout=True)
+                    dialog = DialogSelect("DialogSelect.xml",
+                                          "",
+                                          listing=listing,
+                                          windowtitle=resolved[0]['title'],
+                                          multiselect=False,
+                                          getmorebutton=False,
+                                          richlayout=True)
                     dialog.doModal()
                     item = dialog.result
                     del dialog
@@ -2092,8 +2094,8 @@ class KODISCLib(xbmcprovider.XBMCMultiResolverContentProvider):
                         'pos')) if item is not False else False
                 util.debug("[SC] dialog ret: %s" % str(ret))
                 if ret is not False:
-                    util.debug("[SC] dialog resolved url: %s" % str(
-                        resolved[ret]['url']))
+                    util.debug("[SC] dialog resolved url: %s" %
+                               str(resolved[ret]['url']))
                     sctop.win.setProperty('linfo',
                                           json.dumps(resolved[ret]['linfo']))
                     return resolved[ret]

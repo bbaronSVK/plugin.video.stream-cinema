@@ -83,8 +83,8 @@ def notification(header,
                  message,
                  time=5000,
                  icon=__addon__.getAddonInfo('icon')):
-    xbmc.executebuiltin(
-        "XBMC.Notification(%s,%s,%i,%s)" % (header, message, time, icon))
+    xbmc.executebuiltin("XBMC.Notification(%s,%s,%i,%s)" %
+                        (header, message, time, icon))
 
 
 def yesnoDialog(line1,
@@ -351,8 +351,9 @@ def download(url, dest, name, headers={}):
         r = urllib2.urlopen(req)
         total_length = r.info().get('content-length')
         chunk = min(
-            getSettingAsInt('download-buffer') * 1024 * 1024, (1024 * 1024 * 4)
-            if total_length is None else int(int(total_length) / 100))
+            getSettingAsInt('download-buffer') * 1024 * 1024,
+            (1024 * 1024 *
+             4) if total_length is None else int(int(total_length) / 100))
 
         dl = 0
         util.debug("[SC] info: [%s] [%s]" % (str(filename), str(chunk)))
@@ -371,8 +372,8 @@ def download(url, dest, name, headers={}):
                     kbps = int(
                         float(len(data)) / float((t - lastTime) / 1000) / 1024)
                     done = int(100 * int(dl) / int(total_length))
-                    util.debug(
-                        "[SC] ... %s%% [%s]KB/s" % (str(done), str(kbps)))
+                    util.debug("[SC] ... %s%% [%s]KB/s" %
+                               (str(done), str(kbps)))
                     lastTime = t
                     if notifyEnabled and lastNotify != done and (
                             done % notifyPercent) == 0:
@@ -407,8 +408,8 @@ def checkSupportHTTPS(url):
         util.debug('[SC] OK HTTPS')
         return True
     except urllib2.HTTPError:
-        util.debug(
-            '[SC] serverova chyba HTTPS %s' % str(traceback.format_exc()))
+        util.debug('[SC] serverova chyba HTTPS %s' %
+                   str(traceback.format_exc()))
         return True
     except Exception:
         util.debug('[SC] chyba HTTPS %s' % str(traceback.format_exc()))
