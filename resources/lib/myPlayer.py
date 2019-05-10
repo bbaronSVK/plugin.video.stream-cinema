@@ -603,8 +603,7 @@ class MyPlayer(xbmc.Player):
                 'ws': xbmcgui.Window(10000).getProperty('ws.ident'),
                 'vip': xbmcgui.Window(10000).getProperty('ws.vip')
             })
-            data.update(
-                {'vd': xbmcgui.Window(10000).getProperty('ws.days')})
+            data.update({'vd': xbmcgui.Window(10000).getProperty('ws.days')})
             data.update({'skin': xbmc.getSkinDir()})
             if self.stream is not None:
                 if 'bitrate' in self.stream:
@@ -613,12 +612,17 @@ class MyPlayer(xbmc.Player):
                 else:
                     util.debug("[SC] action no bitrate")
                 if 'sid' in self.stream:
-                    util.info('[SC] mame sid <====================================================================================')
+                    util.info(
+                        '[SC] mame sid <===================================================================================='
+                    )
                     data.update({'sid': self.stream['sid']})
                 else:
-                    util.info('[SC] no sid in stream <==================================================================================== %s' % str(self.stream))
+                    util.info(
+                        '[SC] no sid in stream <==================================================================================== %s'
+                        % str(self.stream))
         except Exception as e:
-            util.info('[SC] problem s updatom dat: %s' % str(traceback.format_exc()))
+            util.info('[SC] problem s updatom dat: %s' %
+                      str(traceback.format_exc()))
             pass
         try:
             if self.itemDuration > 0:
