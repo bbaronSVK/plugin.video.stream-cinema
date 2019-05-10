@@ -613,6 +613,7 @@ class StreamCinemaContentProvider(ContentProvider):
                     data = {
                         'scid': itm['id'],
                         'action': 'start',
+                        'sid': itm['sid']
                     }
                     util.debug("[SC] prehravanie %s" % str(data))
                     sctop.player.scid = itm['id']

@@ -26,6 +26,7 @@ class MyPlayer(xbmc.Player):
             self.watchedTime = 0
             self.win = xbmcgui.Window(10000)
             self.scid = None
+            self.sid = None
             self.ids = None
             self.itemDBID = None
             self.itemType = None
@@ -222,6 +223,7 @@ class MyPlayer(xbmc.Player):
             return
         util.debug("[SC] JE to moj plugin ... %s" % str(mojPlugin))
         self.scid = self.win.getProperty('scid')
+        self.sid = self.win.getProperty('sid')
         try:
             self.ids = json.loads(
                 self.win.getProperty('%s.ids' % sctop.__scriptid__))
@@ -241,6 +243,7 @@ class MyPlayer(xbmc.Player):
         self.win.clearProperty('%s.ids' % sctop.__scriptid__)
         self.win.clearProperty('%s.stream' % sctop.__scriptid__)
         self.win.clearProperty('scid')
+        self.win.clearProperty('sid')
         self.win.clearProperty('scresume')
         try:
             if sctop.getSettingAsBool('filter_audio'):
@@ -578,37 +581,55 @@ class MyPlayer(xbmc.Player):
         if data.get('action', None) is None:
             util.debug("[SC] nemame action")
             return
+
+        if self.stream is None:
+            try:
+                stream = json.loads(
+                    self.win.getProperty('%s.stream' % sctop.__scriptid__))
+                util.debug("[SC] stream %s" % str(stream))
+                self.stream = stream
+            except:
+                pass
+
         url = "%s/Stats?action=%s" % (sctop.BASE_URL, data.get(
             'action', 'None'))
         data.update({'est': self.estimateFinishTime})
         data.update({'se': self.se, 'ep': self.ep})
         data.update({'ver': sctop.addonInfo('version')})
-        lastAction = xbmcgui.Window(10000).getProperty('sc.lastAction')
-        util.debug('[SC] lastAction: %s' % (str(lastAction)))
-        if lastAction == "" or time() - float(lastAction) > 5:
-            xbmcgui.Window(10000).setProperty('sc.lastAction', str(time()))
-            try:
-                data.update(
-                    {'state': bool(xbmc.getCondVisibility("!Player.Paused"))})
-                data.update({
-                    'ws': xbmcgui.Window(10000).getProperty('ws.ident'),
-                    'vip': xbmcgui.Window(10000).getProperty('ws.vip')
-                })
-                data.update(
-                    {'vd': xbmcgui.Window(10000).getProperty('ws.days')})
-                data.update({'skin': xbmc.getSkinDir()})
+        try:
+            data.update(
+                {'state': bool(xbmc.getCondVisibility("!Player.Paused"))})
+            data.update({
+                'ws': xbmcgui.Window(10000).getProperty('ws.ident'),
+                'vip': xbmcgui.Window(10000).getProperty('ws.vip')
+            })
+            data.update(
+                {'vd': xbmcgui.Window(10000).getProperty('ws.days')})
+            data.update({'skin': xbmc.getSkinDir()})
+            if self.stream is not None:
                 if 'bitrate' in self.stream:
                     util.debug("[SC] action bitrate")
                     data.update({'bt': self.stream['bitrate']})
                 else:
                     util.debug("[SC] action no bitrate")
-            except:
-                pass
-            try:
-                if self.itemDuration > 0:
-                    data.update({'dur': self.itemDuration})
-            except Exception:
-                pass
+                if 'sid' in self.stream:
+                    util.info('[SC] mame sid <====================================================================================')
+                    data.update({'sid': self.stream['sid']})
+                else:
+                    util.info('[SC] no sid in stream <==================================================================================== %s' % str(self.stream))
+        except Exception as e:
+            util.info('[SC] problem s updatom dat: %s' % str(traceback.format_exc()))
+            pass
+        try:
+            if self.itemDuration > 0:
+                data.update({'dur': self.itemDuration})
+        except Exception:
+            pass
+
+        lastAction = xbmcgui.Window(10000).getProperty('sc.lastAction')
+        util.debug('[SC] lastAction: %s' % (str(lastAction)))
+        if lastAction == "" or time() - float(lastAction) > 5:
+            xbmcgui.Window(10000).setProperty('sc.lastAction', str(time()))
             util.debug("[SC] action: %s" % str(data))
             url = self.parent.provider._url(url)
             try:
