@@ -19,7 +19,11 @@
 # */
 from crypto.md5crypt import md5crypt
 from datetime import timedelta
-import elementtree.ElementTree as ET
+try:
+    import elementtree.ElementTree as ET
+except ImportError:
+    import xml.etree.ElementTree as ET
+
 import hashlib
 from provider import ResolveException
 import traceback
