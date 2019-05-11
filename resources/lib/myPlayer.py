@@ -601,7 +601,8 @@ class MyPlayer(xbmc.Player):
                 {'state': bool(xbmc.getCondVisibility("!Player.Paused"))})
             data.update({
                 'ws': xbmcgui.Window(10000).getProperty('ws.ident'),
-                'vip': xbmcgui.Window(10000).getProperty('ws.vip')
+                'vip': xbmcgui.Window(10000).getProperty('ws.vip'),
+                'vt': xbmcgui.Window(10000).getProperty('ws.viptyp')
             })
             data.update({'vd': xbmcgui.Window(10000).getProperty('ws.days')})
             data.update({'skin': xbmc.getSkinDir()})
