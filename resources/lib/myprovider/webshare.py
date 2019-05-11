@@ -204,12 +204,14 @@ class Webshare():
             if xml.find('vip').text == '1':
                 xbmcgui.Window(10000).setProperty('ws.vip', '1')
                 try:
-                    private_space = int(xml.find('private_space').text) / 1073741824
+                    private_space = int(
+                        xml.find('private_space').text) / 1073741824
                     util.info('[SC] private_space %d' % private_space)
                     viptyp = 4 if private_space > 50 else 3 if private_space >= 50 else 2 if private_space >= 20 else 1
                     xbmcgui.Window(10000).setProperty('ws.viptyp', str(viptyp))
                 except:
-                    util.info('[SC] vip typ error %s ' % str(traceback.format_exc()))
+                    util.info('[SC] vip typ error %s ' %
+                              str(traceback.format_exc()))
                     pass
                 xbmcgui.Window(10000).setProperty('ws.ident',
                                                   xml.find('ident').text)
