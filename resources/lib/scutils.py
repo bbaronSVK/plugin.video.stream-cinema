@@ -1128,7 +1128,7 @@ class KODISCLib(xbmcprovider.XBMCMultiResolverContentProvider):
                 'tagline', 'writer', 'tvshowtitle', 'premiered', 'status',
                 'aired', 'credits', 'lastplayed', 'album', 'artist', 'votes',
                 'trailer', 'dateadded', 'count', 'date', 'imdbnumber',
-                'mediatype'
+                'mediatype', 'castarr'
         ]:
             if label in item.keys():
                 if label == 'cast':
@@ -1387,6 +1387,11 @@ class KODISCLib(xbmcprovider.XBMCMultiResolverContentProvider):
             li.addStreamInfo('subtitle', infoLabels['msubtitle'])
         if 'art' in infoLabels.keys():
             li.setArt(infoLabels['art'])
+        if 'castarr' in infoLabels.keys():
+            util.info('[SC] cast arr')
+            li.setCast(infoLabels['castarr'])
+        else:
+            util.info('[SC] nemame hercov...')
         li.setProperty('IsPlayable', 'true')
         if 'runtime' in infoLabels.keys() and infoLabels['runtime'] > 0:
             duration = int(infoLabels['runtime']) * 60
