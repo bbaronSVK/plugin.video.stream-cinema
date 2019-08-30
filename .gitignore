@@ -1,1 +1,7 @@
 *.pyo
+.idea/inspectionProfiles/profiles_settings.xml
+.idea/misc.xml
+.idea/modules.xml
+.idea/plugin.video.stream-cinema.iml
+.idea/vcs.xml
+.idea

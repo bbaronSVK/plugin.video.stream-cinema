@@ -279,7 +279,7 @@ class MyPlayer(xbmc.Player):
                 title = stream.get('originaltitle')
                 try:
                     imdb = 'tt%07d' % int(stream.get('imdb')) if stream.get(
-                        'imdb').isdigit() else None
+                        'imdb', 0) > 0 else None
                 except:
                     imdb = None
                     util.debug("[SC] imdb %s" % str(traceback.format_exc()))
@@ -294,7 +294,7 @@ class MyPlayer(xbmc.Player):
                 year = xbmc.getInfoLabel('VideoPlayer.Year')
                 title = xbmc.getInfoLabel('VideoPlayer.Title')
                 imdb = xbmc.getInfoLabel(
-                    "VideoPlayer.IMDBNumber")  #"ListItem.IMDBNumber")
+                    "VideoPlayer.IMDBNumber")
 
             if episode is not None:
                 util.debug("[SC] Serial")
@@ -602,7 +602,8 @@ class MyPlayer(xbmc.Player):
             data.update({
                 'ws': xbmcgui.Window(10000).getProperty('ws.ident'),
                 'vip': xbmcgui.Window(10000).getProperty('ws.vip'),
-                'vt': xbmcgui.Window(10000).getProperty('ws.viptyp')
+                'vt': xbmcgui.Window(10000).getProperty('ws.viptyp'),
+                'j': xbmcgui.Window(10000).getProperty('ws.j')
             })
             data.update({'vd': xbmcgui.Window(10000).getProperty('ws.days')})
             data.update({'skin': xbmc.getSkinDir()})

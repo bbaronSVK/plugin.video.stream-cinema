@@ -31,6 +31,7 @@ import json
 from provider import ContentProvider
 from provider import ResolveException
 from urlparse import urlparse, parse_qs, urlunsplit
+from myprovider.webshare import Webshare as wx
 import urllib
 import util
 import xbmcgui
@@ -66,12 +67,13 @@ class StreamCinemaContentProvider(ContentProvider):
             sctop.addonInfo('version'))
         #util.debug("[SC] tr: %s" % str(self.tr))
         self.cache = sctop.cache
+        self.ws = wx(sctop.getSetting('wsuser'),
+                     sctop.getSetting('wspass'), self.cache)
         util.debug("[SC] init cache %s" % self.cache.__class__.__name__)
         util.init_urllib(self.cache)
         cookies = self.cache.get('cookies')
         #if not cookies or len(cookies) == 0:
         #    util.request(self._url(self.base_url))
-        self.ws = None
 
     def capabilities(self):
         return ['resolve', 'categories']  # , 'search']
@@ -151,10 +153,26 @@ class StreamCinemaContentProvider(ContentProvider):
                     pass
             if 'system' in data:
                 self.system(data["system"])
+            if 'filter' in data:
+                try:
+                    skeys = sctop.win.getProperty('sc.filter._keys')
+                    if skeys != '':
+                        fremove = json.loads(skeys)
+                        if fremove is not None:
+                            for i in fremove:
+                                sctop.win.setProperty('sc.filter.%s' % str(i), None)
+                    fkeys = [];
+                    for k, v in data['filter'].items():
+                        if k != 'meta':
+                            fkeys.append(k)
+                            util.debug('[SC] filter %s: %s' % (str(k), str(v)))
+                            sctop.win.setProperty('sc.filter.%s' % str(k), str(v))
+                    sctop.win.setProperty('sc.filter._keys', json.dumps(fkeys))
+                except:
+                    util.debug('[SC] filter err %s' % str(traceback.format_exc()))
         else:
             result = [{'title': 'i failed', 'url': 'failed', 'type': 'dir'}]
             self.parent.endOfDirectory(succeeded=False)
-        #util.debug('--------------------- DONE -----------------')
         return result
 
     @bug.buggalo_try_except({'method': 'scinema.system'})
@@ -571,9 +589,6 @@ class StreamCinemaContentProvider(ContentProvider):
                     sctop.openSettings('201.101')
                     return None
             try:
-                from myprovider.webshare import Webshare as wx
-                self.ws = wx(sctop.getSetting('wsuser'),
-                             sctop.getSetting('wspass'), self.cache)
                 if not self.ws.login():
                     res = sctop.yesnoDialog(sctop.getString(30945),
                                             sctop.getString(30946), "")
