@@ -293,8 +293,7 @@ class MyPlayer(xbmc.Player):
                 showtitle = xbmc.getInfoLabel('VideoPlayer.TVShowTitle')
                 year = xbmc.getInfoLabel('VideoPlayer.Year')
                 title = xbmc.getInfoLabel('VideoPlayer.Title')
-                imdb = xbmc.getInfoLabel(
-                    "VideoPlayer.IMDBNumber")
+                imdb = xbmc.getInfoLabel("VideoPlayer.IMDBNumber")
 
             if episode is not None:
                 util.debug("[SC] Serial")

@@ -67,8 +67,8 @@ class StreamCinemaContentProvider(ContentProvider):
             sctop.addonInfo('version'))
         #util.debug("[SC] tr: %s" % str(self.tr))
         self.cache = sctop.cache
-        self.ws = wx(sctop.getSetting('wsuser'),
-                     sctop.getSetting('wspass'), self.cache)
+        self.ws = wx(sctop.getSetting('wsuser'), sctop.getSetting('wspass'),
+                     self.cache)
         util.debug("[SC] init cache %s" % self.cache.__class__.__name__)
         util.init_urllib(self.cache)
         cookies = self.cache.get('cookies')
@@ -160,16 +160,19 @@ class StreamCinemaContentProvider(ContentProvider):
                         fremove = json.loads(skeys)
                         if fremove is not None:
                             for i in fremove:
-                                sctop.win.setProperty('sc.filter.%s' % str(i), None)
-                    fkeys = [];
+                                sctop.win.setProperty('sc.filter.%s' % str(i),
+                                                      None)
+                    fkeys = []
                     for k, v in data['filter'].items():
                         if k != 'meta':
                             fkeys.append(k)
                             util.debug('[SC] filter %s: %s' % (str(k), str(v)))
-                            sctop.win.setProperty('sc.filter.%s' % str(k), str(v))
+                            sctop.win.setProperty('sc.filter.%s' % str(k),
+                                                  str(v))
                     sctop.win.setProperty('sc.filter._keys', json.dumps(fkeys))
                 except:
-                    util.debug('[SC] filter err %s' % str(traceback.format_exc()))
+                    util.debug('[SC] filter err %s' %
+                               str(traceback.format_exc()))
         else:
             result = [{'title': 'i failed', 'url': 'failed', 'type': 'dir'}]
             self.parent.endOfDirectory(succeeded=False)

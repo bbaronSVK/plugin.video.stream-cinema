@@ -204,13 +204,18 @@ class Webshare():
             if xml.find('vip').text == '1':
                 xbmcgui.Window(10000).setProperty('ws.vip', '1')
                 try:
-                    t = ['credits', 'points', 'files', 'bytes', 'score_files', 'score_bytes', 'private_files',
-                         'private_bytes', 'private_space', 'tester', 'role', 'id'
-                         ]
-                    j = dict((i, xml.find(i).text) for i in t if xml.find(i) is not None)
-                    xbmcgui.Window(10000).setProperty('ws.j', str(json.dumps(j)))
+                    t = [
+                        'credits', 'points', 'files', 'bytes', 'score_files',
+                        'score_bytes', 'private_files', 'private_bytes',
+                        'private_space', 'tester', 'role', 'id'
+                    ]
+                    j = dict((i, xml.find(i).text) for i in t
+                             if xml.find(i) is not None)
+                    xbmcgui.Window(10000).setProperty('ws.j',
+                                                      str(json.dumps(j)))
                 except Exception as e:
-                    util.debug('[SC] chyba pri natiahnuti dat %s' % str(traceback.format_exc()))
+                    util.debug('[SC] chyba pri natiahnuti dat %s' %
+                               str(traceback.format_exc()))
 
                 try:
                     private_space = int(
