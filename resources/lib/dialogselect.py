@@ -9,7 +9,6 @@ from sctop import getCondVisibility
 
 class DialogSelect(xbmcgui.WindowXMLDialog):
     '''Wrapper around Kodi dialogselect to use for the custom skin settings etc.'''
-
     def __init__(self, *args, **kwargs):
         xbmcgui.WindowXMLDialog.__init__(self)
         self.listing = kwargs.get("listing")

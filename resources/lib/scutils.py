@@ -160,8 +160,8 @@ class KODISCLib(xbmcprovider.XBMCMultiResolverContentProvider):
         if 'season' in params:
             arg.update({
                 "play":
-                "/Play/%d/%d/%d" % (int(params['id']), int(params['season']),
-                                    int(params['episode']))
+                "/Play/%d/%d/%d" % (int(params['id']), int(
+                    params['season']), int(params['episode']))
             })
         return sctop._create_plugin_url(arg,
                                         'plugin://%s/' % sctop.__scriptid__)

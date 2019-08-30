@@ -276,10 +276,8 @@ def use_cache(cache_days=14):
         Any method that needs caching just add @use_cache as decorator
         NOTE: use unnamed arguments for calling the method and named arguments for optional settings
     '''
-
     def decorator(func):
         '''our decorator'''
-
         def decorated(*args, **kwargs):
             '''process the original method and apply caching of the results'''
             method_class = args[0]

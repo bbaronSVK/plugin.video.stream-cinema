@@ -524,8 +524,8 @@ def manager(name, trakt, content):
                    '/users/me/lists/%s/items')]
 
         if relevant:
-            items.append((sctop.getString(30811).encode('utf-8'),
-                          'clear_cache'))
+            items.append(
+                (sctop.getString(30811).encode('utf-8'), 'clear_cache'))
 
         select = sctop.selectDialog([i[0] for i in items],
                                     sctop.getString(30941).encode('utf-8'))

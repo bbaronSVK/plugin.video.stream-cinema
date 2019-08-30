@@ -416,10 +416,10 @@ class MyPlayer(xbmc.Player):
                     return
                 util.debug(
                     "[SC] Zacalo sa prehravat: DBID: [%s], SCID: [%s] imdb: %s dur: %s est: %s fi: [%s] | %sx%s - title: %s (year: %s) showtitle: %s"
-                    % (str(self.itemDBID), str(self.scid), str(imdb),
-                       str(self.itemDuration), self.estimateFinishTime,
-                       _filename, str(season), str(episode), str(title),
-                       str(year), str(showtitle)))
+                    % (str(self.itemDBID), str(
+                        self.scid), str(imdb), str(self.itemDuration),
+                       self.estimateFinishTime, _filename, str(season),
+                       str(episode), str(title), str(year), str(showtitle)))
                 data = {
                     'scid': self.scid,
                     'action': 'start',
@@ -691,10 +691,11 @@ class MyPlayer(xbmc.Player):
                     if shouldPlayDefault or shouldPlayNonDefault:
                         self.stop()
                         data.update({'play': data['url'], 'url': data['url']})
-                        pu = sctop._create_plugin_url({
-                            'dtitle': data['title'],
-                            'play': data['url']
-                        }, 'plugin://' + sctop.__scriptid__ + '/')
+                        pu = sctop._create_plugin_url(
+                            {
+                                'dtitle': data['title'],
+                                'play': data['url']
+                            }, 'plugin://' + sctop.__scriptid__ + '/')
                         util.debug("[SC] upNext pluginurl: %s" % str(pu))
                         self.play(pu)
                         return

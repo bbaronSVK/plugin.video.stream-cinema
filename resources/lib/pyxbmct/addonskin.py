@@ -200,7 +200,6 @@ class Skin(BaseSkin):
     Defines parameters that control
     the appearance of PyXBMCt windows and controls.
     """
-
     def __init__(self):
         sdir = xbmc.getSkinDir()
         if 'estuary' in sdir:

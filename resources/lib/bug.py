@@ -67,7 +67,6 @@ def buggalo_try_except(extraData=None):
 
     @param extraData: str or dict
     """
-
     def decorator(fn):
         def wrap_in_try_except(*args, **kwargs):
             try:

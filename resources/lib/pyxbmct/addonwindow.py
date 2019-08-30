@@ -100,7 +100,6 @@ class Label(xbmcgui.ControlLabel):
 
         self.label = Label('Status', angle=45)
     """
-
     def __new__(cls, *args, **kwargs):
         return super(Label, cls).__new__(cls, -10, -10, 1, 1, *args, **kwargs)
 
@@ -126,7 +125,6 @@ class FadeLabel(xbmcgui.ControlFadeLabel):
     
         self.fadelabel = FadeLabel(textColor='0xFFFFFFFF')
     """
-
     def __new__(cls, *args, **kwargs):
         return super(FadeLabel, cls).__new__(cls, -10, -10, 1, 1, *args,
                                              **kwargs)
@@ -152,7 +150,6 @@ class TextBox(xbmcgui.ControlTextBox):
     
         self.textbox = TextBox(textColor='0xFFFFFFFF')
     """
-
     def __new__(cls, *args, **kwargs):
         return super(TextBox, cls).__new__(cls, -10, -10, 1, 1, *args,
                                            **kwargs)
@@ -179,7 +176,6 @@ class Image(xbmcgui.ControlImage):
     
         self.image = Image('d:\images\picture.jpg', aspectRatio=2)
     """
-
     def __new__(cls, *args, **kwargs):
         return super(Image, cls).__new__(cls, -10, -10, 1, 1, *args, **kwargs)
 
@@ -223,7 +219,6 @@ class Button(xbmcgui.ControlButton):
     
         self.button = Button('Status', font='font14')
     """
-
     def __new__(cls, *args, **kwargs):
         textures = {
             'focusTexture':
@@ -270,7 +265,6 @@ class RadioButton(xbmcgui.ControlRadioButton):
     
         self.radiobutton = RadioButton('Status', font='font14')
     """
-
     def __new__(cls, *args, **kwargs):
         if int(xbmc.getInfoLabel('System.BuildVersion')[:2]) >= 13:
             textures = {
@@ -334,7 +328,6 @@ class Edit(xbmcgui.ControlEdit):
     
         self.edit = Edit('Status')
     """
-
     def __new__(cls, *args, **kwargs):
         textures = {
             'focusTexture': os.path.join(skin.images, 'Edit',
@@ -373,7 +366,6 @@ class List(xbmcgui.ControlList):
     
         self.cList = List('font14', space=5)
     """
-
     def __new__(cls, *args, **kwargs):
         textures = {
             'buttonTexture':
@@ -404,7 +396,6 @@ class Slider(xbmcgui.ControlSlider):
     
         self.slider = Slider()
     """
-
     def __new__(cls, *args, **kwargs):
         textures = {
             'textureback':
@@ -431,7 +422,6 @@ class AbstractWindow(object):
 
     .. warning:: This is an abstract class and is not supposed to be instantiated directly!
     """
-
     def __init__(self):
         self.actions_connected = []
         self.controls_connected = []
@@ -717,7 +707,6 @@ class AddonWindow(AbstractWindow):
 
     .. warning:: This is an abstract class and is not supposed to be instantiated directly!
     """
-
     def __init__(self, title=''):
         """Constructor method."""
         super(AddonWindow, self).__init__()
@@ -846,7 +835,6 @@ class AddonWindow(AbstractWindow):
 
 class FullWindowMixin(xbmcgui.Window):
     """An abstract class to define window event processing."""
-
     def onAction(self, action):
         """
         Catch button actions.
@@ -874,7 +862,6 @@ class FullWindowMixin(xbmcgui.Window):
 
 class DialogWindowMixin(xbmcgui.WindowDialog):
     """An abstract class to define window event processing."""
-
     def onAction(self, action):
         """
         Catch button actions.
@@ -941,7 +928,6 @@ class AddonFullWindow(FullWindowMixin, AddonWindow):
         addon.setGeometry(400, 300, 4, 3)
         addon.doModal()
     """
-
     def __new__(cls, title='', *args, **kwargs):
         return super(AddonFullWindow, cls).__new__(cls, *args, **kwargs)
 
