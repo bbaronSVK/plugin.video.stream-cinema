@@ -1,0 +1,1318 @@
+# XBMC Media Center language file
+# Addon Name: Stream Cinema CZ a SK
+# Addon id: plugin.video.stream-cinema
+# Addon version: 1.3.18
+# Addon Provider: bbaron
+msgid ""
+msgstr ""
+"Project-Id-Version: XBMC-Addons\n"
+"Report-Msgid-Bugs-To: alanwww1@xbmc.org\n"
+"POT-Creation-Date: 2019-09-02 16:28+0000\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Language: sk\n"
+"Plural-Forms: nplurals=3; plural=(n==1) ? 0 : (n>=2 && n<=4) ? 1 : 2\n"
+
+msgctxt "Addon Summary"
+msgid "stream-cinema.online - play content from webshare.cz[CR]For proper functioning, it is necessary to [I]register at webshare.cz and have activated VIP[/I]."
+msgstr "stream-cinema.online - prehravanie obsahu z webshare.cz[CR]Pre spravne fungovanie je potrebne sa [I]registrovat na webshare.cz a mat aktivovane VIP[/I]."
+
+msgctxt "Addon Disclaimer"
+msgid "The author of this addon do not host any of the content which is found and have no affiliation with of the content providers. This addon simply search on webshare.cz for content. Use at your own risk!"
+msgstr "Autor tohto addonu nemá žiaden obsah, ktorý sa v ňom nachádza a nemá žiadnu príslušnosť k poskytovateľovi obsahu. Tento addon iba vyhľadá obsah na webshare.cz. Používajte na vlastné riziko!"
+
+msgctxt "#30010"
+msgid "Accounts"
+msgstr "Účty"
+
+msgctxt "#30020"
+msgid "Subtitles"
+msgstr "Titulky"
+
+msgctxt "#30030"
+msgid "Download"
+msgstr "Sťahovanie"
+
+msgctxt "#30040"
+msgid "Subscriptions"
+msgstr "Knižnica"
+
+msgctxt "#30050"
+msgid "SpeedTest"
+msgstr "SpeedTest"
+
+msgctxt "#30060"
+msgid "Aut. stream selection"
+msgstr "Aut. výber streamu"
+
+msgctxt "#30070"
+msgid "Search"
+msgstr "Vyhľadávanie"
+
+msgctxt "#30080"
+msgid "Trakt.tv"
+msgstr "Trakt.tv"
+
+msgctxt "#30100"
+msgid "webshare.cz"
+msgstr "webshare.cz"
+
+msgctxt "#30101"
+msgid "Username"
+msgstr "Login"
+
+msgctxt "#30102"
+msgid "Password"
+msgstr "Heslo"
+
+msgctxt "#30103"
+msgid "Trakt"
+msgstr "Trakt"
+
+msgctxt "#30104"
+msgid "Authorize..."
+msgstr "Autorizácia..."
+
+msgctxt "#30105"
+msgid "webshare password can't contain accents and special characters"
+msgstr "heslo na webshare nesmie obsahovať diakritiku ani špeciálne znaky"
+
+msgctxt "#30106"
+msgid "You can sign up at webshare.cz"
+msgstr "zaregistrovať sa môžete na webshare.cz"
+
+msgctxt "#30107"
+msgid "Run connection test..."
+msgstr "Spustiť test pripojenia..."
+
+msgctxt "#30109"
+msgid "stream-cinema.online"
+msgstr "stream-cinema.online"
+
+msgctxt "#30110"
+msgid "Use SSL"
+msgstr "Použiť SSL"
+
+msgctxt "#30111"
+msgid "Logout from webshare.cz"
+msgstr "Odhlásiť z webshare.cz"
+
+msgctxt "#30112"
+msgid "You are now logged out from webshare.cz"
+msgstr "Odhlásenie z webshare.cz bolo úspešné"
+
+msgctxt "#30113"
+msgid "Update"
+msgstr "Skontrolovať aktualizácie"
+
+msgctxt "#30201"
+msgid "Enable subtitles"
+msgstr "Povoliť titulky"
+
+msgctxt "#30202"
+msgid "Convert subtitles to UTF-8"
+msgstr "Konvertovať titulky do UTF-8"
+
+msgctxt "#30203"
+msgid "Primary Language"
+msgstr "Primárny jazyk"
+
+msgctxt "#30204"
+msgid "Secondary Language"
+msgstr "Sekundárny jazyk"
+
+msgctxt "#30301"
+msgid "Folder for download"
+msgstr "Priečinok pre sťahovanie"
+
+msgctxt "#30302"
+msgid "Show download status"
+msgstr "Zobrazovať stav sťahovania"
+
+msgctxt "#30303"
+msgid " - display notification every"
+msgstr " - zobraziť stav každých"
+
+msgctxt "#30304"
+msgid "Limit download buffer"
+msgstr "Obmedzenie vyrovnávacej pamäte na stiahnutie"
+
+msgctxt "#30311"
+msgid "10%"
+msgstr "10%"
+
+msgctxt "#30312"
+msgid "5%"
+msgstr "5%"
+
+msgctxt "#30313"
+msgid "1%"
+msgstr "1%"
+
+msgctxt "#30314"
+msgid "Downloading"
+msgstr "Sťahujem"
+
+msgctxt "#30315"
+msgid "Done"
+msgstr "Hotovo"
+
+msgctxt "#30316"
+msgid "Error"
+msgstr "Chyba"
+
+msgctxt "#30400"
+msgid "Movies folder"
+msgstr "Priečinok pre filmy"
+
+msgctxt "#30401"
+msgid "TVShow folder"
+msgstr "Priečinok pre seriály"
+
+msgctxt "#30402"
+msgid "Subscription service sleep on start"
+msgstr "Oneskoriť štart služby o (minúty)"
+
+msgctxt "#30403"
+msgid "Default show check time (days)"
+msgstr "Predvolený čas pre obnovu seriálu (dni)"
+
+msgctxt "#30404"
+msgid "Automatically add movies to the library"
+msgstr "Automaticky pridávať filmy do knižnice"
+
+msgctxt "#30405"
+msgid "Check for new episodes"
+msgstr "Skontrolovať nové časti"
+
+msgctxt "#30500"
+msgid "Run internet speed test..."
+msgstr "Spustiť test pripojenia..."
+
+msgctxt "#30501"
+msgid "Select download size"
+msgstr "Vyber sťahované veľkosti súborov"
+
+msgctxt "#30502"
+msgid "Turning on filtering may not show all available content"
+msgstr "Zapnutím filtrovania sa nemusí zobrazovať všetok dostupný obsah"
+
+msgctxt "#30503"
+msgid "Download speed (webshare.cz)"
+msgstr "Nameraná rýchlosť (webshare.cz)"
+
+msgctxt "#30504"
+msgid "Filter stream by download speed"
+msgstr "Filtrovať streamy podľa rýchlosti"
+
+msgctxt "#30551"
+msgid "250KB - slow internet connection"
+msgstr "250KB - pomalé pripojenie"
+
+msgctxt "#30552"
+msgid "500KB"
+msgstr "500KB"
+
+msgctxt "#30553"
+msgid "1MB"
+msgstr "1MB"
+
+msgctxt "#30554"
+msgid "2MB - DSL"
+msgstr "2MB - DSL"
+
+msgctxt "#30555"
+msgid "4.5MB"
+msgstr "4.5MB"
+
+msgctxt "#30556"
+msgid "7.5MB"
+msgstr "7.5MB"
+
+msgctxt "#30557"
+msgid "12MB - fast internet connection"
+msgstr "12MB - rýchle pripojenie"
+
+msgctxt "#30558"
+msgid "17MB"
+msgstr "17MB"
+
+msgctxt "#30559"
+msgid "24MB"
+msgstr "24MB"
+
+msgctxt "#30560"
+msgid "31MB - very fast internet connection"
+msgstr "31MB - optika"
+
+msgctxt "#30600"
+msgid "Enable automatic stream selection"
+msgstr "Povoliť automatický výber streamu"
+
+msgctxt "#30601"
+msgid "Selection priority"
+msgstr "Priorita výberu"
+
+msgctxt "#30602"
+msgid "Filter by audio"
+msgstr "Filtrovať podľa audia"
+
+msgctxt "#30603"
+msgid "Primary language"
+msgstr "Primárny jazyk"
+
+msgctxt "#30604"
+msgid "Secondary language"
+msgstr "Sekundárny jazyk"
+
+msgctxt "#30605"
+msgid "Filter by quality"
+msgstr "Filtrovať podľa kvality"
+
+msgctxt "#30606"
+msgid "Quality"
+msgstr "Vybraná kvalita"
+
+msgctxt "#30607"
+msgid "Remove HEVC stream"
+msgstr "Vyradiť HEVC stream"
+
+msgctxt "#30608"
+msgid "Detailed stream selection"
+msgstr "Detailný výber streamu"
+
+msgctxt "#30609"
+msgid "Show up next episode"
+msgstr "Ponúkať nasledujúcu epizódu"
+
+msgctxt "#30610"
+msgid "Remove 3D stream"
+msgstr "Vyradiť 3D stream"
+
+msgctxt "#30700"
+msgid "Enable history"
+msgstr "Povoliť históriu"
+
+msgctxt "#30701"
+msgid "Items in history"
+msgstr "Počet položiek v histórií"
+
+msgctxt "#30800"
+msgid "Use collection"
+msgstr "Používať zbierky"
+
+msgctxt "#30801"
+msgid "Use watchlist"
+msgstr "Používať zoznam na pozretie"
+
+msgctxt "#30802"
+msgid "Display Friends & Following"
+msgstr "Zobraziť priateľov a sledovaných"
+
+msgctxt "#30803"
+msgid "Friends & Following below your lists"
+msgstr "Priatelia a sledovaní pod mojimi zoznamami"
+
+msgctxt "#30804"
+msgid "Display Liked Lists"
+msgstr "Zobraziť obľúbené zoznamy"
+
+msgctxt "#30805"
+msgid "Liked Lists below your lists"
+msgstr "Obľúbené zoznamy pod mojimi zoznamami"
+
+msgctxt "#30806"
+msgid "Display Popular Lists"
+msgstr "Zobraziť populárne zoznamy"
+
+msgctxt "#30807"
+msgid "Popular Lists below your lists"
+msgstr "Populárne zoznamy pod mojimi zoznamami"
+
+msgctxt "#30808"
+msgid "Display Trending Lists"
+msgstr "Zobraziť populárne zoznamy za týždeň"
+
+msgctxt "#30809"
+msgid "Trending Lists below your lists"
+msgstr "Populárne zoznamy za týždeň pod mojimi zoznamami"
+
+msgctxt "#30810"
+msgid "Show only relevant actions in Trakt Manager"
+msgstr "Zobraziť len relevantné akcie v Správcovi Traktu"
+
+msgctxt "#30811"
+msgid "Clear Trakt Manager's cache"
+msgstr "Vyčistiť pamäť Správcu Traktu"
+
+msgctxt "#30812"
+msgid "Cache cleared"
+msgstr "Pamäť vyčistená"
+
+msgctxt "#30901"
+msgid "Movies"
+msgstr "Filmy"
+
+msgctxt "#30902"
+msgid "Series"
+msgstr "Seriály"
+
+msgctxt "#30903"
+msgid "A-Z"
+msgstr "A-Z"
+
+msgctxt "#30904"
+msgid "New"
+msgstr "Najnovšie"
+
+msgctxt "#30905"
+msgid "Popular"
+msgstr "Populárne"
+
+msgctxt "#30906"
+msgid "Country"
+msgstr "Krajina"
+
+msgctxt "#30907"
+msgid "Quality"
+msgstr "Kvalita"
+
+msgctxt "#30908"
+msgid "Genre"
+msgstr "Žáner"
+
+msgctxt "#30909"
+msgid "Year"
+msgstr "Rok"
+
+msgctxt "#30910"
+msgid "TV today"
+msgstr "TV dnes"
+
+msgctxt "#30911"
+msgid "Monday"
+msgstr "Pondelok"
+
+msgctxt "#30912"
+msgid "Tuesday"
+msgstr "Utorok"
+
+msgctxt "#30913"
+msgid "Wednesday"
+msgstr "Streda"
+
+msgctxt "#30914"
+msgid "Thursday"
+msgstr "Štvrtok"
+
+msgctxt "#30915"
+msgid "Friday"
+msgstr "Piatok"
+
+msgctxt "#30916"
+msgid "Saturday"
+msgstr "Sobota"
+
+msgctxt "#30917"
+msgid "Sunday"
+msgstr "Nedeľa"
+
+msgctxt "#30918"
+msgid "Add new to library"
+msgstr "Pridať nové do knižnice"
+
+msgctxt "#30919"
+msgid "Series"
+msgstr "Séria"
+
+msgctxt "#30920"
+msgid "Latest episodes"
+msgstr "Posledné pridané časti"
+
+msgctxt "#30921"
+msgid "Latest series"
+msgstr "Posledné pridané seriály"
+
+msgctxt "#30922"
+msgid "Settings"
+msgstr "Nastavenia"
+
+msgctxt "#30923"
+msgid "Add to library with subscription"
+msgstr "Pridať do knižnice s odberom"
+
+msgctxt "#30924"
+msgid "Cancel subscription"
+msgstr "Zrušiť odber"
+
+msgctxt "#30925"
+msgid "Library"
+msgstr "Knižnica"
+
+msgctxt "#30926"
+msgid "Add to library (all)"
+msgstr "Pridať do knižnice (všetko)"
+
+msgctxt "#30927"
+msgid "Last seen"
+msgstr "Naposledy sledované"
+
+msgctxt "#30928"
+msgid "TV program"
+msgstr "TV program na 14 dni"
+
+msgctxt "#30929"
+msgid "Latest streams"
+msgstr "Posledné pridané"
+
+msgctxt "#30930"
+msgid "1) Visit: [COLOR skyblue]%s[/COLOR]"
+msgstr "1) Navštívte: [COLOR skyblue]%s[/COLOR]"
+
+msgctxt "#30931"
+msgid "2) When prompted enter [COLOR skyblue]%s[/COLOR]"
+msgstr "2) Po výzve zadajte [COLOR skyblue]%s[/COLOR]"
+
+msgctxt "#30932"
+msgid "An account already exists.[CR]Do you want to reset?"
+msgstr "Účet už je autorizovaný.[CR]Chcete sa odhlásiť?"
+
+msgctxt "#30934"
+msgid "Add to [B]Collection/B]"
+msgstr "Pridať do [B]Zbierky[/B]"
+
+msgctxt "#30935"
+msgid "Remove from [B]Collection[/B]"
+msgstr "Odstrániť zo [B]Zbierky[/B]"
+
+msgctxt "#30936"
+msgid "Add to [B]Watchlist[/B]"
+msgstr "Pridať do [B]Zoznamu na pozretie[/B]"
+
+msgctxt "#30937"
+msgid "Remove from [B]Watchlist[/B]"
+msgstr "Odobrať zo [B]Zoznamu na pozretie[/B]"
+
+msgctxt "#30938"
+msgid "Add to [B]new List[/B]"
+msgstr "Pridať do [B]nového zoznamu[/B]"
+
+msgctxt "#30939"
+msgid "Add to [B]%s[/B]"
+msgstr "Pridať do [B]%s[/B]"
+
+msgctxt "#30940"
+msgid "Remove from [B]%s[/B]"
+msgstr "Odobrať z [B]%s[/B]"
+
+msgctxt "#30941"
+msgid "Trakt Manager"
+msgstr "Správca Traktu"
+
+msgctxt "#30942"
+msgid "Show info"
+msgstr "Zobraz info"
+
+msgctxt "#30943"
+msgid "My lists"
+msgstr "Moje zoznamy"
+
+msgctxt "#30944"
+msgid "Watchlist"
+msgstr "Zoznam na pozretie"
+
+msgctxt "#30945"
+msgid "Failed to sign in to WebShare"
+msgstr "Nepodarilo sa prihlásiť na WebShare.cz"
+
+msgctxt "#30946"
+msgid "Do you want to open the settings?"
+msgstr "Chceš otvoriť nastavenia?"
+
+msgctxt "#30947"
+msgid "You have not an active VIP on WebShare"
+msgstr "Nemáš aktívne VIP na WebShare.cz"
+
+msgctxt "#30948"
+msgid "Remain the only %s of days with WebShare VIP"
+msgstr "Ostáva ti už len %s dní s VIP na WebShare.cz"
+
+msgctxt "#30949"
+msgid "Select stream"
+msgstr "Vybrať stream"
+
+msgctxt "#30950"
+msgid "New"
+msgstr "Novinky"
+
+msgctxt "#30951"
+msgid "People (Movies)"
+msgstr "Ľudia (filmy)"
+
+msgctxt "#30952"
+msgid "People (Series)"
+msgstr "Ľudia (seriály)"
+
+msgctxt "#30953"
+msgid "Search"
+msgstr "Vyhľadávanie"
+
+msgctxt "#30954"
+msgid "New version of plugin"
+msgstr "Nová verzia pluginu"
+
+msgctxt "#30955"
+msgid "New version of plugin (%s) has been uploaded. The plugin needs to be updated to work properly. If you have an automatic update, you can update yourself by clicking OK. If this does not happen, update the plugin manually."
+msgstr "Vyšla nová verzia pluginu (%s). Pre správne fungovanie je potrebné plugin aktualizovať. Ak máte automatickú aktualizaciu, tak sa vám plugin sám aktualizuje po kliknuti na OK. Ak sa tak nestane, aktualizujte plugin ručne."
+
+msgctxt "#30956"
+msgid "Just watching"
+msgstr "Práve sledované"
+
+msgctxt "#30957"
+msgid "Too many requests, please wait (1 min) and try again."
+msgstr "Príliš veľa požiadaviek, prosím počkajte (1 min) a opakujte akciu."
+
+msgctxt "#30958"
+msgid "History"
+msgstr "História"
+
+msgctxt "#30959"
+msgid "Rated Movies"
+msgstr "Ohodnotené filmy"
+
+msgctxt "#30960"
+msgid "Rated Shows"
+msgstr "Ohodnotené seriály"
+
+msgctxt "#30961"
+msgid "Watched Movies"
+msgstr "Pozreté filmy"
+
+msgctxt "#30962"
+msgid "Watched Shows"
+msgstr "Pozreté seriály"
+
+msgctxt "#30963"
+msgid "Friends and Following"
+msgstr "Priatelia a sledovaní"
+
+msgctxt "#30964"
+msgid "Liked Lists"
+msgstr "Obľúbené zoznamy"
+
+msgctxt "#30965"
+msgid "Popular Lists"
+msgstr "Populárne zoznamy"
+
+msgctxt "#30966"
+msgid "Trending Lists"
+msgstr "Populárne zoznamy za tento týždeň"
+
+msgctxt "#30968"
+msgid "Select list where do you want to import items to"
+msgstr "Vyber zoznam, do ktorého chceš pridať položky"
+
+msgctxt "#30969"
+msgid "List items appended to"
+msgstr "Zoznam bol importovaný"
+
+msgctxt "#30970"
+msgid "Are you sure, you want to clone list"
+msgstr "Chceš naklonovať zoznam medzi svoje zoznamy?"
+
+msgctxt "#30972"
+msgid "Are you sure you want to delete your trakt list"
+msgstr "Naozaj chceš odstrániť zoznam"
+
+msgctxt "#30973"
+msgid "List removed"
+msgstr "Zoznam bol odstránený"
+
+msgctxt "#30974"
+msgid "You've unliked a list"
+msgstr "Zoznam odobratý z obľúbených"
+
+msgctxt "#30975"
+msgid "You liked a list"
+msgstr "Zoznam pridaný do obľúbených"
+
+msgctxt "#30976"
+msgid "List cloned"
+msgstr "Zoznam bol naklonovaný"
+
+msgctxt "#30977"
+msgid "Unlike list"
+msgstr "Odobrať z obľúbených (trakt.tv)"
+
+msgctxt "#30978"
+msgid "Like a list"
+msgstr "Pridať medzi obľúbené (trakt.tv)"
+
+msgctxt "#30979"
+msgid "Delete list"
+msgstr "Odstrániť zoznam"
+
+msgctxt "#30980"
+msgid "Clone list"
+msgstr "Klonovať zoznam"
+
+msgctxt "#30981"
+msgid "Import to list"
+msgstr "Importovať do zoznamu"
+
+msgctxt "#30982"
+msgid "next"
+msgstr "ďalšia strana"
+
+msgctxt "#30987"
+msgid "Rating added (%d)"
+msgstr "Hodnotenie odoslané (%d)"
+
+msgctxt "#30988"
+msgid "Rating removed"
+msgstr "Hodnotenie odstránené"
+
+msgctxt "#30989"
+msgid "Rate this"
+msgstr "Ohodnotiť"
+
+msgctxt "#30990"
+msgid "Remove rating"
+msgstr "Odstrániť hodnotenie"
+
+msgctxt "#30991"
+msgid " 1 - Weak sauce :("
+msgstr "  1 - Najhoršie"
+
+msgctxt "#30992"
+msgid " 2 - Terrible"
+msgstr "  2 - Veľmi zlé"
+
+msgctxt "#30993"
+msgid " 3 - Bad"
+msgstr "  3 - Zlé"
+
+msgctxt "#30994"
+msgid " 4 - Poor"
+msgstr "  4 - Podpriemerné"
+
+msgctxt "#30995"
+msgid " 5 - Meh"
+msgstr "  5 - Priemerné"
+
+msgctxt "#30996"
+msgid " 6 - Unrate"
+msgstr "  6 - Prijateľné"
+
+msgctxt "#30997"
+msgid " 7 - Good"
+msgstr "  7 - Dobré"
+
+msgctxt "#30998"
+msgid " 8 - Great"
+msgstr "  8 - Veľmi dobré"
+
+msgctxt "#30999"
+msgid " 9 - Superb"
+msgstr "  9 - Výborné"
+
+msgctxt "#31000"
+msgid "10 - Totally ninja!"
+msgstr "10 - Najlepšie"
+
+msgctxt "#31001"
+msgid "Action"
+msgstr "Akčný"
+
+msgctxt "#31002"
+msgid "Crime"
+msgstr "Krimi"
+
+msgctxt "#31003"
+msgid "Comedy"
+msgstr "Komédia"
+
+msgctxt "#31004"
+msgid "Thriller"
+msgstr "Thriller"
+
+msgctxt "#31005"
+msgid "Drama"
+msgstr "Dráma"
+
+msgctxt "#31035"
+msgid "USA"
+msgstr "USA"
+
+msgctxt "#31060"
+msgid "France"
+msgstr "Francúzsko"
+
+msgctxt "#31061"
+msgid "Greece"
+msgstr "Grécko"
+
+msgctxt "#31062"
+msgid "Russia"
+msgstr "Rusko"
+
+msgctxt "#31063"
+msgid "Western"
+msgstr "Western"
+
+msgctxt "#31086"
+msgid "Romance"
+msgstr "Romantický"
+
+msgctxt "#31100"
+msgid "Sci-Fi"
+msgstr "Sci-Fi"
+
+msgctxt "#31127"
+msgid "Canada"
+msgstr "Kanada"
+
+msgctxt "#31128"
+msgid "Animated"
+msgstr "Animovaný"
+
+msgctxt "#31150"
+msgid "Great Britain"
+msgstr "Veľká Británia"
+
+msgctxt "#31151"
+msgid "Romania"
+msgstr "Rumunsko"
+
+msgctxt "#31152"
+msgid "Switzerland"
+msgstr "Švajčiarsko"
+
+msgctxt "#31153"
+msgid "Mystery"
+msgstr "Mysteriózny"
+
+msgctxt "#31168"
+msgid "Germany"
+msgstr "Nemecko"
+
+msgctxt "#31178"
+msgid "War"
+msgstr "Vojnový"
+
+msgctxt "#31209"
+msgid "Denmark"
+msgstr "Dánsko"
+
+msgctxt "#31210"
+msgid "Adventure"
+msgstr "Dobrodružný"
+
+msgctxt "#31211"
+msgid "Fantasy"
+msgstr "Fantasy"
+
+msgctxt "#31222"
+msgid "South African Republic"
+msgstr "Juhoafrická republika"
+
+msgctxt "#31240"
+msgid "Czech Republic"
+msgstr "Česko"
+
+msgctxt "#31241"
+msgid "Biographical"
+msgstr "Životopisný"
+
+msgctxt "#31242"
+msgid "Historic"
+msgstr "Historický"
+
+msgctxt "#31334"
+msgid "Spain"
+msgstr "Španielsko"
+
+msgctxt "#31335"
+msgid "Mexico"
+msgstr "Mexiko"
+
+msgctxt "#31394"
+msgid "Horor"
+msgstr "Horor"
+
+msgctxt "#31654"
+msgid "Chile"
+msgstr "Chile"
+
+msgctxt "#31665"
+msgid "Hong Kong"
+msgstr "Hong Kong"
+
+msgctxt "#31694"
+msgid "Sports"
+msgstr "Športový"
+
+msgctxt "#31911"
+msgid "Italy"
+msgstr "Taliansko"
+
+msgctxt "#32029"
+msgid "Catastrophic"
+msgstr "Katastrofický"
+
+msgctxt "#32241"
+msgid "Czecho-Slovakia"
+msgstr "Československo"
+
+msgctxt "#32312"
+msgid "Belgium"
+msgstr "Belgicko"
+
+msgctxt "#32368"
+msgid "Family"
+msgstr "Rodinný"
+
+msgctxt "#32369"
+msgid "Musical"
+msgstr "Muzikál"
+
+msgctxt "#32441"
+msgid "India"
+msgstr "India"
+
+msgctxt "#32488"
+msgid "Music"
+msgstr "Hudebné"
+
+msgctxt "#32794"
+msgid "South Korea"
+msgstr "Južná Korea"
+
+msgctxt "#32795"
+msgid "Documentary"
+msgstr "Dokumentárny"
+
+msgctxt "#32806"
+msgid "Brazil"
+msgstr "Brazília"
+
+msgctxt "#32807"
+msgid "Peru"
+msgstr "Peru"
+
+msgctxt "#32820"
+msgid "Fairytale"
+msgstr "Rozprávka"
+
+msgctxt "#32943"
+msgid "Austria"
+msgstr "Rakúsko"
+
+msgctxt "#32966"
+msgid "West Germany"
+msgstr "Západné Nemecko"
+
+msgctxt "#33214"
+msgid "Japan"
+msgstr "Japonsko"
+
+msgctxt "#33446"
+msgid "Hungary"
+msgstr "Maďarsko"
+
+msgctxt "#33581"
+msgid "Psychological"
+msgstr "Psychologický"
+
+msgctxt "#33615"
+msgid "Singapore"
+msgstr "Singapur"
+
+msgctxt "#33623"
+msgid "Slovakia"
+msgstr "Slovensko"
+
+msgctxt "#33832"
+msgid "Netherlands"
+msgstr "Holandsko"
+
+msgctxt "#33878"
+msgid "Australia"
+msgstr "Austrália"
+
+msgctxt "#34001"
+msgid "China"
+msgstr "Čína"
+
+msgctxt "#34626"
+msgid "Iceland"
+msgstr "Island"
+
+msgctxt "#34708"
+msgid "Sweden"
+msgstr "Švédsko"
+
+msgctxt "#34722"
+msgid "Road movie"
+msgstr "Road movie"
+
+msgctxt "#34948"
+msgid "Turkey"
+msgstr "Turecko"
+
+msgctxt "#35100"
+msgid "Ukraine"
+msgstr "Ukrajina"
+
+msgctxt "#35397"
+msgid "Colombia"
+msgstr "Kolumbia"
+
+msgctxt "#35539"
+msgid "The Soviet Union"
+msgstr "Sovietsky zväz"
+
+msgctxt "#35890"
+msgid "Ireland"
+msgstr "Írsko"
+
+msgctxt "#35917"
+msgid "Luxembourg"
+msgstr "Luxembursko"
+
+msgctxt "#36160"
+msgid "Erotic"
+msgstr "Erotický"
+
+msgctxt "#36379"
+msgid "Bahamas"
+msgstr "Bahamy"
+
+msgctxt "#36470"
+msgid "Kenya"
+msgstr "Keňa"
+
+msgctxt "#36570"
+msgid "IMAX"
+msgstr "IMAX"
+
+msgctxt "#36661"
+msgid "Norway"
+msgstr "Norsko"
+
+msgctxt "#37092"
+msgid "The stories"
+msgstr "Poviedkový"
+
+msgctxt "#37250"
+msgid "Yugoslavia"
+msgstr "Fed. rep. Juhoslávia"
+
+msgctxt "#37446"
+msgid "Film-Noir"
+msgstr "Film-Noir"
+
+msgctxt "#38179"
+msgid "Jugoslavia"
+msgstr "Juhoslávia"
+
+msgctxt "#38548"
+msgid "New Zealand"
+msgstr "Nový Zéland"
+
+msgctxt "#38690"
+msgid "Argentina"
+msgstr "Argentina"
+
+msgctxt "#38861"
+msgid "Short"
+msgstr "Krátkometrážny"
+
+msgctxt "#39001"
+msgid "Subtitles could be unavailable or out of sync."
+msgstr "Titulky nemusia byť dostupné alebo synchrónne."
+
+msgctxt "#39002"
+msgid "In that case use your own subtitles."
+msgstr "V tom prípade použite svoje vlastné titulky."
+
+msgctxt "#39282"
+msgid "Lithuania"
+msgstr "Litva"
+
+msgctxt "#40183"
+msgid "Poland"
+msgstr "Poľsko"
+
+msgctxt "#40672"
+msgid "United Arab Emirates"
+msgstr "Spojené arabské emiráty"
+
+msgctxt "#41583"
+msgid "Malaysia"
+msgstr "Malajzia"
+
+msgctxt "#41584"
+msgid "Indonesia"
+msgstr "Indonézia"
+
+msgctxt "#42879"
+msgid "Finland"
+msgstr "Fínsko"
+
+msgctxt "#44656"
+msgid "Poetic"
+msgstr "Poetický"
+
+msgctxt "#45004"
+msgid "Reality-TV"
+msgstr "Reality-TV"
+
+msgctxt "#45920"
+msgid "Dancing"
+msgstr "Tanečný"
+
+msgctxt "#46035"
+msgid "Slovenia"
+msgstr "Slovinsko"
+
+msgctxt "#46295"
+msgid "Bulgaria"
+msgstr "Bulharsko"
+
+msgctxt "#46699"
+msgid "Estonia"
+msgstr "Estonsko"
+
+msgctxt "#46700"
+msgid "Georgia"
+msgstr "Gruzínsko"
+
+msgctxt "#46777"
+msgid "Parable"
+msgstr "Podobenstvo"
+
+msgctxt "#47830"
+msgid "Puppet"
+msgstr "Bábkový"
+
+msgctxt "#48468"
+msgid "Philippines"
+msgstr "Filipíny"
+
+msgctxt "#49113"
+msgid "Portugal"
+msgstr "Portugalsko"
+
+msgctxt "#49263"
+msgid "Venezuela"
+msgstr "Venezuela"
+
+msgctxt "#49447"
+msgid "Thailand"
+msgstr "Thajsko"
+
+msgctxt "#49591"
+msgid "East Germany"
+msgstr "Východné Nemecko"
+
+msgctxt "#49640"
+msgid "Taiwan"
+msgstr "Tchaj-wan"
+
+msgctxt "#49883"
+msgid "Papua New Guinea"
+msgstr "Papua-Nová Guinea"
+
+msgctxt "#51642"
+msgid "Morocco"
+msgstr "Maroko"
+
+msgctxt "#52119"
+msgid "Namibia"
+msgstr "Namíbia"
+
+msgctxt "#52385"
+msgid "Jordan"
+msgstr "Jordánsko"
+
+msgctxt "#52386"
+msgid "Saudi Arabia"
+msgstr "Saudská Arábia"
+
+msgctxt "#52387"
+msgid "Ghana"
+msgstr "Ghana"
+
+msgctxt "#52388"
+msgid "Egypt"
+msgstr "Egypt"
+
+msgctxt "#53919"
+msgid "Malta"
+msgstr "Malta"
+
+msgctxt "#54045"
+msgid "Tanzania"
+msgstr "Tanzánia"
+
+msgctxt "#55947"
+msgid "Puerto Rico"
+msgstr "Portoriko"
+
+msgctxt "#84582"
+msgid "Vietnam"
+msgstr "Vietnam"
+
+msgctxt "#84751"
+msgid "Panama"
+msgstr "Panama"
+
+msgctxt "#85001"
+msgid "Nepal"
+msgstr "Nepál"
+
+msgctxt "#85931"
+msgid "Serbia"
+msgstr "Srbsko"
+
+msgctxt "#86962"
+msgid "Israel"
+msgstr "Izrael"
+
+msgctxt "#87392"
+msgid "Catarrh"
+msgstr "Katar"
+
+msgctxt "#87393"
+msgid "Tunisia"
+msgstr "Tunisko"
+
+msgctxt "#87745"
+msgid "Talk-show"
+msgstr "Talk-show"
+
+msgctxt "#87884"
+msgid "Uruguay"
+msgstr "Uruguay"
+
+msgctxt "#87943"
+msgid "Algeria"
+msgstr "Alžírsko"
+
+msgctxt "#88163"
+msgid "Iran"
+msgstr "Irán"
+
+msgctxt "#88248"
+msgid "Cambodia"
+msgstr "Kambodža"
+
+msgctxt "#88610"
+msgid "Bolivia"
+msgstr "Bolívia"
+
+msgctxt "#88639"
+msgid "Aruba"
+msgstr "Aruba"
+
+msgctxt "#88668"
+msgid "Journalistic"
+msgstr "Publicistický"
+
+msgctxt "#90146"
+msgid "Nigeria"
+msgstr "Nigéria"
+
+msgctxt "#90991"
+msgid "Experimental"
+msgstr "Experimentálne"
+
+msgctxt "#92038"
+msgid "Botswana"
+msgstr "Botswana"
+
+msgctxt "#92437"
+msgid "Croatia"
+msgstr "Chorvátsko"
+
+msgctxt "#93832"
+msgid "Jamaica"
+msgstr "Jamajka"
+
+msgctxt "#94198"
+msgid "Serbia and Montenegro"
+msgstr "Srbsko a Čierna Hora"
+
+msgctxt "#94247"
+msgid "Latvia"
+msgstr "Lotyšsko"
+
+msgctxt "#94596"
+msgid "Palestine"
+msgstr "Palestina"
+
+msgctxt "#94714"
+msgid "Paraguay"
+msgstr "Paraguay"
+
+msgctxt "#94782"
+msgid "Lichtenstein"
+msgstr "Lichtenštajnsko"
+
+msgctxt "#95010"
+msgid "Kazakhstan"
+msgstr "Kazachstan"
+
+msgctxt "#95011"
+msgid "Mongolia"
+msgstr "Mongolsko"
+
+msgctxt "#95050"
+msgid "Bosnia and Herzegovina"
+msgstr "Bosna a Hercegovina"
+
+msgctxt "#95071"
+msgid "Belarus"
+msgstr "Bielorusko"
+
+msgctxt "#96308"
+msgid "Monaco"
+msgstr "Monako"
+
+msgctxt "#97876"
+msgid "Brunei"
+msgstr "Brunej"
+
+msgctxt "#30006"
+msgid "[B]Downloaded files[/B]"
+msgstr "[B]Stiahnuté súbory[/B]"
+
+msgctxt "#30007"
+msgid "You need VIP account"
+msgstr "Potrebujete VIP účet"
+
+msgctxt "#30008"
+msgid "New dubbed"
+msgstr "Novinky dabované"
+
+msgctxt "#30009"
+msgid "Concerts"
+msgstr "Koncerty"
+
+msgctxt "#30010"
+msgid "Lists/Charts"
+msgstr "Seznamy/Žebříčky"
+
+msgctxt "#30011"
+msgid "Collections"
+msgstr "Kolekce"
+
+msgctxt "#30010"
+msgid "Kids"
+msgstr "Pro děti"

@@ -85,6 +85,13 @@ class KODISCLib(xbmcprovider.XBMCMultiResolverContentProvider):
                 self._parse_settings(b['items'])
         util.info('--------------------------------------------------------')
 
+    def root(self):
+        if not '!download' in self.provider.capabilities():
+            xbmcutil.add_local_dir(self.getString(30006), self.settings[
+                                   'downloads'], xbmcutil.icon('download.png'))
+        self.list(self.provider.categories())
+        return xbmcplugin.endOfDirectory(int(sys.argv[1]))
+
     @bug.buggalo_try_except({'method': 'scutils.run'})
     def run(self, params):
         if params == {} or params == self.params():
@@ -640,11 +647,11 @@ class KODISCLib(xbmcprovider.XBMCMultiResolverContentProvider):
     def download(self, item):
         userData = self.provider.ws.userData(True)
         if userData.find('vip') is None or userData.find('vip').text != '1':
-            sctop.dialog.ok(self.provider.name, 'You need VIP account')
+            self.showNotification(self.provider.name, self.getString(30007))
             return
         downloads = sctop.getSetting('downloads')
         if '' == downloads:
-            sctop.dialog.ok(self.provider.name, xbmcutil.__lang__(30009))
+            sctop.dialog.ok(self.provider.name, self.getString(30009))
             return
         stream = self.resolve(item['url'])
         if stream is not None and stream is not False:
@@ -1007,19 +1014,19 @@ class KODISCLib(xbmcprovider.XBMCMultiResolverContentProvider):
                 self.render_dir(item)
             elif item['type'] == 'next':
                 params.update({'list': item['url']})
-                xbmcutil.add_dir(xbmcutil.__lang__(30007), params,
+                xbmcutil.add_dir(self.getString(30007), params,
                                  xbmcutil.icon('next.png'))
             elif item['type'] == 'prev':
                 params.update({'list': item['url']})
-                xbmcutil.add_dir(xbmcutil.__lang__(30008), params,
+                xbmcutil.add_dir(self.getString(30008), params,
                                  xbmcutil.icon('prev.png'))
             elif item['type'] == 'new':
                 params.update({'list': item['url']})
-                xbmcutil.add_dir(xbmcutil.__lang__(30012), params,
+                xbmcutil.add_dir(self.getString(30012), params,
                                  xbmcutil.icon('new.png'))
             elif item['type'] == 'top':
                 params.update({'list': item['url']})
-                xbmcutil.add_dir(xbmcutil.__lang__(30013), params,
+                xbmcutil.add_dir(self.getString(30013), params,
                                  xbmcutil.icon('top.png'))
             elif item['type'] == 'video':
                 self.render_video(item)
