@@ -87,8 +87,9 @@ class KODISCLib(xbmcprovider.XBMCMultiResolverContentProvider):
 
     def root(self):
         if not '!download' in self.provider.capabilities():
-            xbmcutil.add_local_dir(self.getString(30006), self.settings[
-                                   'downloads'], xbmcutil.icon('download.png'))
+            xbmcutil.add_local_dir(self.getString(30006),
+                                   self.settings['downloads'],
+                                   xbmcutil.icon('download.png'))
         self.list(self.provider.categories())
         return xbmcplugin.endOfDirectory(int(sys.argv[1]))
 
