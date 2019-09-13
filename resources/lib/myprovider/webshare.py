@@ -177,6 +177,9 @@ class Webshare():
 
     def userData(self, all=False):
         self.getToken()
+        if self.token is None:
+            self.login()
+
         if self.token is not None:
             if self._userData is None:
                 headers, req = self._create_request('/', {'wst': self.token})
@@ -207,7 +210,8 @@ class Webshare():
                     t = [
                         'credits', 'points', 'files', 'bytes', 'score_files',
                         'score_bytes', 'private_files', 'private_bytes',
-                        'private_space', 'tester', 'role', 'id'
+                        'private_space', 'tester', 'role', 'id', 'username',
+                        'email'
                     ]
                     j = dict((i, xml.find(i).text) for i in t
                              if xml.find(i) is not None)

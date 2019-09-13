@@ -151,17 +151,22 @@ class StreamCinemaContentProvider(ContentProvider):
                     result.append(item)
                 except Exception:
                     pass
+            try:
+                skeys = sctop.win.getProperty('sc.filter._keys')
+                if skeys != '':
+                    fremove = json.loads(skeys)
+                    if fremove is not None:
+                        for i in fremove:
+                            util.debug('[SC] remove filter %s' % str(i))
+                            sctop.win.clearProperty('sc.filter.%s' % str(i))
+                sctop.win.clearProperty('sc.filter._keys')
+            except:
+                sctop.win.clearProperty('sc.filter._keys')
+                pass
             if 'system' in data:
                 self.system(data["system"])
             if 'filter' in data:
                 try:
-                    skeys = sctop.win.getProperty('sc.filter._keys')
-                    if skeys != '':
-                        fremove = json.loads(skeys)
-                        if fremove is not None:
-                            for i in fremove:
-                                sctop.win.setProperty('sc.filter.%s' % str(i),
-                                                      None)
                     fkeys = []
                     for k, v in data['filter'].items():
                         if k != 'meta':
@@ -171,6 +176,7 @@ class StreamCinemaContentProvider(ContentProvider):
                                                   str(v))
                     sctop.win.setProperty('sc.filter._keys', json.dumps(fkeys))
                 except:
+                    sctop.win.clearProperty('sc.filter._keys')
                     util.debug('[SC] filter err %s' %
                                str(traceback.format_exc()))
         else:

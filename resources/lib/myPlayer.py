@@ -590,6 +590,9 @@ class MyPlayer(xbmc.Player):
             except:
                 pass
 
+        if data.get('action', 'None') == 'None':
+            return
+
         url = "%s/Stats?action=%s" % (sctop.BASE_URL, data.get(
             'action', 'None'))
         data.update({'est': self.estimateFinishTime})
