@@ -426,7 +426,12 @@ class AbstractWindow(object):
         self.actions_connected = []
         self.controls_connected = []
 
-    def setGeometry(self, width_, height_, rows_, columns_, pos_x=-1,
+    def setGeometry(self,
+                    width_,
+                    height_,
+                    rows_,
+                    columns_,
+                    pos_x=-1,
                     pos_y=-1):
         """
         Set width, height, Grid layout, and coordinates (optional) for a new control window.

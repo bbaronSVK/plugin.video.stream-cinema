@@ -692,7 +692,6 @@ class MyPlayer(xbmc.Player):
                         "[SC] upNext: [%s] [%s] " %
                         (str(shouldPlayDefault), str(shouldPlayNonDefault)))
                     if shouldPlayDefault or shouldPlayNonDefault:
-                        self.stop()
                         data.update({'play': data['url'], 'url': data['url']})
                         pu = sctop._create_plugin_url(
                             {

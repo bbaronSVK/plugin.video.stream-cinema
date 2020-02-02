@@ -5,3 +5,4 @@
 .idea/plugin.video.stream-cinema.iml
 .idea/vcs.xml
 .idea
+*.pyc
