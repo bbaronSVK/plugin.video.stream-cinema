@@ -174,7 +174,7 @@ msgid "TVShow folder"
 msgstr "Priečinok pre seriály"
 
 msgctxt "#30402"
-msgid "Subscription service sleep on start"
+msgid "Subscription service sleep on start (minutes)"
 msgstr "Oneskoriť štart služby o (minúty)"
 
 msgctxt "#30403"
@@ -188,6 +188,10 @@ msgstr "Automaticky pridávať filmy do knižnice"
 msgctxt "#30405"
 msgid "Check for new episodes"
 msgstr "Skontrolovať nové časti"
+
+msgctxt "#30406"
+msgid "Automatically add Trakt watchlist to the library"
+msgstr "Automaticky pridávať Trakt watchlist do knižnice"
 
 msgctxt "#30500"
 msgid "Run internet speed test..."
@@ -1302,17 +1306,6 @@ msgid "New dubbed"
 msgstr "Novinky dabované"
 
 msgctxt "#30009"
-msgid "Concerts"
-msgstr "Koncerty"
+msgid "Please setup download folder"
+msgstr "Nastavte prosím priečinok pre sťahovania"
 
-msgctxt "#30010"
-msgid "Lists/Charts"
-msgstr "Seznamy/Žebříčky"
-
-msgctxt "#30011"
-msgid "Collections"
-msgstr "Kolekce"
-
-msgctxt "#30010"
-msgid "Kids"
-msgstr "Pro děti"

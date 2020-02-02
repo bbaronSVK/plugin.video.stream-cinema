@@ -85,6 +85,7 @@
         <setting label="30403" id="refresh_time" type="slider" default="1" range="0,60" option="int" />
         <setting type="sep" />
         <setting label="30404" id="download-movies" type="bool" default="false" />
+        <setting label="30406" id="download-trakt-watchlist" type="bool" default="false" />
         <setting type="sep" />
         <setting type="action" label="30405" option="close" action="RunPlugin(plugin://plugin.video.stream-cinema/?action=73756273)" />
     </category>

@@ -72,8 +72,9 @@ class StreamCinemaContentProvider(ContentProvider):
         util.debug("[SC] init cache %s" % self.cache.__class__.__name__)
         util.init_urllib(self.cache)
         cookies = self.cache.get('cookies')
-        #if not cookies or len(cookies) == 0:
-        #    util.request(self._url(self.base_url))
+        hasTrakt = str(sctop.getSetting('trakt.token') != '')
+        util.debug('[SC] has trakt: %s' % hasTrakt)
+        sctop.win.setProperty('sc.trakt', hasTrakt)
 
     def capabilities(self):
         return ['resolve', 'categories']  # , 'search']
@@ -150,6 +151,8 @@ class StreamCinemaContentProvider(ContentProvider):
                         item = self._video_item(m)
                     result.append(item)
                 except Exception:
+                    util.debug('[SC] item error: %s' %
+                               str(traceback.format_exc()))
                     pass
             try:
                 skeys = sctop.win.getProperty('sc.filter._keys')

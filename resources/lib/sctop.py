@@ -36,6 +36,7 @@ addon = xbmcaddon.Addon
 dialog = xbmcgui.Dialog()
 
 progressDialog = xbmcgui.DialogProgress()
+progressDialogBG = xbmcgui.DialogProgressBG()
 
 keyboard = xbmc.Keyboard
 
@@ -322,8 +323,6 @@ def merge_dicts(*dict_args):
 
 
 def getCondVisibility(text):
-    '''executes the builtin getCondVisibility'''
-    # temporary solution: check if strings needs to be adjusted for backwards compatability
     if KODI_VERSION < 17:
         text = text.replace("Integer.IsGreater", "IntegerGreaterThan")
         text = text.replace("String.Contains", "SubString")

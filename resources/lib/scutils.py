@@ -35,7 +35,7 @@ from urlparse import urlparse, parse_qs, urlunsplit
 
 class KODISCLib(xbmcprovider.XBMCMultiResolverContentProvider):
     last_run = 0
-    sleep_time = 1000 * 1 * 60
+    sleep_time = 1 * 60
     subs = None
     mPlayer = None
     force = False
@@ -50,6 +50,7 @@ class KODISCLib(xbmcprovider.XBMCMultiResolverContentProvider):
         self.win = xbmcgui.Window(10000)
         self.noImage = os.path.join(self.addon_dir(), 'resources', 'img',
                                     'no-image.png')
+        self.monitor = xbmc.Monitor()
         #self._settings()
         self.cache = sctop.cache
         self.provider.cache = self.cache
@@ -200,6 +201,7 @@ class KODISCLib(xbmcprovider.XBMCMultiResolverContentProvider):
                 perc = float(num / total) * 100
                 #util.info("percento: %d" % int(perc))
                 if dialog.iscanceled():
+                    dialog.close()
                     return
 
                 try:
@@ -245,6 +247,7 @@ class KODISCLib(xbmcprovider.XBMCMultiResolverContentProvider):
             else:
                 data = None
 
+        dialog.close()
         if not error and new_items and not ('update' in params) and not (
                 'notify' in params):
             self.showNotification(self.getString(30901), 'New content')
@@ -288,18 +291,23 @@ class KODISCLib(xbmcprovider.XBMCMultiResolverContentProvider):
                 e = False
                 n = False
 
-                dialog = sctop.progressDialog
-                dialog.create('Stream Cinema CZ & SK', 'Add all to library')
+                dialog = sctop.progressDialogBG
+                dialog.create('Stream Cinema CZ & SK',
+                              'Adding Trakt watchlist to library')
                 total = float(len(data['menu']))
                 num = 0
                 for i in data['menu']:
                     num += 1
                     perc = float(num / total) * 100
                     #util.info("percento: %d - (%d / %d)" % (int(perc), int(num), int(total)))
-                    if dialog.iscanceled():
-                        return
+                    # background dialog cannot be canceled
+                    # if dialog.iscanceled():
+                    #     dialog.close()
+                    #     return
                     try:
-                        dialog.update(int(perc), "%s" % (i['title']))
+                        dialog.update(int(perc),
+                                      "Adding Trakt watchlist to library",
+                                      "%s" % (i['title']))
                     except Exception:
                         util.debug('[SC] ERR: %s' %
                                    str(traceback.format_exc()))
@@ -311,6 +319,8 @@ class KODISCLib(xbmcprovider.XBMCMultiResolverContentProvider):
 
                     error |= e
                     new |= n
+
+                dialog.close()
                 if not error and new:
                     self.showNotification(self.getString(30901), 'New content')
                     xbmc.executebuiltin('UpdateLibrary(video)')
@@ -523,6 +533,7 @@ class KODISCLib(xbmcprovider.XBMCMultiResolverContentProvider):
                                 util.info("percento: %s %d %d" %
                                           (str(perc), int(num), int(total)))
                                 if dialog.iscanceled():
+                                    dialog.close()
                                     self.setSubs(subs)
                                     return
 
@@ -534,7 +545,7 @@ class KODISCLib(xbmcprovider.XBMCMultiResolverContentProvider):
                                     pass
 
                             util.debug("[SC] sub id: %s" % str(iid))
-                            if xbmc.abortRequested:
+                            if self.monitor.abortRequested():
                                 util.info("[SC] Exiting")
                                 return
 
@@ -542,14 +553,16 @@ class KODISCLib(xbmcprovider.XBMCMultiResolverContentProvider):
                                 self.cache.delete("subscription.last_run")
                                 return
 
-                            if iid == 'movie':
-                                util.debug("[SC] movie nepokracujem")
+                            if (iid == 'movie') or (iid == 'traktwatchlist'):
+                                util.debug(
+                                    "[SC] movie alebo traktwatchlist nepokracujem"
+                                )
                                 continue
 
                             if iid in sdata['data']:
                                 if not notified:
                                     self.showNotification(
-                                        'Subscription', 'Chcecking')
+                                        'Subscription', 'Checking')
                                     notified = True
                                 util.debug("[SC] Refreshing %s" % str(iid))
                                 ids.update({iid: mtime})
@@ -570,11 +583,14 @@ class KODISCLib(xbmcprovider.XBMCMultiResolverContentProvider):
                             self.setSubs(subs)
                         util.debug("[SC] subscription done")
 
+                    if dialog is not None:
+                        dialog.close()
+
                 if sctop.getSettingAsBool('download-movies'):
                     if 'movie' in subs:
                         data = subs['movie']
                     else:
-                        data = {'last_run': time.time()}
+                        data = {'last_run': 0}
 
                     util.debug("[SC] data: %s" % str(data))
 
@@ -588,6 +604,29 @@ class KODISCLib(xbmcprovider.XBMCMultiResolverContentProvider):
                         util.info("[SC] movie netreba stahovat")
                 else:
                     util.info("[SC] movie library disabled")
+
+                if sctop.getSettingAsBool('download-trakt-watchlist'):
+                    util.info("[SC] trakt watchlist enabled")
+
+                    if 'traktwatchlist' in subs:
+                        data = subs['traktwatchlist']
+                    else:
+                        data = {'last_run': 0}
+
+                    util.debug("[SC] data: %s" % str(data))
+                    if self.canCheck(data['last_run']) or force is True:
+                        util.debug("[SC] download trakt watchlist")
+                        data['last_run'] = time.time()
+                        subs['traktwatchlist'] = data
+                        self.setSubs(subs)
+                        # self.run({'action': 'add-to-lib-trakt', 'tl': 'watchlist', 'tu': 'me', 'title': '[B]$30944[/B]'})
+                        self.add_item_trakt({'tl': 'watchlist'})
+                    else:
+                        util.info(
+                            "[SC] download trakt watchlist netreba stahovat")
+
+                else:
+                    util.info("[SC] trakt watchlist disabled")
 
                 if new_items:
                     util.debug("[SC] UpdateLibrary")
@@ -1466,17 +1505,17 @@ class KODISCLib(xbmcprovider.XBMCMultiResolverContentProvider):
         if sctop.player is None:
             sctop.player = myPlayer.MyPlayer(parent=self)
         try:
-            sleep_time = int(self.getSetting("start_sleep_time")) * 1000 * 60
+            sleep_time = int(self.getSetting("start_sleep_time")) * 60
         except:
             sleep_time = self.sleep_time
             pass
 
         util.debug("[SC] start delay: %s" % str(sleep_time))
-        start = 0
-        while not xbmc.abortRequested and start < sleep_time:
+        start = time.time() + sleep_time
+        while not self.monitor.abortRequested() and time.time() < start:
             self._player()
-            start += 1000
-            sctop.sleep(1000)
+            if self.monitor.waitForAbort(1):
+                break
         del start
 
         util.debug("[SC] start sleep end")
@@ -1490,21 +1529,22 @@ class KODISCLib(xbmcprovider.XBMCMultiResolverContentProvider):
 
         util.debug("[SC] last_rum: %s" % str(self.last_run))
 
-        if not xbmc.abortRequested and time.time() > self.last_run:
+        if not self.monitor.abortRequested() and time.time() > self.last_run:
             self.evalSchedules()
 
-        self.sleep_time = 1000
-        while not xbmc.abortRequested:
+        self.sleep_time = 1
+        while not self.monitor.abortRequested():
             self._player()
-            self._sheduler()
-            sctop.sleep(self.sleep_time)
+            self._scheduler()
+            if self.monitor.waitForAbort(self.sleep_time):
+                break
         del sctop.player
         util.info("[SC] Shutdown")
 
     def _player(self):
         try:
-            if not xbmc.abortRequested and sctop.player.isPlayingVideo(
-            ) and sctop.player.scid > 0:
+            if not self.monitor.abortRequested(
+            ) and sctop.player.isPlayingVideo() and sctop.player.scid > 0:
                 notificationtime = 30
                 playTime = sctop.player.getTime()
                 totalTime = sctop.player.getTotalTime()
@@ -1532,7 +1572,7 @@ class KODISCLib(xbmcprovider.XBMCMultiResolverContentProvider):
             util.debug("[SC] _player e: %s" % str(e))
             pass
 
-    def _sheduler(self):
+    def _scheduler(self):
         try:
             if time.time() > self.last_run + 600:
                 self.evalSchedules()

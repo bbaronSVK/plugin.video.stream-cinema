@@ -200,7 +200,7 @@ msgid "TVShow folder"
 msgstr ""
 
 msgctxt "#30402"
-msgid "Subscription service sleep on start"
+msgid "Subscription service sleep on start (minutes)"
 msgstr ""
 
 msgctxt "#30403"
@@ -213,6 +213,10 @@ msgstr ""
 
 msgctxt "#30405"
 msgid "Check for new episodes"
+msgstr ""
+
+msgctxt "#30406"
+msgid "Automatically add Trakt watchlist to the library"
 msgstr ""
 
 #empty strings from id 30406 to 30499
@@ -1583,19 +1587,6 @@ msgid "New dubbed"
 msgstr ""
 
 msgctxt "#30009"
-msgid "Concerts"
+msgid "Please setup download folder"
 msgstr ""
-
-msgctxt "#30010"
-msgid "Lists/Charts"
-msgstr ""
-
-msgctxt "#30011"
-msgid "Collections"
-msgstr ""
-
-msgctxt "#30010"
-msgid "Kids"
-msgstr ""
-
 
