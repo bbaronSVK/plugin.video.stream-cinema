@@ -224,7 +224,7 @@ def request(url, headers={}, output="content", method=None):
     except (urllib2.URLError, Exception) as e:
         URLError(e)
 
-    util.debug('len(data) %s' % len(data))
+    util.debug('[SC] len(data) %s' % len(data))
 
     if output == "content":
         try:
@@ -244,6 +244,15 @@ def URLError(e):
         xbmcplugin.endOfDirectory(HANDLE, succeeded=False)
     except:
         pass
+
+def json_settings():
+    settings = ['kruser', 'krpass', 'kra_token', 'wsuser', 'ws_token']
+    json_settings = {}
+    for i in settings:
+        util.debug('[SC] s %s = %s' % (str(i), str(getSetting(i))))
+        json_settings[i] = getSetting(i)
+    util.debug('[SC] SC.json_settings: {}'.format(json.dumps(json_settings)))
+    win.setProperty('SC.json_settings', json.dumps(json_settings))
 
 
 def post(url, data, headers={}, output="content"):
@@ -265,8 +274,10 @@ def post(url, data, headers={}, output="content"):
         URLError(e)
 
     if (output == "content"):
+        util.debug('[SC] POST response: %s' % str(data))
         return data
     else:
+        util.debug('[SC] POST response: %s' % str(data))
         return (data, code)
 
 

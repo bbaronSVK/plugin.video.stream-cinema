@@ -200,7 +200,7 @@ class Webshare():
             if not xml.find('status').text == 'OK':
                 self.clearToken()
                 return False
-            if all == True:
+            if all is True:
                 return xml
             util.debug("[SC] userInfo: %s %s" %
                        (xml.find('ident').text, xml.find('vip').text))

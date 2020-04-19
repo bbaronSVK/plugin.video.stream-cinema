@@ -20,9 +20,11 @@
 # *
 # */
 
-import resolver
-import os
 import sys
+
+import os
+import resolver
+
 sys.path.append(os.path.join(os.path.dirname(resolver.__file__), 'usage'))
 sys.path.append(
     os.path.join(os.path.dirname(resolver.__file__), 'contentprovider'))
@@ -32,6 +34,7 @@ from provider import ContentProvider
 from provider import ResolveException
 from urlparse import urlparse, parse_qs, urlunsplit
 from myprovider.webshare import Webshare as wx
+from myprovider.kraska import Kraska
 import urllib
 import util
 import xbmcgui
@@ -42,7 +45,6 @@ import trakt
 import tracker
 import traceback
 import datetime
-import storagecache
 
 reload(sys)
 sys.setrecursionlimit(10000)
@@ -107,6 +109,15 @@ class StreamCinemaContentProvider(ContentProvider):
             'lang': sctop.KODI_LANG,
             'v': sctop.addonInfo('version')
         })
+
+        util.debug('[SC] providers [%s] [%s]' % (str(sctop.getSetting('kruser')), str(sctop.getSetting('wsuser'))))
+        if sctop.getSetting('kruser') != '' and sctop.getSetting('wsuser') != '':
+            q.update({'pro': 'kraska,webshare'})
+        elif sctop.getSetting('kruser') != '':
+            q.update({'pro': 'kraska'})
+        elif sctop.getSetting('wsuser') != '':
+            q.update({'pro': 'webshare'})
+
         if sctop.getSettingAsBool('filter_audio'):
             q.update({'l': sctop.getSetting('filter_lang.1')})
         if not url.startswith('http'):
@@ -142,13 +153,18 @@ class StreamCinemaContentProvider(ContentProvider):
                 try:
                     if 'visible' in m and not sctop.getCondVisibility(
                             m['visible']):
+                        # util.debug('[SC] item invisible %s' % m.title)
                         continue
                     if m['type'] == 'dir':
+                        # util.debug('[SC] dir item')
                         item = self._dir_item(m)
                     elif m['type'] == 'video':
+                        # util.debug('[SC] video item')
                         item = self._video_item(m)
                     else:
+                        # util.debug('[SC] default video item')
                         item = self._video_item(m)
+                    # util.debug('[SC] pridavam polozku do vysledku')
                     result.append(item)
                 except Exception:
                     util.debug('[SC] item error: %s' %
@@ -185,6 +201,7 @@ class StreamCinemaContentProvider(ContentProvider):
         else:
             result = [{'title': 'i failed', 'url': 'failed', 'type': 'dir'}]
             self.parent.endOfDirectory(succeeded=False)
+        # util.debug('[SC] vraciam result: %s' % str(result))
         return result
 
     @bug.buggalo_try_except({'method': 'scinema.system'})
@@ -228,7 +245,7 @@ class StreamCinemaContentProvider(ContentProvider):
             util.info("[SC] kontrola verzie: %s %s" %
                       (str(sctop.addonInfo('version')), data["version"]))
             if sctop.addonInfo('version') != data[
-                    "version"] and sctop.getSetting('ver') != data['version']:
+                "version"] and sctop.getSetting('ver') != data['version']:
                 try:
                     sctop.dialog.ok(
                         sctop.getString(30954),
@@ -284,14 +301,14 @@ class StreamCinemaContentProvider(ContentProvider):
             pass
         headers = {
             'X-UID':
-            self.uid,
+                self.uid,
             'X-LANG':
-            self.tr['language'],
+                self.tr['language'],
             'X-VER':
-            sctop.API_VERSION,
+                sctop.API_VERSION,
             'Accept':
-            'application/vnd.bbaron.kodi-plugin-v%s+json' %
-            (sctop.API_VERSION),
+                'application/vnd.bbaron.kodi-plugin-v%s+json' %
+                (sctop.API_VERSION),
         }
         url = self._url(url)
         code = None
@@ -395,9 +412,9 @@ class StreamCinemaContentProvider(ContentProvider):
             menu = OrderedDict()
         except ImportError as e:
             menu = {}
-        #util.debug("CTX ITM: %s" % str(item))
-        #util.debug("CTX DAT: %s" % str(data))
-        #if 'dir' in data and data['dir'] == 'tvshows':
+        # util.debug("CTX ITM: %s" % str(item))
+        # util.debug("CTX DAT: %s" % str(data))
+        # if 'dir' in data and data['dir'] == 'tvshows':
 
         if 'csearch' in item:
             menu.update({
@@ -476,7 +493,7 @@ class StreamCinemaContentProvider(ContentProvider):
                         "action": "info",
                         'imdb': "tt%07d" % int(data['imdb'])
                     }
-                })  #{"cmd":'Action("Info")'}})
+                })  # {"cmd":'Action("Info")'}})
             else:
                 menu.update({"$30942": {"cmd": 'Action("Info")'}})
             params = self.parent.params()
@@ -490,13 +507,13 @@ class StreamCinemaContentProvider(ContentProvider):
             menu.update({"$30949": params})
             try:
                 id = int(data['id'])
-                #menu.update({"report stream": {"action": "report", "id": data['id'], "title": data['title']}})
+                # menu.update({"report stream": {"action": "report", "id": data['id'], "title": data['title']}})
             except Exception:
                 pass
 
         if 'trakt' in data and data['trakt'].isdigit(
-        ) and trakt.getTraktCredentialsInfo() == True:
-            #name, imdb, tvdb, content
+        ) and trakt.getTraktCredentialsInfo() is True:
+            # name, imdb, tvdb, content
             content = 'series' if 'season' in data and data['season'].isdigit(
             ) else 'movie'
             menu.update({
@@ -542,13 +559,13 @@ class StreamCinemaContentProvider(ContentProvider):
                     "force": "1"
                 }
             })
-            #util.debug("[SC] MAME menu!")
+            # util.debug("[SC] MAME menu!")
 
-        #util.debug("[SC] data %s" % str(data))
+        # util.debug("[SC] data %s" % str(data))
         if 'season' in data or data.get('id') == 'series':
             if data['id'] in self.subs.keys() and data['id'] != 'series':
                 item['title'] = "[COLOR red]*[/COLOR] %s" % item['title']
-                #util.debug("[SC] Serial je v odoberani: %s" % data['title'])
+                # util.debug("[SC] Serial je v odoberani: %s" % data['title'])
                 menu.update({
                     "$30924": {
                         "action": "remove-from-sub",
@@ -557,7 +574,7 @@ class StreamCinemaContentProvider(ContentProvider):
                     }
                 })
             else:
-                #util.debug("[SC] Serial neodoberam: %s" % data['title'])
+                # util.debug("[SC] Serial neodoberam: %s" % data['title'])
                 menu.update({
                     "$30918": {
                         "action": "add-to-lib",
@@ -572,10 +589,10 @@ class StreamCinemaContentProvider(ContentProvider):
                         "title": data['title']
                     }
                 })
-        #menu.update({"$30922": {"cmd":'Addon.OpenSettings("%s")' % sctop.__scriptid__}})
-        #menu.update({"run Schedule": {"action": "subs"}})
-        #menu.update({"test": {"action": "test"}})
-        #menu.update({"last": {'cp': 'czsklib', 'list': 'http://stream-cinema.online/json/movies-a-z'}})
+        # menu.update({"$30922": {"cmd":'Addon.OpenSettings("%s")' % sctop.__scriptid__}})
+        # menu.update({"run Schedule": {"action": "subs"}})
+        # menu.update({"test": {"action": "test"}})
+        # menu.update({"last": {'cp': 'czsklib', 'list': 'http://stream-cinema.online/json/movies-a-z'}})
 
         item['menu'] = menu
         return item
@@ -593,35 +610,47 @@ class StreamCinemaContentProvider(ContentProvider):
         util.debug("[SC] _resolve")
         if itm is None:
             return None
-        if itm.get('provider') == 'plugin.video.online-files':
+        if itm.get('provider') == 'plugin.video.online-files' or itm.get('provider') == 'webshare':
             if sctop.getSetting('wsuser') == "":
                 res = sctop.yesnoDialog(sctop.getString(30945),
                                         sctop.getString(30946), "")
-                if res == True:
+                if res is True:
                     sctop.openSettings('201.101')
                     return None
             try:
                 if not self.ws.login():
                     res = sctop.yesnoDialog(sctop.getString(30945),
                                             sctop.getString(30946), "")
-                    if res == True:
+                    if res is True:
                         sctop.openSettings('201.101')
                     return None
                 else:
                     udata = self.ws.userData()
                     util.debug("[SC] udata: %s" % str(udata))
-                    if udata == False:
+                    if udata is False:
                         util.debug("[SC] NIEJE VIP ucet")
                         sctop.infoDialog(sctop.getString(30947),
                                          icon="WARNING")
                         sctop.sleep(5000)
                     elif int(udata) <= 14:
-                        sctop.infoDialog(sctop.getString(30948) % str(udata),
-                                         icon="WARNING")
+                        try:
+                            if sctop.getSetting('ws_notify') != '' and int(sctop.getSetting('ws_notify')) > int(datetime.datetime.now().strftime("%s")):
+                                sctop.infoDialog(sctop.getString(30948) % str(udata),
+                                                 icon="WARNING")
+                            else:
+                                sctop.setSetting("ws_notify", str(int(datetime.datetime.now().strftime("%s")) + 3600))
+                                txt="Konci Ti predplatne a preto Ti odporucame aktivovat ucet cez https://kra.sk/start " \
+                                + "za zvyhodnene ceny. " \
+                                + "Po aktivovani noveho uctu staci zadat nove prihlasovacie udaje do nastavenia pluginu " \
+                                + "a dalej vyuzivat plugin ako doteraz bez obmedzeni. " \
+                                + "S prichodom KODI 19 moze dojst k znefunkceniu pluginu s webshare uctom."
+                                sctop.dialog.ok("Upozornenie...", txt)
+                        except:
+                            util.debug('[SC] notify error %s' % str(traceback.format_exc()))
                         util.debug("[SC] VIP ucet konci")
 
                 try:
-                    util.debug('[SC] ideme pre ident ')
+                    util.debug('[SC] ideme pre webshare ident %s' % itm['url'])
                     ident = self._json(self._url(itm['url']))['ident']
                 except:
                     ident = '6d8359zW1u'
@@ -675,13 +704,50 @@ class StreamCinemaContentProvider(ContentProvider):
                            (str(e), str(traceback.format_exc())))
                 bug.onExceptionRaised()
                 pass
+        elif itm.get('provider') == 'kraska':
+            try:
+                kra = Kraska(sctop.getSetting('kruser'), sctop.getSetting('krpass'),
+                             self.cache)
+
+                try:
+                    util.debug('[SC] ideme pre kra ident %s' % itm['url'])
+                    ident = self._json(self._url(itm['url']))['ident']
+                except Exception as e:
+                    util.debug('[SC] error get ident: %s' % str(traceback.format_exc()))
+                    return
+
+                itm['url'] = kra.resolve(ident)
+                itm['headers'] = {'User-Agent': util.UA}
+                try:
+                    if itm['subs'] is not None:
+                        if "kra.sk" in itm['subs']:
+                            import urlparse
+                            import re
+                            o = urlparse(itm['subs'])
+                            g = re.split('/', o[2] if o[5] == '' else o[5])
+                            util.debug("[SC] kra.sk titulky: %s | %s" %
+                                       (str(g[2]), itm['subs']))
+                            url = self.kr.resolve(g[2])
+                            itm['subs'] = url
+                            content = sctop.request(url)
+                            itm['subs'] = self.parent.saveSubtitle(
+                                content, 'cs', False)
+                            util.debug("[SC] posielam URL na titulky: %s" %
+                                       itm['subs'])
+                except Exception as e:
+                    util.debug("[SC] chyba KRA titlkov... %s | %s" %
+                               (str(e), str(traceback.format_exc())))
+                    pass
+            except Exception as e:
+                util.debug('[SC] kra error')
+                pass
         itm['title'] = self.parent.encode(itm['title'])
 
         return itm
 
     def resolve(self, item, captcha_cb=None, select_cb=None):
-        #util.debug("[SC] ITEM RESOLVE: " + str(item))
-        #util.debug("[SC] RESOLVE argv: [%s] " % str(sys.argv))
+        # util.debug("[SC] ITEM RESOLVE: " + str(item))
+        # util.debug("[SC] RESOLVE argv: [%s] " % str(sys.argv))
         sctop.win.setProperty('sc.resume', 'true')
         addparams = sys.argv[3] if 3 in sys.argv else None
         if addparams is not None and re.search('resume:false',
@@ -702,7 +768,7 @@ class StreamCinemaContentProvider(ContentProvider):
                     sctop.merge_dicts(data['info'], i) for i in data['strms']
                 ]
                 data = out
-            #util.debug("[SC] data: %s" % str(data))
+            # util.debug("[SC] data: %s" % str(data))
             if len(data) < 1:
                 raise ResolveException('Video is not available.')
             return self._resolve(select_cb(data))
