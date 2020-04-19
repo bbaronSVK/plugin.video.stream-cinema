@@ -30,7 +30,7 @@
         <disclaimer lang="en">The author of this addon do not host any of the content which is found and have no affiliation with of the content providers. This addon simply search on web storages for content. Use at your own risk!</disclaimer>
         <disclaimer lang="sk">Autor tohto addonu nemá žiaden obsah, ktorý sa v ňom nachádza a nemá žiadnu príslušnosť k poskytovateľovi obsahu. Tento addon iba vyhľadá obsah na web uloziskach. Používajte na vlastné riziko!</disclaimer>
         <disclaimer lang="cs">Autor tohto addonu nemá žáden obsah, který se v ňem nachází a nemá žádnou příslušnost k poskytovateli obsahu. Tento addon jen vyhledává obsah na webovych uloziskach. Používejte na vlastní riziko!</disclaimer>
-        <news>pridane nove ulozisko kra.sk</news>
+        <news>pridane nove ulozisko kra.sk a uprava upNext</news>
     </extension>
     <extension library="lib" point="xbmc.python.module" />
 </addon>
