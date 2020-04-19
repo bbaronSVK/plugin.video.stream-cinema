@@ -639,7 +639,7 @@ class StreamCinemaContentProvider(ContentProvider):
                                                  icon="WARNING")
                             else:
                                 sctop.setSetting("ws_notify", str(int(datetime.datetime.now().strftime("%s")) + 3600))
-                                txt="Konci Ti predplatne a preto Ti odporucame aktivovat ucet cez https://kra.sk/start " \
+                                txt="Konci Ti predplatne a preto Ti odporucame aktivovat ucet cez https://bit.ly/sc-kra " \
                                 + "za zvyhodnene ceny. " \
                                 + "Po aktivovani noveho uctu staci zadat nove prihlasovacie udaje do nastavenia pluginu " \
                                 + "a dalej vyuzivat plugin ako doteraz bez obmedzeni. " \
