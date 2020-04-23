@@ -78,11 +78,11 @@ msgid "webshare.cz"
 msgstr ""
 
 msgctxt "#30101"
-msgid "Username"
+msgid "Username (webshare.cz)"
 msgstr ""
 
 msgctxt "#30102"
-msgid "Password"
+msgid "Password (webshare.cz)"
 msgstr ""
 
 msgctxt "#30103"
@@ -1590,3 +1590,14 @@ msgctxt "#30009"
 msgid "Please setup download folder"
 msgstr ""
 
+msgctxt "#30114"
+msgid "Username (kra.sk)"
+msgstr ""
+
+msgctxt "#30115"
+msgid "Password (kra.sk)"
+msgstr ""
+
+msgctxt "#30116"
+msgid "kra.sk"
+msgstr ""

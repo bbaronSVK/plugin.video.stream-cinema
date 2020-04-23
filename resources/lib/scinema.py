@@ -612,17 +612,13 @@ class StreamCinemaContentProvider(ContentProvider):
             return None
         if itm.get('provider') == 'plugin.video.online-files' or itm.get('provider') == 'webshare':
             if sctop.getSetting('wsuser') == "":
-                res = sctop.yesnoDialog(sctop.getString(30945),
-                                        sctop.getString(30946), "")
-                if res is True:
-                    sctop.openSettings('201.101')
-                    return None
+                sctop.infoDialog(sctop.getString(30945),
+                                 sctop.getString(30946))
+                return None
             try:
                 if not self.ws.login():
-                    res = sctop.yesnoDialog(sctop.getString(30945),
-                                            sctop.getString(30946), "")
-                    if res is True:
-                        sctop.openSettings('201.101')
+                    sctop.infoDialog(sctop.getString(30945),
+                                    sctop.getString(30946))
                     return None
                 else:
                     udata = self.ws.userData()
@@ -639,11 +635,10 @@ class StreamCinemaContentProvider(ContentProvider):
                                                  icon="WARNING")
                             else:
                                 sctop.setSetting("ws_notify", str(int(datetime.datetime.now().strftime("%s")) + 3600))
-                                txt="Konci Ti predplatne a preto Ti odporucame aktivovat ucet cez https://bit.ly/sc-kra " \
+                                txt="Konci Ti predplatne, a preto Ti odporucame aktivovat ucet cez https://bit.ly/sc-kra " \
                                 + "za zvyhodnene ceny. " \
                                 + "Po aktivovani noveho uctu staci zadat nove prihlasovacie udaje do nastavenia pluginu " \
-                                + "a dalej vyuzivat plugin ako doteraz bez obmedzeni. " \
-                                + "S prichodom KODI 19 moze dojst k znefunkceniu pluginu s webshare uctom."
+                                + "a dalej vyuzivat plugin ako doteraz bez obmedzeni. "
                                 sctop.dialog.ok("Upozornenie...", txt)
                         except:
                             util.debug('[SC] notify error %s' % str(traceback.format_exc()))
