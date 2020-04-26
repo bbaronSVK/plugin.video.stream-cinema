@@ -217,7 +217,7 @@ class MyPlayer(xbmc.Player):
         self.ep = None
         self.libItem = None
         self.watchedTime = 0
-        self.started = int(datetime.now().strftime("%s"))
+        self.started = int(time.time())
         util.debug("[SC] Zacalo sa prehravat %s" % str(self.started))
         mojPlugin = self.win.getProperty(sctop.__scriptid__)
         if sctop.__scriptid__ not in mojPlugin:

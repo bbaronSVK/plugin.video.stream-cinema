@@ -1570,10 +1570,10 @@ class KODISCLib(xbmcprovider.XBMCMultiResolverContentProvider):
                         sctop.player.action(data)
 
                 showupnext = sctop.getSettingAsBool("show_up_next")
-                util.debug('[SC] [%s] [%s]' % (str(sctop.player.started + 30), str(datetime.now().strftime("%s"))))
+                util.debug('[SC] [%s] [%s]' % (str(sctop.player.started + 30), str(time.time())))
                 util.debug("[SC] upNext [%s] [%s] " % (str(
-                    (totalTime - playTime) <= int(notificationtime)), (int(datetime.now().strftime("%s")) - sctop.player.started) > 30))
-                if showupnext and (int(datetime.now().strftime("%s")) - sctop.player.started) > 10 and (
+                    (totalTime - playTime) <= int(notificationtime)), (int(time.time()) - sctop.player.started) > 30))
+                if showupnext and (int(time.time()) - sctop.player.started) > 10 and (
                         totalTime - playTime) <= int(notificationtime):
                     sctop.player.upNext()
         except Exception as e:
