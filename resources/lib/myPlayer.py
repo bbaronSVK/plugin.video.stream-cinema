@@ -543,16 +543,6 @@ class MyPlayer(xbmc.Player):
         util.debug("[SC] Zmennila sa rychlost prehravania %s" % speed)
         self.waitForChange()
         return
-        '''
-        data = {
-            'scid': self.scid,
-            'action': 'speed',
-            'speed': speed,
-            'prog': self.timeRatio()
-        }
-        self.action(data)
-        return
-        '''
 
     def onPlayBackSeek(self, time, seekOffset):
         if self.scid is None:
@@ -560,17 +550,6 @@ class MyPlayer(xbmc.Player):
         util.debug("[SC] Seekujem %s %s" % (time, seekOffset))
         self.waitForChange()
         return
-        '''
-        data = {
-            'scid': self.scid,
-            'action': 'seek',
-            'time': time,
-            'seekOffset': seekOffset,
-            'prog': self.timeRatio()
-        }
-        self.action(data)
-        return
-        '''
 
     def onPlayBackPaused(self):
         if self.scid is None:
@@ -588,70 +567,6 @@ class MyPlayer(xbmc.Player):
         if data.get('action', None) is None:
             util.debug("[SC] nemame action")
             return
-
-        if self.stream is None:
-            try:
-                stream = json.loads(
-                    self.win.getProperty('%s.stream' % sctop.__scriptid__))
-                util.debug("[SC] stream %s" % str(stream))
-                self.stream = stream
-            except:
-                pass
-
-        if data.get('action', 'None') == 'None':
-            return
-
-        url = "%s/Stats?action=%s" % (sctop.BASE_URL, data.get(
-            'action', 'None'))
-        data.update({'est': self.estimateFinishTime})
-        data.update({'se': self.se, 'ep': self.ep})
-        data.update({'ver': sctop.addonInfo('version')})
-        try:
-            data.update(
-                {'state': bool(xbmc.getCondVisibility("!Player.Paused"))})
-            data.update({
-                'ws': xbmcgui.Window(10000).getProperty('ws.ident'),
-                'vip': xbmcgui.Window(10000).getProperty('ws.vip'),
-                'vt': xbmcgui.Window(10000).getProperty('ws.viptyp'),
-                'j': xbmcgui.Window(10000).getProperty('ws.j')
-            })
-            data.update({'vd': xbmcgui.Window(10000).getProperty('ws.days')})
-            data.update({'skin': xbmc.getSkinDir()})
-            if self.stream is not None:
-                if 'bitrate' in self.stream:
-                    util.debug("[SC] action bitrate")
-                    data.update({'bt': self.stream['bitrate']})
-                else:
-                    util.debug("[SC] action no bitrate")
-                if 'sid' in self.stream:
-                    util.info(
-                        '[SC] mame sid <===================================================================================='
-                    )
-                    data.update({'sid': self.stream['sid']})
-                else:
-                    util.info(
-                        '[SC] no sid in stream <==================================================================================== %s'
-                        % str(self.stream))
-        except Exception as e:
-            util.info('[SC] problem s updatom dat: %s' %
-                      str(traceback.format_exc()))
-            pass
-        try:
-            if self.itemDuration > 0:
-                data.update({'dur': self.itemDuration})
-        except Exception:
-            pass
-
-        lastAction = xbmcgui.Window(10000).getProperty('sc.lastAction')
-        util.debug('[SC] lastAction: %s' % (str(lastAction)))
-        if lastAction == "" or time() - float(lastAction) > 5:
-            xbmcgui.Window(10000).setProperty('sc.lastAction', str(time()))
-            util.debug("[SC] action: %s" % str(data))
-            url = self.parent.provider._url(url)
-            try:
-                sctop.post_json(url, data, {'X-UID': sctop.uid})
-            except:
-                pass
 
     def upNext(self):
         util.debug("[SC] upNext: start")
