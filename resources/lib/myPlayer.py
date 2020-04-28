@@ -7,7 +7,6 @@ import sctop
 import math
 import os
 from datetime import datetime, timedelta
-from time import time
 import bug
 import util
 import traceback
