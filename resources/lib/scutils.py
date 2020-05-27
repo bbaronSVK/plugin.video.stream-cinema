@@ -887,51 +887,17 @@ class KODISCLib(xbmcprovider.XBMCMultiResolverContentProvider):
                 pg.create(g(30050))
                 pg.update(0)
 
-                # https://vip.3.dl.webshare.cz
-                try:
-                    from myprovider.webshare import Webshare as ws
-                    w = ws(sctop.getSetting('wsuser'),
-                           sctop.getSetting('wspass'))
-                    r = w.resolve(_idents[ret])
-                    o = urlparse(r)
-                    pg.update(10)
-                    wspeedtest = speedTest(
-                        None, run, out,
-                        'http' if 'http://' in o[0] else 'https')
-                    pg.update(10, 'webshare.cz')
-                    urls = [{'host': o[1], 'url': o[2]} for i in range(run)]
-                    wsdown = wspeedtest.download(urls=urls)
-                    pg.update(50)
-                except Exception as e:
-                    wsdown = 0
-                    util.debug("[SC] ERROR: %s" % str(traceback.format_exc()))
-
                 speedtest = speedTest(None, run, out)
                 pg.update(60, speedtest.host)
                 bedown = speedtest.download()
                 pg.update(100)
                 pg.close()
-                if wsdown > 100:
-                    sctop.setSetting('bitrate', int(wsdown))
+                if bedown > 100:
+                    sctop.setSetting('bitrate', int(bedown))
                     sctop.setSetting('bitrateformated',
-                                     str(pretty_speed(wsdown)))
-                if str(params.get('wizard', '')) == '1':
-                    sctop.win.setProperty(
-                        'scwizard',
-                        json.dumps({
-                            'ws': {
-                                'host': speedtest.host,
-                                'speed': pretty_speed(bedown)
-                            },
-                            'oth': {
-                                'host': speedtest.host,
-                                'speed': pretty_speed(bedown)
-                            }
-                        }))
-                    return
+                                     str(pretty_speed(bedown)))
                 sctop.dialog.ok(
                     g(30050),
-                    "%s: %s" % ('webshare.cz', str(pretty_speed(wsdown))),
                     "%s: %s" % (speedtest.host, str(pretty_speed(bedown))))
                 sctop.openSettings('1.0')
             if action == 'play-force':
@@ -1209,8 +1175,8 @@ class KODISCLib(xbmcprovider.XBMCMultiResolverContentProvider):
                 util.debug("[SC] item ma tvdb %s %sx%s %s" %
                            (str(item.get('trakt')), str(item.get('season')),
                             str(item.get('episode')), str(playcount)))
-                playcount = 1 if len(playcount) > 0 else 0
-                infoLabels['playcount'] = playcount
+                if len(playcount) > 0:
+                    infoLabels['playcount'] = 1
         except:
             pass
 

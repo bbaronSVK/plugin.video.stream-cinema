@@ -121,10 +121,16 @@ def openSettings(query=None, id=addonInfo('id')):
     try:
         idle()
         execute('Addon.OpenSettings(%s)' % id)
-        if query == None: raise Exception()
+        if query is None: raise Exception()
         c, f = query.split('.')
-        execute('SetFocus(%i)' % (int(c) + 100))
-        execute('SetFocus(%i)' % (int(f) + 200))
+        if KODI_VERSION >= 18:
+            f1 = -100 + int(c)
+            f2 = -80 + int(f)
+        else:
+            f1 = int(c) + 100
+            f2 = int(f) + 200
+        execute('SetFocus(%i)' % f1)
+        execute('SetFocus(%i)' % f2)
     except:
         return
 

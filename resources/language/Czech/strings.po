@@ -206,8 +206,8 @@ msgid "Turning on filtering may not show all available content"
 msgstr "Zapnutím filtrování se nemusí zobrazovat všechen dostupný obsah"
 
 msgctxt "#30503"
-msgid "Download speed (webshare.cz)"
-msgstr "Naměrená rychlost (webshare.cz)"
+msgid "Download speed"
+msgstr "Naměrená rychlost"
 
 msgctxt "#30504"
 msgid "Filter stream by download speed"
@@ -529,21 +529,17 @@ msgctxt "#30944"
 msgid "Watchlist"
 msgstr "Seznam ke shlédnutí"
 
-msgctxt "#30945"
-msgid "Failed to sign in to WebShare"
-msgstr "Nepodařilo se přihlásit na WebShare"
-
 msgctxt "#30946"
 msgid "Do you want to open the settings?"
 msgstr "Chcete otevřít nastavení?"
 
 msgctxt "#30947"
-msgid "You have not an active VIP on WebShare"
-msgstr "Nemáte aktivní VIP na WebShare"
+msgid "You have not an active subscription"
+msgstr "Nemáte aktivní předplatné"
 
 msgctxt "#30948"
-msgid "Remain the only %s of days with WebShare VIP"
-msgstr "Zbývá už jen %s dní na WebShare VIP"
+msgid "Remain the only %s days of subscription"
+msgstr "Zbývá pouze %s dnů předplatného"
 
 msgctxt "#30949"
 msgid "Select stream"

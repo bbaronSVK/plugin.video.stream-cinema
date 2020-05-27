@@ -206,8 +206,8 @@ msgid "Turning on filtering may not show all available content"
 msgstr "Zapnutím filtrovania sa nemusí zobrazovať všetok dostupný obsah"
 
 msgctxt "#30503"
-msgid "Download speed (webshare.cz)"
-msgstr "Nameraná rýchlosť (webshare.cz)"
+msgid "Download speed"
+msgstr "Nameraná rýchlosť"
 
 msgctxt "#30504"
 msgid "Filter stream by download speed"
@@ -529,21 +529,17 @@ msgctxt "#30944"
 msgid "Watchlist"
 msgstr "Zoznam na pozretie"
 
-msgctxt "#30945"
-msgid "Failed to sign in to WebShare"
-msgstr "Nepodarilo sa prihlásiť na WebShare.cz"
-
 msgctxt "#30946"
 msgid "Do you want to open the settings?"
 msgstr "Chceš otvoriť nastavenia?"
 
 msgctxt "#30947"
-msgid "You have not an active VIP on WebShare"
-msgstr "Nemáš aktívne VIP na WebShare.cz"
+msgid "You have not an active subscription"
+msgstr "Nemáš aktívne predplatné"
 
 msgctxt "#30948"
-msgid "Remain the only %s of days with WebShare VIP"
-msgstr "Ostáva ti už len %s dní s VIP na WebShare.cz"
+msgid "Remain the only %s days of subscription"
+msgstr "Zostáva ti už len %s dní predplatného"
 
 msgctxt "#30949"
 msgid "Select stream"
@@ -1311,7 +1307,7 @@ msgstr "Nastavte prosím priečinok pre sťahovania"
 
 msgctxt "#30114"
 msgid "Username (kra.sk)"
-msgstr "Login (kra.sk)"
+msgstr "Používateľske meno (kra.sk)"
 
 msgctxt "#30115"
 msgid "Password (kra.sk)"

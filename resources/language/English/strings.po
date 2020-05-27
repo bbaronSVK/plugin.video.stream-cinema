@@ -234,7 +234,7 @@ msgid "Turning on filtering may not show all available content"
 msgstr ""
 
 msgctxt "#30503"
-msgid "Download speed (webshare.cz)"
+msgid "Download speed"
 msgstr ""
 
 msgctxt "#30504"
@@ -574,20 +574,16 @@ msgctxt "#30944"
 msgid "Watchlist"
 msgstr ""
 
-msgctxt "#30945"
-msgid "Failed to sign in to WebShare"
-msgstr ""
-
 msgctxt "#30946"
 msgid "Do you want to open the settings?"
 msgstr ""
 
 msgctxt "#30947"
-msgid "You have not an active VIP on WebShare"
+msgid "You have not an active subscription"
 msgstr ""
 
 msgctxt "#30948"
-msgid "Remain the only %s of days with WebShare VIP"
+msgid "Remain the only %s days of subscription"
 msgstr ""
 
 msgctxt "#30949"

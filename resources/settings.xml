@@ -1,15 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <settings>
     <category label="30010">
-        <setting type="lsep" label="30100" />
-        <setting label="30101" id="wsuser" type="text" default="" />
-        <setting label="30102" id="wspass" type="text" default="" option="hidden" />
-        <setting id="ws_usessl" label="webshare.cz https" type="bool" default="true"/>
-        <setting id="ws_checkssl" type="bool" default="false" visible="false" />
-        <setting id="ws_token" type="text" visible="false" />
-        <setting id="ws_chsum" type="text" visible="false"/>
-        <setting id="ws_notify" type="text" visible="false"/>
-        <!--setting label="30111" type="action" action="RunPlugin(plugin://plugin.video.stream-cinema/?action=77732d6c6f676f7574)" /-->
         <setting type="sep" />
         <setting type="lsep" label="30116" />
         <setting label="30114" type="text" id="kruser" default=""/>

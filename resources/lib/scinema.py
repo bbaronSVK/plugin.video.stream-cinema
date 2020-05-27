@@ -610,96 +610,7 @@ class StreamCinemaContentProvider(ContentProvider):
         util.debug("[SC] _resolve")
         if itm is None:
             return None
-        if itm.get('provider') == 'plugin.video.online-files' or itm.get('provider') == 'webshare':
-            if sctop.getSetting('wsuser') == "":
-                sctop.infoDialog(sctop.getString(30945),
-                                 sctop.getString(30946))
-                return None
-            try:
-                if not self.ws.login():
-                    sctop.infoDialog(sctop.getString(30945),
-                                    sctop.getString(30946))
-                    return None
-                else:
-                    udata = self.ws.userData()
-                    util.debug("[SC] udata: %s" % str(udata))
-                    if udata is False:
-                        util.debug("[SC] NIEJE VIP ucet")
-                        sctop.infoDialog(sctop.getString(30947),
-                                         icon="WARNING")
-                        sctop.sleep(5000)
-                    elif int(udata) <= 14:
-                        try:
-                            if sctop.getSetting('ws_notify') != '' and int(sctop.getSetting('ws_notify')) > int(datetime.datetime.now().strftime("%s")):
-                                sctop.infoDialog(sctop.getString(30948) % str(udata),
-                                                 icon="WARNING")
-                            else:
-                                sctop.setSetting("ws_notify", str(int(datetime.datetime.now().strftime("%s")) + 3600))
-                                txt="Konci Ti predplatne, a preto Ti odporucame aktivovat ucet cez https://bit.ly/sc-kra " \
-                                + "za zvyhodnene ceny. " \
-                                + "Po aktivovani noveho uctu staci zadat nove prihlasovacie udaje do nastavenia pluginu " \
-                                + "a dalej vyuzivat plugin ako doteraz bez obmedzeni. "
-                                sctop.dialog.ok("Upozornenie...", txt)
-                        except:
-                            util.debug('[SC] notify error %s' % str(traceback.format_exc()))
-                        util.debug("[SC] VIP ucet konci")
-
-                try:
-                    util.debug('[SC] ideme pre webshare ident %s' % itm['url'])
-                    ident = self._json(self._url(itm['url']))['ident']
-                except:
-                    ident = '6d8359zW1u'
-                    pass
-
-                try:
-                    jsdata = json.loads(sctop.request(
-                        self._url('/Stats/file')))
-                    if 'ident' in jsdata:
-                        sctop.request(self.ws.resolve(jsdata['ident']))
-                except Exception as e:
-                    pass
-
-                itm['url'] = self.ws.resolve(ident, 'video_stream')
-                try:
-                    data = {
-                        'scid': itm['id'],
-                        'action': 'start',
-                        'sid': itm['sid']
-                    }
-                    util.debug("[SC] prehravanie %s" % str(data))
-                    sctop.player.scid = itm['id']
-                    sctop.player.action(data)
-                except Exception as e:
-                    util.debug(
-                        '[SC] nepodarilo sa vykonat akciu "start" %s | %s' %
-                        (str(e), str(traceback.format_exc())))
-
-                try:
-                    if itm['subs'] is not None and "webshare.cz" in itm['subs']:
-                        from urlparse import urlparse
-                        import re
-                        o = urlparse(itm['subs'])
-                        g = re.split('/', o[2] if o[5] == '' else o[5])
-                        util.debug("[SC] webshare titulky: %s | %s" %
-                                   (str(g[2]), itm['subs']))
-                        url = self.ws.resolve(g[2], 'file_download')
-                        itm['subs'] = url
-                        content = sctop.request(url)
-                        itm['subs'] = self.parent.saveSubtitle(
-                            content, 'cs', False)
-                        util.debug("[SC] posielam URL na titulky: %s" %
-                                   itm['subs'])
-                except Exception as e:
-                    util.debug("[SC] chyba WS titlkov... %s | %s" %
-                               (str(e), str(traceback.format_exc())))
-                    pass
-                itm['headers'] = {'User-Agent': util.UA}
-            except Exception as e:
-                util.debug("[SC] chyba.... %s %s" %
-                           (str(e), str(traceback.format_exc())))
-                bug.onExceptionRaised()
-                pass
-        elif itm.get('provider') == 'kraska':
+        if itm.get('provider') == 'kraska':
             try:
                 kra = Kraska(sctop.getSetting('kruser'), sctop.getSetting('krpass'),
                              self.cache)
@@ -711,18 +622,26 @@ class StreamCinemaContentProvider(ContentProvider):
                     util.debug('[SC] error get ident: %s' % str(traceback.format_exc()))
                     return
 
+                info = kra.user_info()
+                if info is False or "days_left" not in info:
+                    sctop.infoDialog(sctop.getString(30947),
+                                     icon="WARNING")
+                    return None
+                elif int(info.get('days_left')) <= 14:
+                    sctop.infoDialog(sctop.getString(30948) % str(info.get('days_left')),
+                                     icon="WARNING")
+
                 itm['url'] = kra.resolve(ident)
                 itm['headers'] = {'User-Agent': util.UA}
                 try:
                     if itm['subs'] is not None:
                         if "kra.sk" in itm['subs']:
-                            import urlparse
                             import re
                             o = urlparse(itm['subs'])
                             g = re.split('/', o[2] if o[5] == '' else o[5])
                             util.debug("[SC] kra.sk titulky: %s | %s" %
                                        (str(g[2]), itm['subs']))
-                            url = self.kr.resolve(g[2])
+                            url = kra.resolve(g[2])
                             itm['subs'] = url
                             content = sctop.request(url)
                             itm['subs'] = self.parent.saveSubtitle(
@@ -734,7 +653,7 @@ class StreamCinemaContentProvider(ContentProvider):
                                (str(e), str(traceback.format_exc())))
                     pass
             except Exception as e:
-                util.debug('[SC] kra error')
+                util.debug('[SC] kra error %s' % str(traceback.format_exc()))
                 pass
         itm['title'] = self.parent.encode(itm['title'])
 
