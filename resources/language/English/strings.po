@@ -18,11 +18,11 @@ msgstr ""
 "Plural-Forms: nplurals=2; plural=(n != 1)\n"
 
 msgctxt "Addon Summary"
-msgid "stream-cinema.online - play content from webshare.cz[CR]For proper functioning, it is necessary to [I]register at webshare.cz and have activated VIP[/I]."
+msgid "stream-cinema.online - play content from kra.sk[CR]For proper functioning, it is necessary to [I]register at kra.sk and have activated VIP[/I]."
 msgstr ""
 
 msgctxt "Addon Disclaimer"
-msgid "The author of this addon do not host any of the content which is found and have no affiliation with of the content providers. This addon simply search on webshare.cz for content. Use at your own risk!"
+msgid "The author of this addon do not host any of the content which is found and have no affiliation with of the content providers. This addon simply search on kra.sk for content. Use at your own risk!"
 msgstr ""
 
 msgctxt "#30010"
