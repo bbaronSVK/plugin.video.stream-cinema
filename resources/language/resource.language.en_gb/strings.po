@@ -142,7 +142,7 @@ msgid "Welcome"
 msgstr ""
 
 msgctxt "#30101"
-msgid "Thank you for installing this plugin. Do you wish to configure login credentials right now?"
+msgid "Thank you for installing stream cinema plugin. Do you wish to configure login credentials right now?"
 msgstr ""
 
 msgctxt "#30102"

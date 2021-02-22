@@ -142,8 +142,8 @@ msgid "Welcome"
 msgstr "Vitajte"
 
 msgctxt "#30101"
-msgid "Thank you for installing this plugin. Do you wish to configure login credentials right now?"
-msgstr "Ďakujeme za inštaláciu tohto doplnku. Praješ si nastaviť prihlasovacie údaje?"
+msgid "Thank you for installing stream cinema plugin. Do you wish to configure login credentials right now?"
+msgstr "Ďakujeme za inštaláciu doplnku Stream Cinema. Praješ si nastaviť prihlasovacie údaje?"
 
 msgctxt "#30102"
 msgid "Login error"
