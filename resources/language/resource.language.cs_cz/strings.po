@@ -1,0 +1,207 @@
+# XBMC Media Center language file
+# Addon Name: Stream Cinema CZ a SK
+# Addon id: plugin.video.stream-cinema
+# Addon version: 1.3.18
+# Addon Provider: bbaron
+msgid ""
+msgstr ""
+"Project-Id-Version: XBMC-Addons\n"
+"Report-Msgid-Bugs-To: alanwww1@xbmc.org\n"
+"POT-Creation-Date: 2019-09-02 16:28+0000\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Language: cs\n"
+"Plural-Forms: nplurals=3; plural=(n==1) ? 0 : (n>=2 && n<=4) ? 1 : 2\n"
+
+msgctxt "Addon Summary"
+msgid "stream-cinema.online - play content from kra.sk[CR]For operation it is necessary to [I]register at kra.sk and have an active subscription[/I]."
+msgstr "stream-cinema.online - přehrávání obsahu z kra.sk[CR]Pre provoz je potřebná [I]registrace na kra.sk s aktivním předplatným[/I]."
+
+msgctxt "Addon Disclaimer"
+msgid "The author of this addon does not provide any content and has no affiliation with content providers. This addon only searches shared content on kra.sk. Use at your own risk!"
+msgstr "Autor tohoto doplňku neposkytuje žádný obsah a není nijako propojený s poskytovatelemi obsahu. Tento doplňek pouze vyhledáva zpřístupněný obsah na kra.sk. Použití na vlastní odpovědnost!"
+
+msgctxt "#30010"
+msgid "Accounts"
+msgstr "Účty"
+
+msgctxt "#30011"
+msgid "Please enter your login details for kra.sk"
+msgstr "Prosím zadej své přihlašovací údaje na kra.sk"
+
+msgctxt "#30012"
+msgid "Username (kra.sk)"
+msgstr "Uživatelské jméno (kra.sk)"
+
+msgctxt "#30013"
+msgid "Password (kra.sk)"
+msgstr "Heslo (kra.sk)"
+
+msgctxt "#30014"
+msgid "Turn debug on/off"
+msgstr "Zapnout nebo vypnout debug"
+
+msgctxt "#30015"
+msgid "Subscription days left"
+msgstr "Počet zbývajících dní předplatného"
+
+msgctxt "#30016"
+msgid "Token (kra.sk)"
+msgstr ""
+
+msgctxt "#30017"
+msgid "UUID"
+msgstr ""
+
+msgctxt "#30018"
+msgid "Plugin version"
+msgstr "Verze doplňku"
+
+msgctxt "#30019"
+msgid "Streams"
+msgstr "Streamy"
+
+msgctxt "#30020"
+msgid "Display all streams (orig., orig.+tit, dub.)"
+msgstr "Zobrazit všechny streamy (orig., orig.+tit, dab.)"
+
+msgctxt "#30021"
+msgid "Display only streams with dubbing or subtitles"
+msgstr "Zobrazit pouze streamy s dabingem nebo s titulkama"
+
+msgctxt "#30022"
+msgid "Display only streams with dubbing"
+msgstr "Zobrazit pouze streamy s dabingem"
+
+msgctxt "#30023"
+msgid "Autoselect stream"
+msgstr "Automatický výběr streamu"
+
+msgctxt "#30024"
+msgid "Primary language for audio streams"
+msgstr "Prvořadý jazyk pro zvukové stopy"
+
+msgctxt "#30025"
+msgid "Secondary language for audio streams"
+msgstr "Druhořadý jazyk pro zvukové stopy"
+
+msgctxt "#30026"
+msgid "Max. bitrate in Mbps"
+msgstr "Max. tok dat v Mbps"
+
+msgctxt "#30027"
+msgid "Parental control"
+msgstr "Rodičovský zámek"
+
+msgctxt "#30028"
+msgid "Enable parental control"
+msgstr "Zapnout rodičovský zámek"
+
+msgctxt "#30029"
+msgid "Parental control starts at (hour)"
+msgstr "Rodičovský zámek je aktivní od (hodina)"
+
+msgctxt "#30030"
+msgid "Parental control ends at (hour)"
+msgstr "Rodičovský zámek je aktivní do (hodina)"
+
+msgctxt "#30031"
+msgid "Parental control rating (years)"
+msgstr "Veková přístupnost (rodičovský zámek) v rocích"
+
+msgctxt "#30032"
+msgid "Primary language for audio streams (parental control)"
+msgstr "Prvořadý jazyk pro zvukové stopy (rodičovský zámek)"
+
+msgctxt "#30033"
+msgid "Secondary language for audio streams (parental control)"
+msgstr "Druhořadý jazyk pro zvukové stopy (rodičovský zámek)"
+
+msgctxt "#30034"
+msgid "Display only dubed (CZ/SK) streams while parental control"
+msgstr "Zobrazit v rodičovském zámku pouze dabované streamy (CZ/SK)"
+
+msgctxt "#30035"
+msgid "Trakt.tv"
+msgstr ""
+
+msgctxt "#30036"
+msgid "Trakt.tv user"
+msgstr "Trakt.tv uživatel"
+
+msgctxt "#30037"
+msgid "Trakt.tv authorization"
+msgstr "Trakt.tv autorizace"
+
+msgctxt "#30100"
+msgid "Welcome"
+msgstr "Vítejte"
+
+msgctxt "#30101"
+msgid "Thank you for installing this plugin. Do you wish to configure login credentials right now?"
+msgstr "Ďekujeme za instalaci tohoto doplňku. Přejete si nastavit přihlašovací údaje?"
+
+msgctxt "#30102"
+msgid "Login error"
+msgstr "Chyba při přihlášení"
+
+msgctxt "#30103"
+msgid "You have entered invalid credentials."
+msgstr "Jsou zadané nesprávné přihlašovací údaje."
+
+msgctxt "#30104"
+msgid "Login successful"
+msgstr "Přihlášení úspěšné"
+
+msgctxt "#30105"
+msgid "Do you wish to open plugin settings?"
+msgstr "Přeješ si otevřít nastavení doplnku?"
+
+msgctxt "#30106"
+msgid "Subscription days left: {}"
+msgstr "Zbývající dny předplatného: {}"
+
+msgctxt "#30107"
+msgid "Login error"
+msgstr "Chyba při přihlášení"
+
+msgctxt "#30108"
+msgid "Invalid credentials. Do you wish to open plugin settings?"
+msgstr "Nesprávné přihlašovací údaje. Přeješ si otevřít nastavení doplnku?"
+
+msgctxt "#30109"
+msgid "System"
+msgstr "Systém"
+
+msgctxt "#30110"
+msgid "Debug enabled"
+msgstr "Debug zapnutý"
+
+msgctxt "#30111"
+msgid "Debug disabled"
+msgstr "Debug vypnutý"
+
+msgctxt "#30112"
+msgid "Error"
+msgstr "Chyba"
+
+msgctxt "#30113"
+msgid "Problem retrieving file link"
+msgstr "Problém při stahování odkazu k souboru"
+
+msgctxt "#30114"
+msgid "Connection error"
+msgstr "Chyba při připojení"
+
+msgctxt "#30115"
+msgid "Pin/Unpin"
+msgstr "Připnout/Odepnout"
+
+msgctxt "#30116"
+msgid "Select stream manually"
+msgstr "Vybrat stream manuálně"
+
