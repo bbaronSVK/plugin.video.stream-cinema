@@ -91,8 +91,7 @@ class Kraska:
         days_left = self.get_days_left()
         if 14 >= days_left:
             debug('mame nizky pocet dni predplatneho')
-            dnotify(Strings.txt(Strings.KRASKA_NOTIFY_LOW_DAYS_LEFT).format(days_left))
-
+            dnotify(Strings.txt(Strings.KRASKA_NOTIFY_LOW_DAYS_LEFT).format(days_left), '')
         try:
             debug('skusame resolvnut ident: {}'.format(ident))
             data = self.get_data('/api/file/download', {"data": {"ident": ident}})

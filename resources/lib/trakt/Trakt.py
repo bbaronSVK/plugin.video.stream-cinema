@@ -172,7 +172,8 @@ class TraktAPI(object):
 
     @staticmethod
     def is_enabled():
-        return get_setting_as_bool('trakt.enabled') and get_setting('trakt.authorization')
+        return False
+        # return get_setting_as_bool('trakt.enabled') and get_setting('trakt.authorization')
 
     @staticmethod
     def can_check():

@@ -137,6 +137,14 @@ msgctxt "#30037"
 msgid "Trakt.tv authorization"
 msgstr ""
 
+msgctxt "#30038"
+msgid "Download"
+msgstr ""
+
+msgctxt "#30039"
+msgid "Download folder"
+msgstr ""
+
 msgctxt "#30100"
 msgid "Welcome"
 msgstr ""
@@ -203,5 +211,17 @@ msgstr ""
 
 msgctxt "#30116"
 msgid "Select stream manually"
+msgstr ""
+
+msgctxt "#30117"
+msgid "History"
+msgstr ""
+
+msgctxt "#30118"
+msgid "History is empty"
+msgstr ""
+
+msgctxt "#30119"
+msgid "Download"
 msgstr ""
 

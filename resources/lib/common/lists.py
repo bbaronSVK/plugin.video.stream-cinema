@@ -60,7 +60,7 @@ class SCKODIItem(Storage):
         super(SCKODIItem, self).__init__('SCKODIItem-{}'.format(name))
         if series is not None:
             url = '/Play/{}/{}/{}'.format(name, series, episode)
-            debug('SCKODIItem: {}'.format(url))
+            # debug('SCKODIItem: {}'.format(url))
             kodi_path = hexlify(url)
         else:
             kodi_path = hexlify('/Play/{}'.format(name))
@@ -103,7 +103,8 @@ class SCKODIItem(Storage):
         if self.kodi_db:
             self.kodi_db.set_watched_path(self.kodi_path, times)
         if self.trakt:
-            from resources.lib.trakt.Trakt import trakt, TraktAPI
+            pass
+            # from resources.lib.trakt.Trakt import trakt, TraktAPI
             # debug('trakt enabled: {} / {}'.format(TraktAPI.is_enabled(), trakt.is_enabled()))
             # if trakt.is_enabled() is True:
             #     trakt.set_watched(self.trakt, times, season=self.series, episode=self.episode)

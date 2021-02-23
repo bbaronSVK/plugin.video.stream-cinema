@@ -3,7 +3,7 @@ from resources.lib.kodiutils import sleep, set_setting, get_uuid, get_setting, g
 from resources.lib.language import Strings
 from resources.lib.services.Monitor import monitor
 from resources.lib.services.SCPlayer import player
-from resources.lib.trakt.Trakt import trakt
+# from resources.lib.trakt.Trakt import trakt
 from resources.lib.constants import ADDON
 from resources.lib.api.kraska import Kraska
 
@@ -12,7 +12,7 @@ def periodical_check():
     if monitor.can_check():
         player.periodical_check()
         monitor.periodical_check()
-        trakt.check_trakt()
+        # trakt.check_trakt()
         # debug("settings {}/{}".format(settings.get_setting('stream.lang1'), settings.get_setting('stream.lang2')))
 
 

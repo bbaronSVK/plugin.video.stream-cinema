@@ -137,6 +137,14 @@ msgctxt "#30037"
 msgid "Trakt.tv authorization"
 msgstr "Trakt.tv autorizácia"
 
+msgctxt "#30038"
+msgid "Download"
+msgstr "Sťahovanie"
+
+msgctxt "#30039"
+msgid "Download folder"
+msgstr "Priečinok pre sťahovanie"
+
 msgctxt "#30100"
 msgid "Welcome"
 msgstr "Vitajte"
@@ -204,3 +212,16 @@ msgstr "Pripnúť/Odopnúť"
 msgctxt "#30116"
 msgid "Select stream manually"
 msgstr "Vybrať stream manuálne"
+
+msgctxt "#30117"
+msgid "History"
+msgstr "História"
+
+msgctxt "#30118"
+msgid "History is empty"
+msgstr "História zatiaľ neobsahuje žiadne položky"
+
+msgctxt "#30119"
+msgid "Download"
+msgstr "Sťiahnuť"
+

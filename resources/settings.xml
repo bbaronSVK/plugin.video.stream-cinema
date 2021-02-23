@@ -24,6 +24,9 @@
         <setting type="slider" label="30026" id="stream.max.bitrate" subsetting="true" default="100" range="1,1,100" option="int"
                  enable="eq(-3,true)"/>
     </category>
+    <category label="30038">
+        <setting type="folder" label="30039" id="download.path" source="" option="writeable"/>
+    </category>
     <category label="30027">
         <setting type="bool" label="30028" id="parental.control.enabled" default="false"/>
         <setting type="slider" label="30029" id="parental.control.start" default="5" range="0,1,11" option="int"

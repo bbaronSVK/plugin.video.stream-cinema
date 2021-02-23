@@ -31,6 +31,7 @@ class SC:
     ACTION_CMD = 'cmd'
     ACTION_CSEARCH = 'csearch'
     ACTION_DEBUG = 'debug'
+    ACTION_DOWNLOAD = 'down'
     ACTION_LAST = 'last'
     ACTION_PIN = 'pin'
     ACTION_PLAY_URL = 'playUrl'

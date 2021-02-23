@@ -9,7 +9,7 @@ import xbmc
 from json import dumps
 
 from resources.lib.kodiutils import params, container_refresh, urlencode, container_update, create_plugin_url, \
-    exec_build_in
+    exec_build_in, download, get_setting
 from resources.lib.common.logger import info, debug
 from resources.lib.common.lists import List
 from resources.lib.constants import SORT_METHODS, SC, GUI
@@ -79,7 +79,10 @@ class scinema:
             self.action_last()
         elif action == SC.ACTION_DEBUG:
             check_set_debug(True)
-            pass
+        elif action == 'down':
+            debug('download {}'.format(self.args))
+            self.url = self.args.get('down')
+            self.call_url()
         else:
             info('Neznama akcia: {}'.format(action))
         pass
@@ -87,8 +90,11 @@ class scinema:
     def action_last(self):
         lid = 'p-{}'.format(self.args.get(SC.ITEM_ID)) if parental_history() else self.args.get(SC.ITEM_ID)
         st = List(lid)
-        self.url = '/Last?ids={}'.format(dumps(st.get()))
-        self.call_url()
+        if len(st.get()) > 1:
+            self.url = '/Last?ids={}'.format(dumps(st.get()))
+            self.call_url()
+        else:
+            dok(Strings.txt(Strings.EMPTY_HISTORY_H1), Strings.txt(Strings.EMPTY_HISTORY_L1))
 
     def action_cmd(self):
         url = self.args.get('url')
@@ -183,6 +189,15 @@ class scinema:
         try:
             item = SCItem(self.response)
             url, li, status, selected = item.get()
+            if SC.ACTION in self.args and SC.ACTION_DOWNLOAD in self.args[SC.ACTION]:
+                filename = self.response.get('info', {}).get('stream_info', {}).get('filename')
+                if filename is None:
+                    dok(Strings.txt(Strings.RESOLVE_ERROR_H1), 'Download error')
+                    return
+                from threading import Thread
+                worker = Thread(target=download, args=(url, get_setting('download.path'), filename))
+                worker.start()
+                return
             self.response['strms'] = selected
             home_win.setProperty('SC.play_item', dumps(self.response))
             # info('play: {} {} {}'.format(url, li.getPath(), status))

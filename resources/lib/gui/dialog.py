@@ -32,6 +32,10 @@ def dnotify(heading, message, icon=xbmcgui.NOTIFICATION_INFO, time=5000, sound=T
     return dialog().notification(heading, message, icon, time, sound)
 
 
+def dprogressgb():
+    return xbmcgui.DialogProgressBG()
+
+
 def dselect(list_item, heading='', use_details=False):
     return dialog().select(heading, list_item, useDetails=use_details)
 

@@ -1,7 +1,9 @@
 from __future__ import print_function, unicode_literals
 import json
 import math
+import os
 import sys
+import time
 import traceback
 
 try:
@@ -460,3 +462,66 @@ def open_settings(query=None, id=ADDON_ID):
         exec_build_in('SetFocus(%i)' % f2)
     except:
         return
+
+
+def validate_path(path):
+    from resources.lib.system import SYSTEM_VERSION
+    if SYSTEM_VERSION > 18:
+        return xbmcvfs.validatePath(path)
+    return xbmc.validatePath(path)
+
+
+def make_legal_filename(path):
+    from resources.lib.system import SYSTEM_VERSION
+    if SYSTEM_VERSION > 18:
+        return xbmcvfs.makeLegalFilename(path)
+    return xbmc.makeLegalFilename(path)
+
+
+def microtime():
+    return float(time.time() * 1000)
+
+
+def get_percentage(val, total):
+    return int(val / total * 100)
+
+
+def download(url, dest, name):
+    from resources.lib.gui.dialog import dprogressgb
+    filename = make_legal_filename('{}'.format(os.path.join(translate_path(dest), name)))
+
+    headers = {}
+    pos = 0
+    if xbmcvfs.exists(filename):
+        pos = xbmcvfs.Stat(filename).st_size()
+        headers.update({'Range': 'bytes={}-'.format(pos)})
+
+    from resources.lib.system import Http
+    r = Http.get(url, headers=headers, stream=True)
+    total_length = int(r.headers.get('content-length', 0))
+    chunk = min(32 * 1024 * 1024, (1024 * 1024 * 4) if total_length is None else int(total_length / 100))
+    f = xbmcvfs.File(filename, 'wb')
+    start_pos = pos
+    last_pos = pos
+    last_t = microtime()
+    dialog = dprogressgb()
+    dialog.create(name)
+    from resources.lib.services.Monitor import monitor
+    for data in r.iter_content(chunk):
+        if not monitor.abortRequested():
+            pos += len(data)
+            if total_length > 0:
+                t = microtime()
+                if (t - last_t) > 5:
+                    kbps = int(float(pos - last_pos) / float((t - last_t) / 1000) / 1024)
+                    done = get_percentage(pos, start_pos + total_length)
+                    debug('download: {}% / {}Kbps'.format(done, kbps))
+                    dialog.update(done, message='{}Kbps'.format(kbps))
+                    last_t = t
+                    last_pos = pos
+            f.write(data)
+        else:
+            debug('Koncim download, lebo konci KODI')
+            break
+    f.close()
+    dialog.close()

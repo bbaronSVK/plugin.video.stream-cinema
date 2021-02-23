@@ -268,10 +268,16 @@ class SCVideo(SCBaseItem):
                 self.item.setProperty('PercentPlayed', '{}'.format((resume_time / duration) * 100))
 
     def gen_context(self):
-        menu = [(Strings.txt(Strings.CONTEXT__SELECT_STREAM), 'PlayMedia({})'.format(create_plugin_url({
+        menu = []
+        if get_setting('download.path'):
+            menu.append([Strings.txt(Strings.CONTEXT_DOWNLOAD), 'RunPlugin({})'.format(create_plugin_url({
+                SC.ACTION: SC.ACTION_DOWNLOAD,
+                SC.ACTION_DOWNLOAD: self.data.get(SC.ITEM_URL),
+            }))])
+        menu.append([Strings.txt(Strings.CONTEXT_SELECT_STREAM), 'PlayMedia({})'.format(create_plugin_url({
             SC.ACTION_SELECT_STREAM: '1',
             SC.ITEM_URL: self.data.get(SC.ITEM_URL),
-        })))]
+        }))])
 
         self.item.addContextMenuItems(items=menu)
 
@@ -312,8 +318,9 @@ class SCPlayItem(SCBaseItem):
     @try_catch('filter')
     def filter(self):
         # @todo autoselect / filtrovanie nechcenych streamov
-        if not get_setting_as_bool('stream.autoselect') or SC.ACTION_SELECT_STREAM in self.params:
-            debug('nieje autoselect, alebo je vynuteny vyber streamu')
+        if not get_setting_as_bool('stream.autoselect') \
+                or SC.ACTION_SELECT_STREAM in self.params or SC.ACTION_DOWNLOAD in self.params:
+            debug('nieje autoselect, alebo je vynuteny vyber streamu alebo download')
             return
 
         if get_setting_as_bool('stream.autoselect'):
