@@ -8,11 +8,11 @@ except:
     pass
 
 
-from resources.lib.streamcinema import scinema
+from resources.lib.streamcinema import Scinema
 from resources.lib.common.logger import info
 
 try:
-    scinema().run()
+    Scinema().run()
 except:
 
     info('-----------------------------------------------------------------')

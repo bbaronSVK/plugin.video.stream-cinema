@@ -23,6 +23,10 @@ def parental_history():
     return get_setting_as_bool('parental.control.enabled')  # and get_setting_as_bool('parental.control.history')
 
 
+def get_history_item_name(item):
+    return 'p-{}'.format(item) if parental_history() else item
+
+
 class SCItem:
     def __init__(self, data):
         self.item = None
@@ -219,7 +223,6 @@ class SCDir(SCBaseItem):
             }))))
 
         if context_menu:
-            debug('kontextove menu: {}'.format(context_menu))
             self.item.addContextMenuItems(context_menu)
 
 
@@ -333,7 +336,8 @@ class SCPlayItem(SCBaseItem):
                 lang2 = get_setting('parental.control.lang2').lower()
 
             for pos, s in enumerate(self.streams):
-                # debug('stream: {}'.format(s))
+                debug('stream: bitrate: {} quality: {} lagn: {}'.format(s.get('bitrate', 0), s.get('quality', 'N/A'),
+                                                                        s.get('linfo', 'N/A')))
                 bitrate = int(s.get('bitrate', 0))
                 if max_bitrate >= 100 * megabit:
                     debug('vsetky bitrate su dobre, bitrate {}'.format(bitrate))

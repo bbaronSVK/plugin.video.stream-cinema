@@ -145,6 +145,10 @@ msgctxt "#30039"
 msgid "Download folder"
 msgstr "Priečinok pre sťahovanie"
 
+msgctxt "#30040"
+msgid "Setup KODI video cache"
+msgstr "Nastavenie KODI video cache podla voľnej RAM"
+
 msgctxt "#30100"
 msgid "Welcome"
 msgstr "Vitajte"
@@ -225,3 +229,18 @@ msgctxt "#30119"
 msgid "Download"
 msgstr "Sťiahnuť"
 
+msgctxt "#30120"
+msgid "{}MB free memory"
+msgstr "{}MB z dostupnej pamäti"
+
+msgctxt "#30121"
+msgid "Warning! An KODI advanced setting has already been set. This operation will erase all your settings! Did you still want to continue?"
+msgstr "Pozor! Našlo sa už rozšírené nastavenie KODI. Touto operáciou zrušíš všetky pôvodné nastavenia! Želáš si aj napriek tomu pokračovať?"
+
+msgctxt "#30122"
+msgid "You need to restart KODI for the new settings to work. Did you restart KODI?"
+msgstr "Aby nové nastavenie začalo fungovať, je potrebné reštartovať KODI. Želáš si reštartovať KODI?"
+
+msgctxt "#30123"
+msgid "You need to restart KODI for the new settings to work. Please turn off KODI and start it again."
+msgstr "Aby nové nastavenie začalo fungovať, je potrebné reštartovať KODI. Vypni prosím KODI a znova ho spusti."

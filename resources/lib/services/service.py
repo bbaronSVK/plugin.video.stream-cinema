@@ -1,3 +1,7 @@
+import xbmc
+
+from resources.lib.common.logger import debug
+from resources.lib.gui import get_cond_visibility
 from resources.lib.gui.dialog import dok
 from resources.lib.kodiutils import sleep, set_setting, get_uuid, get_setting, get_system_debug, set_system_debug
 from resources.lib.language import Strings

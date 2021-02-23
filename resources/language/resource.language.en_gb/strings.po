@@ -145,6 +145,10 @@ msgctxt "#30039"
 msgid "Download folder"
 msgstr ""
 
+msgctxt "#30040"
+msgid "Setup KODI video cache"
+msgstr ""
+
 msgctxt "#30100"
 msgid "Welcome"
 msgstr ""
@@ -225,3 +229,18 @@ msgctxt "#30119"
 msgid "Download"
 msgstr ""
 
+msgctxt "#30120"
+msgid "{}MB free memory"
+msgstr ""
+
+msgctxt "#30121"
+msgid "Warning! An KODI advanced setting has already been set. This operation will erase all your settings! Did you still want to continue?"
+msgstr ""
+
+msgctxt "#30122"
+msgid "You need to restart KODI for the new settings to work. Did you restart KODI?"
+msgstr ""
+
+msgctxt "#30123"
+msgid "You need to restart KODI for the new settings to work. Please turn off KODI and start it again."
+msgstr ""

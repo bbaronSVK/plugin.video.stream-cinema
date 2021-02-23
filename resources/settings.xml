@@ -6,6 +6,7 @@
         <setting type="text" label="30012" id="kraska.user" default=""/>
         <setting type="text" label="30013" id="kraska.pass" default="" option="hidden"/>
         <setting type="action" label="30014" action="RunPlugin(plugin://plugin.video.stream-cinema?action=6465627567)" />
+        <setting type="action" label="30040" action="RunPlugin(plugin://plugin.video.stream-cinema?action=627566666572)" />
         <setting type="text" label="30015" id="kraska.days.left" default="" enable="false"/>
         <setting type="text" label="30016" id="kraska.token" default="" enable="false"/>
         <setting type="text" label="30017" id="system.uuid" default="" enable="false"/>

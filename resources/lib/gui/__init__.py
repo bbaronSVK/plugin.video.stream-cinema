@@ -1,6 +1,10 @@
 import xbmcgui
 import xbmc
+import re
 
+from resources.lib.common.lists import List
+from resources.lib.common.logger import debug
+from resources.lib.kodiutils import get_setting
 from resources.lib.system import SYSTEM_VERSION
 
 cur_win = xbmcgui.Window(xbmcgui.getCurrentWindowId())
@@ -8,8 +12,26 @@ home_win = xbmcgui.Window(10000)  # komunikacne okno
 
 
 def get_cond_visibility(text):
+    debug('get_cond_visibility: {}'.format(text))
+    if 'sc://' in text:
+        return translate_cond_visibility(text)
+
     if SYSTEM_VERSION < 17:
         text = text.replace("Integer.IsGreater", "IntegerGreaterThan")
         text = text.replace("String.Contains", "SubString")
         text = text.replace("String.IsEqual", "StringCompare")
+    debug('final: {} / {}'.format(text, xbmc.getCondVisibility(text)))
     return xbmc.getCondVisibility(text)
+
+
+def translate_cond_visibility(text):
+    m = re.search('sc://(?P<typ>[^\(]+)\((?P<param1>[^\s,\)]+),(?P<param2>[^\s,\)]+)\)', text)
+    debug('najdene: {} / {} ({}, {})'.format(m.group(0), m.group('typ'), m.group('param1'), m.group('param2')))
+    if m.group('typ') == 'config':
+        return '{}'.format(get_setting(m.group('param1'))) == '{}'.format(m.group('param2'))
+    elif m.group('typ') == 'history':
+        from resources.lib.gui.item import get_history_item_name
+        name = get_history_item_name(m.group('param1'))
+        st = List(name)
+        return len(st.get()) > int(m.group('param2'))
+    return text

@@ -8,6 +8,7 @@ import xbmcplugin
 import xbmc
 from json import dumps
 
+from resources.lib.common.kodivideocache import set_kodi_cache_size
 from resources.lib.kodiutils import params, container_refresh, urlencode, container_update, create_plugin_url, \
     exec_build_in, download, get_setting
 from resources.lib.common.logger import info, debug
@@ -16,7 +17,7 @@ from resources.lib.constants import SORT_METHODS, SC, GUI
 from resources.lib.api.sc import Sc
 from resources.lib.gui import cur_win, home_win
 from resources.lib.gui.dialog import dok, dinput
-from resources.lib.gui.item import SCItem, parental_history
+from resources.lib.gui.item import SCItem, get_history_item_name
 from resources.lib.common.storage import Storage
 from resources.lib.language import Strings
 from resources.lib.params import params
@@ -24,7 +25,7 @@ from resources.lib.services.service import check_set_debug
 from resources.lib.system import SYSTEM_LANG_CODE
 
 
-class scinema:
+class Scinema:
     def __init__(self):
         self.args = params.args
         self.items_pinned = []
@@ -83,12 +84,14 @@ class scinema:
             debug('download {}'.format(self.args))
             self.url = self.args.get('down')
             self.call_url()
+        elif action == 'buffer':
+            set_kodi_cache_size()
         else:
             info('Neznama akcia: {}'.format(action))
         pass
 
     def action_last(self):
-        lid = 'p-{}'.format(self.args.get(SC.ITEM_ID)) if parental_history() else self.args.get(SC.ITEM_ID)
+        lid = get_history_item_name(self.args.get(SC.ITEM_ID))
         st = List(lid)
         if len(st.get()) > 1:
             self.url = '/Last?ids={}'.format(dumps(st.get()))

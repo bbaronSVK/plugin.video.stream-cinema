@@ -7,6 +7,11 @@ from resources.lib.constants import ADDON, PY2
 
 
 class Strings:
+    SETUP_VIDEO_CACHE_MSG1 = 30120
+    SETUP_VIDEO_CACHE_MSG2 = 30121
+    SETUP_VIDEO_CACHE_MSG3 = 30122
+    SETUP_VIDEO_CACHE_MSG4 = 30123
+
     INTRO_STEP1_H1 = 30100
     INTRO_STEP1_L1 = 30101
 
