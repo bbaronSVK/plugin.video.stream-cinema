@@ -93,7 +93,7 @@ class Scinema:
     def action_last(self):
         lid = get_history_item_name(self.args.get(SC.ITEM_ID))
         st = List(lid)
-        if len(st.get()) > 1:
+        if len(st.get()) > 0:
             self.url = '/Last?ids={}'.format(dumps(st.get()))
             self.call_url()
         else:
