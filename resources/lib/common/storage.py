@@ -29,7 +29,7 @@ class Sqlite(object):
         return self._connection
 
     def execute(self, query, *args):
-        # debug('SQL: {} <- {}'.format(query, args))
+        debug('SQL: {} <- {}'.format(query, args))
         # debug('SQL')
         with self._get_conn() as conn:
             c = conn.cursor()

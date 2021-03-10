@@ -41,6 +41,9 @@ class Strings:
     CONTEXT_PIN_UNPIN = 30115
     CONTEXT_SELECT_STREAM = 30116
     CONTEXT_DOWNLOAD = 30119
+    CONTEXT_ADD_TO_ANDROID_TV = 30124
+    CONTEXT_PIN_TO_HP = 30125
+    CONTEXT_REMOVE = 30126
 
     EMPTY_HISTORY_H1 = 30117
     EMPTY_HISTORY_L1 = 30118
@@ -66,7 +69,8 @@ def get_language_code():
 
 
 def translate(text):
-    # TODO: Add tests
+    if PY2:
+        text = text.encode('utf-8')
     if text is not None and '$' in text:
         translation_strings = list(
             re.finditer(r'\$([0-9]+)', text, re.IGNORECASE | re.DOTALL)

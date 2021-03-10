@@ -138,8 +138,8 @@ msgid "Trakt.tv authorization"
 msgstr "Trakt.tv autorizace"
 
 msgctxt "#30038"
-msgid "Download"
-msgstr "Stahování"
+msgid "Folders"
+msgstr "Adresáře"
 
 msgctxt "#30039"
 msgid "Download folder"
@@ -148,6 +148,82 @@ msgstr "Složka pro stahování"
 msgctxt "#30040"
 msgid "Setup KODI video cache"
 msgstr "Nastavení Kodi video cache podle volné RAM"
+
+msgctxt "#30041"
+msgid "AndroidTV playlist folder"
+msgstr "Adresář pro AndroidTV"
+
+msgctxt "#30042"
+msgid "Run the add-on at startup"
+msgstr "Spustit doplněk pri startu"
+
+msgctxt "#30043"
+msgid "Startup"
+msgstr "Po startu"
+
+msgctxt "#30044"
+msgid "Max. resolution"
+msgstr "Max. rozlišení"
+
+msgctxt "#30045"
+msgid "Advanced"
+msgstr "Rozšířený výběr"
+
+msgctxt "#30046"
+msgid "Exclude 3D"
+msgstr "Vynechat 3D"
+
+msgctxt "#30047"
+msgid "Exclude HDR"
+msgstr "Vynechat HDR"
+
+msgctxt "#30048"
+msgid "Prefer HDR"
+msgstr "Preferuj HDR"
+
+msgctxt "#30049"
+msgid "Preferred codecs"
+msgstr "Preferované kodeky"
+
+msgctxt "#30050"
+msgid "Not prefered codecs"
+msgstr "Nepreferované kodeky"
+
+msgctxt "#30051"
+msgid "Preferred groups"
+msgstr "Preferované skupiny"
+
+msgctxt "#30052"
+msgid "Not preferred groups"
+msgstr "Nepreferované skupiny"
+
+msgctxt "#30053"
+msgid "Preferred source"
+msgstr "Preferovaný zdroj"
+
+msgctxt "#30054"
+msgid "Not preferred source"
+msgstr "Nepreferovaný zdroj"
+
+msgctxt "#30055"
+msgid "Preferred audio with multiple audio channels"
+msgstr "Preferované audio s více audio kanály"
+
+#msgctxt "#30056"
+#msgid ""
+#msgstr ""
+#
+#msgctxt "#30057"
+#msgid ""
+#msgstr ""
+#
+#msgctxt "#30058"
+#msgid ""
+#msgstr ""
+#
+#msgctxt "#30059"
+#msgid ""
+#msgstr ""
 
 msgctxt "#30100"
 msgid "Welcome"
@@ -244,3 +320,16 @@ msgstr "Aby nové nastavenie začalo fungovať, je potrebné reštartovať KODI.
 msgctxt "#30123"
 msgid "You need to restart KODI for the new settings to work. Please turn off KODI and start it again."
 msgstr "Aby nové nastavení začalo fungovat, je nutné restartovat KODI. Vypni prosím KODI a znovu jej spustit."
+
+msgctxt "#30124"
+msgid "Add to Android TV"
+msgstr "Přidat do Android TV"
+
+msgctxt "#30125"
+msgid "Add item to HP"
+msgstr "Připnout na hlavní stránku"
+
+msgctxt "#30126"
+msgid "Remove"
+msgstr "Odobrat"
+

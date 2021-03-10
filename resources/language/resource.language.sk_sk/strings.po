@@ -138,8 +138,8 @@ msgid "Trakt.tv authorization"
 msgstr "Trakt.tv autorizácia"
 
 msgctxt "#30038"
-msgid "Download"
-msgstr "Sťahovanie"
+msgid "Folders"
+msgstr "Priečinky"
 
 msgctxt "#30039"
 msgid "Download folder"
@@ -148,6 +148,86 @@ msgstr "Priečinok pre sťahovanie"
 msgctxt "#30040"
 msgid "Setup KODI video cache"
 msgstr "Nastavenie KODI video cache podla voľnej RAM"
+
+msgctxt "#30041"
+msgid "AndroidTV playlist folder"
+msgstr "Priečinok pre AndroidTV"
+
+msgctxt "#30042"
+msgid "Run the add-on at startup"
+msgstr "Spustiť doplnok pri štarte"
+
+msgctxt "#30043"
+msgid "Startup"
+msgstr "Po štarte"
+
+msgctxt "#30044"
+msgid "Max. resolution"
+msgstr "Max. rozlíšenie"
+
+msgctxt "#30045"
+msgid "Advanced"
+msgstr "Rozšírený výber"
+
+msgctxt "#30046"
+msgid "Exclude 3D"
+msgstr "Vynechať 3D"
+
+msgctxt "#30047"
+msgid "Exclude HDR"
+msgstr "Vynechať HDR"
+
+msgctxt "#30048"
+msgid "Prefer HDR"
+msgstr "Preferuj HDR"
+
+msgctxt "#30049"
+msgid "Preferred codecs"
+msgstr "Preferované kodeky"
+
+msgctxt "#30050"
+msgid "Not prefered codecs"
+msgstr "Nepreferované kodeky"
+
+msgctxt "#30051"
+msgid "Preferred groups"
+msgstr "Preferované skupiny"
+
+msgctxt "#30052"
+msgid "Not preferred groups"
+msgstr "Nepreferované skupiny"
+
+msgctxt "#30053"
+msgid "Preferred source"
+msgstr "Preferovaný zdroj"
+
+msgctxt "#30054"
+msgid "Not preferred source"
+msgstr "Nepreferovaný zdroj"
+
+msgctxt "#30055"
+msgid "Preferred audio with multiple audio channels"
+msgstr "Preferované audio s viacerými audio kanálmi"
+
+#msgctxt "#30056"
+#msgid ""
+#msgstr ""
+#
+#msgctxt "#30057"
+#msgid ""
+#msgstr ""
+#
+#msgctxt "#30058"
+#msgid ""
+#msgstr ""
+#
+#msgctxt "#30059"
+#msgid ""
+#msgstr ""
+
+msgctxt "#30060"
+msgid ""
+msgstr ""
 
 msgctxt "#30100"
 msgid "Welcome"
@@ -244,3 +324,16 @@ msgstr "Aby nové nastavenie začalo fungovať, je potrebné reštartovať KODI.
 msgctxt "#30123"
 msgid "You need to restart KODI for the new settings to work. Please turn off KODI and start it again."
 msgstr "Aby nové nastavenie začalo fungovať, je potrebné reštartovať KODI. Vypni prosím KODI a znova ho spusti."
+
+msgctxt "#30124"
+msgid "Add to Android TV"
+msgstr "Pridať do Android TV"
+
+msgctxt "#30125"
+msgid "Add item to HP"
+msgstr "Pripnúť na hlavnú stránku"
+
+msgctxt "#30126"
+msgid "Remove"
+msgstr "Odobrať"
+

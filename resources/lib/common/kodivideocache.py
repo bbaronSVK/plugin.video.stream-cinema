@@ -10,29 +10,30 @@ from resources.lib.language import Strings
 
 
 def set_kodi_cache_size():
-
-    free_mem = int('{}'.format(xbmc.getInfoLabel('System.FreeMemory')).replace('MB', ''))
-    msg = Strings.txt(Strings.SETUP_VIDEO_CACHE_MSG1) # 'Mas {}MB volnej pamate.'
+    free_mem = xbmc.getInfoLabel('System.FreeMemory')
+    free_mem = int(free_mem) / 1e6 if 'MB' not in free_mem else int(free_mem.replace('MB', ''))
+    msg = Strings.txt(Strings.SETUP_VIDEO_CACHE_MSG1)
     user_input = dinput(msg.format(free_mem), '80', type=INPUT_NUMERIC)
     debug('user input: {}'.format(user_input))
     if user_input == '':
         return
     coefficient = int('{}'.format(user_input).replace('%', ''))
-    coefficient = 80 if coefficient is None or 50 < coefficient > 80 else coefficient
+    coefficient = 80 if coefficient is None or 1 < coefficient > 80 else coefficient
     filename = translate_path('special://userdata/advancedsettings.xml')
 
+    debug('cache size: {} * {}% / 3 = {}, '.format(free_mem, coefficient, int(free_mem / 3 * (coefficient/100))))
     if xbmcvfs.exists(filename):
         res = dyesno('WARNING', Strings.txt(Strings.SETUP_VIDEO_CACHE_MSG2))
         if not res:
             return False
 
-    cache_size = min(500, int(free_mem / 3 * coefficient)) * 1000000
+    cache_size = min(500, int(free_mem / 3 * (coefficient/100)))
     debug('Nova cache {}'.format(cache_size))
     advanced_settings = '<advancedsettings>' \
-                        '<cache><memorysize>{cache_size:}</memorysize>' \
+                        '<cache><memorysize>{}</memorysize>' \
                         '<buffermode>1</buffermode>' \
                         '<readfactor>20</readfactor></cache>' \
-                        '</advancedsettings>'.format(cache_size=cache_size)
+                        '</advancedsettings>'.format(cache_size)
     debug('Nove advanced settings: {}'.format(advanced_settings))
     f = xbmcvfs.File(filename, 'w')
     f.write(advanced_settings)

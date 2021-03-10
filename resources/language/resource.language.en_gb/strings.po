@@ -138,7 +138,7 @@ msgid "Trakt.tv authorization"
 msgstr ""
 
 msgctxt "#30038"
-msgid "Download"
+msgid "Folders"
 msgstr ""
 
 msgctxt "#30039"
@@ -148,6 +148,82 @@ msgstr ""
 msgctxt "#30040"
 msgid "Setup KODI video cache"
 msgstr ""
+
+msgctxt "#30041"
+msgid "AndroidTV playlist folder"
+msgstr ""
+
+msgctxt "#30042"
+msgid "Run the add-on at startup"
+msgstr ""
+
+msgctxt "#30043"
+msgid "Startup"
+msgstr ""
+
+msgctxt "#30044"
+msgid "Max. resolution"
+msgstr ""
+
+msgctxt "#30045"
+msgid "Advanced"
+msgstr ""
+
+msgctxt "#30046"
+msgid "Exclude 3D"
+msgstr ""
+
+msgctxt "#30047"
+msgid "Exclude HDR"
+msgstr ""
+
+msgctxt "#30048"
+msgid "Prefer HDR"
+msgstr ""
+
+msgctxt "#30049"
+msgid "Preferred codecs"
+msgstr ""
+
+msgctxt "#30050"
+msgid "Not prefered codecs"
+msgstr ""
+
+msgctxt "#30051"
+msgid "Preferred groups"
+msgstr ""
+
+msgctxt "#30052"
+msgid "Not preferred groups"
+msgstr ""
+
+msgctxt "#30053"
+msgid "Preferred source"
+msgstr ""
+
+msgctxt "#30054"
+msgid "Not preferred source"
+msgstr ""
+
+msgctxt "#30055"
+msgid "Preferred audio with multiple audio channels"
+msgstr ""
+
+#msgctxt "#30056"
+#msgid ""
+#msgstr ""
+#
+#msgctxt "#30057"
+#msgid ""
+#msgstr ""
+#
+#msgctxt "#30058"
+#msgid ""
+#msgstr ""
+#
+#msgctxt "#30059"
+#msgid ""
+#msgstr ""
 
 msgctxt "#30100"
 msgid "Welcome"
@@ -244,3 +320,16 @@ msgstr ""
 msgctxt "#30123"
 msgid "You need to restart KODI for the new settings to work. Please turn off KODI and start it again."
 msgstr ""
+
+msgctxt "#30124"
+msgid "Add to Android TV"
+msgstr ""
+
+msgctxt "#30125"
+msgid "Add item to HP"
+msgstr ""
+
+msgctxt "#30126"
+msgid "Remove"
+msgstr ""
+

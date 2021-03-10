@@ -1,21 +1,22 @@
 from __future__ import print_function, unicode_literals
 
 LOG = 2
+APP = 'SC'
 
 try:  # noqa C901
     import xbmc
 
     def debug(text):
-        xbmc.log('[SC] {}'.format(text), xbmc.LOGDEBUG)
+        xbmc.log('[{}] {}'.format(APP, text), xbmc.LOGDEBUG)
 
     def info(text):
-        xbmc.log('[SC] {}'.format(text), xbmc.LOGINFO)
+        xbmc.log('[{}] {}'.format(APP, text), xbmc.LOGINFO)
 
     def warning(text):
-        xbmc.log('[SC] {}'.format(text), xbmc.LOGWARNING)
+        xbmc.log('[{}] {}'.format(APP, text), xbmc.LOGWARNING)
 
     def error(text):
-        xbmc.log('[SC] {}'.format(text), xbmc.LOGERROR)
+        xbmc.log('[{}] {}'.format(APP, text), xbmc.LOGERROR)
 except Exception as e:
     def debug(text):
         if LOG > 1:

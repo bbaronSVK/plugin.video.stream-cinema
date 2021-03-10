@@ -50,7 +50,7 @@ def user_agent(system=True):
 
 
 def get_app_log():
-    app = get_app_name()
+    return get_app_name()
 
 
 class Http:

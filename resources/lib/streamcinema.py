@@ -17,7 +17,7 @@ from resources.lib.constants import SORT_METHODS, SC, GUI
 from resources.lib.api.sc import Sc
 from resources.lib.gui import cur_win, home_win
 from resources.lib.gui.dialog import dok, dinput
-from resources.lib.gui.item import SCItem, get_history_item_name
+from resources.lib.gui.item import SCItem, get_history_item_name, list_hp
 from resources.lib.common.storage import Storage
 from resources.lib.language import Strings
 from resources.lib.params import params
@@ -35,12 +35,21 @@ class Scinema:
         self.update_listing = False
         self.cache_to_disc = False
         self.url = '/'
+        self.payload = None
         self.storage = Storage('scinema')
         self.send_end = False
+        self.listType = None
 
     def run(self):
+
         if SC.ITEM_URL in self.args:
             self.url = self.args.get(SC.ITEM_URL)
+
+        if self.url == '/' and xbmc.Player().isPlayingVideo():
+            container_update('special://home', True)
+            self.succeeded = False
+            self.end_of_directory()
+            return
 
         if SC.ITEM_URL in self.args and self.args.get(SC.ITEM_URL).startswith('http'):
             self.args.update({SC.ITEM_ACTION: SC.ACTION_PLAY_URL})
@@ -59,16 +68,15 @@ class Scinema:
             stara URL zo SC CS&SK pre play aby fungovala kniznica
             '''
             self.url = self.args.get('play')
-            self.call_url()
+            self.call_url_and_response()
         else:
-            self.call_url()
+            self.call_url_and_response()
         self.end()
 
     def action(self):
-        # @todo tu treba spravit "akcie"
         action = self.args.get(SC.ITEM_ACTION)
         if action == SC.ACTION_PLAY_URL:
-            self.play_url(self.args.get('url'))
+            self.play_url(self.args.get(SC.ITEM_URL))
             self.succeeded = True
         elif action == SC.ACTION_CMD:
             self.action_cmd()
@@ -80,24 +88,90 @@ class Scinema:
             self.action_last()
         elif action == SC.ACTION_DEBUG:
             check_set_debug(True)
-        elif action == 'down':
-            debug('download {}'.format(self.args))
-            self.url = self.args.get('down')
-            self.call_url()
-        elif action == 'buffer':
+        elif action == SC.ACTION_DOWNLOAD:
+            self.url = self.args.get(SC.ITEM_DOWNLOAD)
+            self.call_url_and_response()
+        elif action == SC.ACTION_BUFFER:
             set_kodi_cache_size()
+        elif action == SC.ACTION_ANDROID:
+            self.action_android()
+        elif action == SC.ACTION_ADD2HP:
+            self.action_add2hp()
+        elif action == SC.ACTION_DEL2HP:
+            self.action_add2hp(True)
+        elif action == SC.ACTION_ADD_CUSTOM_FILTER:
+            self.action_add_custom_filter()
+        elif action == SC.ACTION_DEL_CUSTOM_FILTER:
+            self.action_add_custom_filter(True)
+        elif action == SC.ACTION_REMOVE_FROM_LIST:
+            self.action_remove_from_list()
         else:
             info('Neznama akcia: {}'.format(action))
         pass
+
+    def action_remove_from_list(self):
+        st = List(self.args[SC.ITEM_PAGE])
+        st.add(self.args[SC.ITEM_ID], True)
+        container_refresh()
+        pass
+
+    def action_android(self):
+        st = List('android')
+        st.add(self.args)
+
+    def action_add2hp(self, remove=False):
+        st = list_hp
+        del self.args[SC.ACTION]
+        if remove is False:
+            label = dinput('Zadaj vlastny nazov', self.args[SC.ITEM_ID])
+            if label == '':
+                label = self.args[SC.ITEM_ID]
+            self.args[SC.ITEM_ID] = label
+
+        st.add(self.args, remove_only=remove)
+        if remove is True:
+            container_refresh()
+
+    def action_add_custom_filter(self, remove=False):
+        if SC.ITEM_PAGE in self.args:
+            st = List(SC.TXT_CUSTOM_FORMAT.format(self.args[SC.ITEM_PAGE]))
+        else:
+            st = List(SC.TXT_CUSTOM_FORMAT.format(self.url))
+
+        cfg = {
+            SC.ITEM_URL: '',
+            SC.ITEM_TITLE: '',
+        }
+        if remove is False:
+            label = dinput('Zadaj nazov polozky')
+            if label == '':
+                label = self.args[SC.ITEM_ID]
+            cfg[SC.ITEM_TITLE] = label
+
+            url = dinput('Zadaj url pre [B]plugin[/B] z https://stream-cinema.online/filter', '')
+            if url == '':
+                return False
+            cfg[SC.ITEM_URL] = url
+        else:
+            cfg.update({
+                SC.ITEM_URL: self.args[SC.ITEM_URL],
+                SC.ITEM_TITLE: self.args[SC.ITEM_TITLE],
+            })
+
+        st.add(cfg, remove_only=remove)
+        if remove is True:
+            container_refresh()
 
     def action_last(self):
         lid = get_history_item_name(self.args.get(SC.ITEM_ID))
         st = List(lid)
         if len(st.get()) > 0:
-            self.url = '/Last?ids={}'.format(dumps(st.get()))
-            self.call_url()
+            self.url = '/Last'
+            self.payload = dict(ids=dumps(st.get()))
+            self.call_url_and_response()
         else:
-            dok(Strings.txt(Strings.EMPTY_HISTORY_H1), Strings.txt(Strings.EMPTY_HISTORY_L1))
+            if SC.ITEM_WIDGET not in self.args:
+                dok(Strings.txt(Strings.EMPTY_HISTORY_H1), Strings.txt(Strings.EMPTY_HISTORY_L1))
 
     def action_cmd(self):
         url = self.args.get('url')
@@ -136,11 +210,39 @@ class Scinema:
             query.update({'ms': '1'})
         url = '/Search/{}?{}'.format(_id, urlencode(query))
         info('search url: {}'.format(url))
-        plugin_url = create_plugin_url({'url': url})
+        self.url = url
+        self.call_url()
+        if 'msgERROR' in self.response.get('system', {}):
+            self.msg_error()
+            self.succeeded = False
+            self.end_of_directory()
+            return
         self.succeeded = True
         self.end_of_directory()
-        container_update(plugin_url, True)
+        plugin_url = create_plugin_url({'url': url})
+        container_update(plugin_url)
         return
+
+    def msg_error(self):
+        if SC.ITEM_WIDGET in self.args:
+            debug('Mame error hlasku, ale sme z widgetu, tak ju nezobrazujeme')
+            return
+
+        if 'msgERROR' in self.response.get('system', {}):
+            debug('ERR REPOSNSE: {}'.format(self.response))
+            data = self.response.get('system').get('msgERROR')
+            if isinstance(data, dict):
+                lang = SYSTEM_LANG_CODE
+                i18n = data.get('i18n', {})
+                if lang not in i18n:
+                    debug('err pre jazyk {} nemame, tak nastavujem cs'.format(lang))
+                    lang = SC.DEFAULT_LANG
+                dok(Strings.txt(Strings.SYSTEM_H1), '{}'.format(data['i18n'][lang]))
+                pass
+            else:
+                dok(Strings.txt(Strings.SYSTEM_H1), '{}'.format(data))
+        else:
+            dok(Strings.txt(Strings.SYSTEM_H1), Strings.txt(Strings.SYSTEM_API_ERROR_L1))
 
     def pinned_key(self):
         return SC.TXT_PINNED.format(self.url)
@@ -155,22 +257,65 @@ class Scinema:
         info('new pined {} for {}'.format(data, self.pinned_key()))
         self.storage[self.pinned_key()] = data
 
+    def call_url_and_response(self):
+        self.call_url()
+        self.parse_response()
+
     def call_url(self):
         try:
-            self.response = Sc.get(self.url)
+            if self.payload is not None:
+                debug('POST DATA: {}'.format(self.payload))
+                self.response = Sc.post(self.url, data=self.payload)
+            else:
+                self.response = Sc.get(self.url)
         except:
             self.response = {}
+
+    def parse_response(self):
+        if SC.ITEM_SYSTEM in self.response:
+            self.system()
+
         if SC.ITEM_MENU in self.response:
             self.list()
         elif SC.ITEM_STRMS in self.response:
             return self.play()
         else:
-            dok(Strings.txt(Strings.SYSTEM_H1), Strings.txt(Strings.SYSTEM_API_ERROR_L1))
+            self.msg_error()
+
+    def pinned_hp(self):
+        st = list_hp
+        for itm in st.get():
+            info('HP item: {}'.format(itm))
+            item = SCItem({'type': SC.ITEM_HPDIR, 'title': itm.get(SC.ITEM_ID), 'url': itm.get(SC.ITEM_URL)})
+            if item.visible:
+                # info('Pridavam item na HP: {}'.format(itm.get(SC.ITEM_ID)))
+                item.li().setProperty('SpecialSort', GUI.TOP)
+                self.items_pinned.append(item.get())
+
+    def pinned_custom(self):
+        st = List(SC.TXT_CUSTOM_FORMAT.format(self.url))
+        for itm in st.get():
+            debug('custom item: {}'.format(itm))
+            cfg = {
+                SC.ITEM_TYPE: SC.ITEM_CUSTOM_FILTER,
+                SC.ITEM_TITLE: itm.get(SC.ITEM_TITLE),
+                SC.ITEM_URL: itm.get(SC.ITEM_URL),
+                'self_url': self.url,
+            }
+            item = SCItem(cfg)
+            if item.visible:
+                item.li().setProperty('SpecialSort', GUI.TOP)
+                self.items_pinned.append(item.get())
 
     def list(self):
         self.succeeded = True
         pinned = self.get_pinned()
         hidden = self.storage.get('h-{}'.format(self.url))
+        self.pinned_custom()
+        if self.url == '/':
+            info('Mame HP, skontrolujeme pripnute polozky')
+            self.pinned_hp()
+
         for i in self.response.get(SC.ITEM_MENU):
             item = SCItem(i)
 
@@ -193,20 +338,31 @@ class Scinema:
             item = SCItem(self.response)
             url, li, status, selected = item.get()
             if SC.ACTION in self.args and SC.ACTION_DOWNLOAD in self.args[SC.ACTION]:
-                filename = self.response.get('info', {}).get('stream_info', {}).get('filename')
+                filename = selected.get('stream_info', {}).get('filename')
                 if filename is None:
-                    dok(Strings.txt(Strings.RESOLVE_ERROR_H1), 'Download error')
+                    dok(Strings.txt(Strings.RESOLVE_ERROR_H1), Strings.txt(Strings.RESOLVE_ERROR_L1))
                     return
                 from threading import Thread
                 worker = Thread(target=download, args=(url, get_setting('download.path'), filename))
                 worker.start()
                 return
+            debug('----------------------------------------------------------------------------------------------------')
+            debug('play url: {}'.format(self.url))
+            debug('play selected: {}'.format(dumps(selected)))
+            debug('play response: {}'.format(dumps(self.response)))
+            debug('play item: {}'.format(li))
+            debug('----------------------------------------------------------------------------------------------------')
             self.response['strms'] = selected
             home_win.setProperty('SC.play_item', dumps(self.response))
-            # info('play: {} {} {}'.format(url, li.getPath(), status))
-            self.succeeded = True
-            xbmcplugin.setResolvedUrl(params.handle, True, li)
-            self.end_of_directory()
+            if params.handle == -1:
+                debug('HANDLE -1')
+                xbmc.Player().play(url, li)
+            else:
+                debug('HANDLE {}'.format(params.handle))
+                self.succeeded = True
+                self.cache_to_disc = False
+                xbmcplugin.setResolvedUrl(params.handle, True, li)
+                self.end_of_directory()
         except:
             # dok('ERROR', 'Chyba pri prehravani')
             info("ERR: {}".format(str(traceback.format_exc())))
@@ -228,9 +384,6 @@ class Scinema:
     def end(self):
         if self.send_end:
             return
-
-        if SC.ITEM_SYSTEM in self.response:
-            self.system()
 
         if not self.items:
             self.succeeded = False
@@ -272,17 +425,18 @@ class Scinema:
             color1 = tmp.get('color1', None)
             xbmcplugin.setPluginFanart(params.handle, image=image, color1=color1)
 
-        if 'msgERROR' in data:
-            if 'i18n' in data.get('msgERROR'):
-                lang = SYSTEM_LANG_CODE
-                i18n = data.get('msgERROR', {}).get('i18n', {})
-                if lang not in i18n:
-                    debug('err pre jazyk {} nemame, tak nastavujem cs'.format(lang))
-                    lang = SC.DEFAULT_LANG
-                dok(Strings.txt(Strings.SYSTEM_H1), str(data.get('msgERROR', {}).get('i18n', {}).get(lang)))
-                pass
-            else:
-                dok(Strings.txt(Strings.SYSTEM_H1), str(data.get('msgERROR')))
+        if 'addCustomFilter' in data:
+            item = SCItem({
+                'type': 'add_custom_filter',
+                'title': '[B]+[/B]   ADD',
+                SC.ITEM_ACTION: SC.ACTION_ADD_CUSTOM_FILTER
+            })
+            item.li().setProperty('SpecialSort', GUI.BOTTOM)
+            self.items.append(item.get())
+
+        if 'listType' in data:
+            params.args.update({'listType': data['listType']})
+            self.listType = data['listType']
 
     def system_after(self):
         data = self.response.get(SC.ITEM_SYSTEM, {})
@@ -318,7 +472,7 @@ class Stream:
         file = self.select_stream()
         info('Vybrany stream: {}'.format(file))
         item = SCItem(self.data)
-        xbmcplugin.setResolvedUrl(params.handle, True, item)
+        # xbmcplugin.setResolvedUrl(params.handle, True, item)
         pass
 
 

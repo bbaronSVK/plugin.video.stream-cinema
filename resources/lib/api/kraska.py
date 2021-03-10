@@ -56,7 +56,7 @@ class Kraska:
                            username.encode('utf-8')).encode('utf-8')).hexdigest()
 
     def get_token(self):
-        debug('get_token start')
+        # debug('get_token start')
         try:
             chsum = settings.get_setting('kraska.chsum')
             if chsum is None or chsum == '':
@@ -72,16 +72,16 @@ class Kraska:
             debug('error get token: {}'.format(traceback.format_exc()))
             self.token = False
             return False
-        debug('get_token from settings')
+        # debug('get_token from settings')
         token = settings.get_setting('kraska.token')
         if token == '' or 'False' == token or None is token:
             token = False
         self.token = token
-        debug('get_token: {}'.format(token))
+        # debug('get_token: {}'.format(token))
         return token
 
     def resolve(self, ident):
-        debug('kra resolve: {} token: {}'.format(ident, self.get_token()))
+        # debug('kra resolve: {} token: {}'.format(ident, self.get_token()))
         if self.get_token() is False:
             debug('nemame token v resolve a nepodarilo sa nam ani prihlasit')
             if self.login() is False:
@@ -124,10 +124,10 @@ class Kraska:
             data = {}
         if self.token:
             data.update({'session_id': self.token})
-        debug('kra req: {} {}'.format(endpoint, json.dumps(data)))
+        debug('kra req: {}'.format(endpoint, json.dumps(data)))
         try:
             raw_data = Http.post(BASE + endpoint, json=data)
-            debug('kra raw response: {}'.format(raw_data.text))
+            # debug('kra raw response: {}'.format(raw_data.text))
             return raw_data.json()
         except Exception as e:
             return False

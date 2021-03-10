@@ -1,3 +1,5 @@
+from __future__ import print_function, unicode_literals
+
 from json import dumps
 
 from xbmcgui import ListItem
@@ -11,12 +13,13 @@ from resources.lib.debug import try_catch
 from resources.lib.gui import get_cond_visibility as gcv, home_win
 from resources.lib.gui.dialog import dselect, dok
 from resources.lib.kodiutils import create_plugin_url, convert_bitrate, get_setting_as_bool, get_setting_as_int, \
-    get_setting
-from resources.lib.language import translate as _t, Strings
+    get_setting, get_info_label, get_system_platform, decode
+from resources.lib.language import Strings
 from resources.lib.params import params
 from resources.lib.system import SYSTEM_LANG_CODE
 
 list_item = ListItem
+list_hp = List('HP')
 
 
 def parental_history():
@@ -45,11 +48,17 @@ class SCItem:
             self.item = SCDir(data)
         elif item_type == SC.ITEM_VIDEO:
             self.item = SCVideo(data)
+        elif item_type == SC.ITEM_HPDIR:
+            self.item = SCHPDir(data)
+        elif item_type == SC.ITEM_CUSTOM_FILTER:
+            self.item = SCCustomFilterDir(data)
         elif item_type == SC.ITEM_CMD:
             self.item = SCCmd(data)
         elif item_type == SC.ITEM_ACTION:
             self.item = SCAction(data)
         elif item_type == SC.ITEM_NEXT:
+            self.item = SCAction(data)
+        elif item_type == 'add_custom_filter':
             self.item = SCAction(data)
         else:
             info('Nepodporovana polozka {} {}'.format(item_type, data))
@@ -71,9 +80,14 @@ class SCBaseItem:
         self.item = list_item()
         self.data = data
         self.info_set = False
+        self.info = {}
 
         if SC.ITEM_TITLE in data:
-            self.item.setLabel(_t(data.get(SC.ITEM_TITLE)))
+            self.item.setLabel(data.get(SC.ITEM_TITLE))
+
+        if SC.ITEM_URL in data:
+            url = create_plugin_url(data)
+            self.item.setPath(url)
 
         if SC.ITEM_ART in data:
             self.set_art()
@@ -93,10 +107,6 @@ class SCBaseItem:
 
         if 'stream_info' in data:
             self.set_stream_info()
-
-        if SC.ITEM_URL in data:
-            url = create_plugin_url(data)
-            self.item.setPath(url)
 
     @try_catch('set_stream_info')
     def set_stream_info(self):
@@ -128,12 +138,18 @@ class SCBaseItem:
 
     @try_catch('_set_info')
     def _set_info(self, item_info):
+        # debug('set_info {}'.format(item_info))
+        debug('SET INFO: {} {}x{}'.format(item_info.get('mediatype'), item_info.get('episode', 'X'), item_info.get('season', 'Y')))
+        self.info.update(item_info)
         try:
             if SC.ITEM_TITLE in item_info:
-                title = _t(item_info.get(SC.ITEM_TITLE))
+                title = '{}'.format(item_info.get(SC.ITEM_TITLE))
                 self.item.setLabel(title)
                 del (item_info[SC.ITEM_TITLE])
 
+            for i, e in enumerate(item_info):
+                # debug('set info {} {}'.format(i, e))
+                self.item.setProperty(e, '{}'.format(item_info[e]))
             self.item.setInfo('video', item_info)
             self.item.setProperty('original_title', item_info.get('originaltitle'))
             self.info_set = True
@@ -181,9 +197,17 @@ class SCStreamSelect(SCBaseItem):
         SCBaseItem.__init__(self, data)
         label2 = ''
         if 'bitrate' in data:
-            label2 += '   bitrate: [B]{}[/B]'.format(convert_bitrate(int(data.get('bitrate'))))
+            label2 += 'bitrate: [B]{}[/B]'.format(convert_bitrate(int(data.get('bitrate'))))
         if 'linfo' in data:
             label2 += '   audio: [B][UPPERCASE]{}[/UPPERCASE][/B]'.format(', '.join(data['linfo']))
+
+        strm_nfo = data.get('stream_info', {})
+        if 'grp' in strm_nfo:
+            label2 += '   grp: [B]{}[/B]'.format(strm_nfo['grp'])
+
+        if 'src' in strm_nfo:
+            label2 += '   src: [B]{}[/B]'.format(strm_nfo['src'])
+
         if SC.ITEM_URL in data:
             url = data.get(SC.ITEM_URL)
             self.item.setPath(url)
@@ -222,8 +246,51 @@ class SCDir(SCBaseItem):
                 SC.ITEM_ID: self.data.get(SC.ITEM_URL)
             }))))
 
+            if get_system_platform() == 'android':
+                context_menu.append(
+                    (Strings.txt(Strings.CONTEXT_ADD_TO_ANDROID_TV), 'RunPlugin({})'.format(create_plugin_url({
+                        SC.ITEM_ACTION: SC.ACTION_ANDROID,
+                        SC.ITEM_URL: self.data.get(SC.ITEM_URL),
+                        SC.ITEM_ID: self.item.getLabel()
+                    }))))
+
+            context_menu.append((Strings.txt(Strings.CONTEXT_PIN_TO_HP), 'RunPlugin({})'.format(create_plugin_url({
+                SC.ITEM_ACTION: SC.ACTION_ADD2HP,
+                SC.ITEM_URL: self.data.get(SC.ITEM_URL),
+                SC.ITEM_ID: self.item.getLabel()
+            }))))
+
         if context_menu:
             self.item.addContextMenuItems(context_menu)
+
+
+class SCHPDir(SCDir):
+    def __init__(self, data):
+        SCDir.__init__(self, data)
+
+    def make_ctx(self):
+        context_menu = [(Strings.txt(Strings.CONTEXT_REMOVE), 'RunPlugin({})'.format(create_plugin_url({
+            SC.ITEM_ACTION: SC.ACTION_DEL2HP,
+            SC.ITEM_URL: self.data.get(SC.ITEM_URL),
+            SC.ITEM_ID: self.item.getLabel()
+        })))]
+
+        self.item.addContextMenuItems(context_menu)
+
+
+class SCCustomFilterDir(SCDir):
+    def __init__(self, data):
+        SCDir.__init__(self, data)
+
+    def make_ctx(self):
+        context_menu = [('Remove custom item', 'RunPlugin({})'.format(create_plugin_url({
+            SC.ITEM_ACTION: SC.ACTION_DEL_CUSTOM_FILTER,
+            SC.ITEM_URL: self.data.get(SC.ITEM_URL),
+            SC.ITEM_TITLE: self.item.getLabel(),
+            SC.ITEM_PAGE: self.data.get('self_url')
+        })))]
+
+        self.item.addContextMenuItems(context_menu)
 
 
 class SCNext(SCDir):
@@ -232,6 +299,46 @@ class SCNext(SCDir):
         SCDir.__init__(data)
         info('Mame next polozku')
         self.item.setProperty('SpecialSort', GUI.BOTTOM)
+
+
+class SCNFO(SCBaseItem):
+    ITEMS_XML = [
+        'title',
+        'originaltitle',
+        'sorttitle',
+        'plot',
+        'runtime',
+        'mpaa',
+        'genre',
+        'country',
+        'director',
+        'year',
+        'studio',
+        'trailer',
+        'dateadded',
+    ]
+
+    def __init__(self, data):
+        SCBaseItem.__init__(self, data)
+
+    def xml(self):
+        out = []
+        for pos, item in enumerate(self.info):
+            if item in self.ITEMS_XML:
+                if isinstance(self.info[item], list):
+                    out.append('\n<{0}>{1}</{0}>'.format(decode(item), ' / '.join(self.info[item])))
+                else:
+                    out.append('\n<{0}>{1}</{0}>'.format(decode(item), decode(self.info[item])))
+
+        i18n = self.data.get(SC.ITEM_I18N_ART)
+        lang = SYSTEM_LANG_CODE
+        if lang not in i18n:
+            lang = SC.DEFAULT_LANG
+        art = i18n.get(lang)
+        for pos, item in enumerate(art):
+            out.append('\n<thumb aspect="{0}">{1}</thumb>'.format(item, art[item]))
+
+        return decode('<movie>{}</movie>'.format(''.join(out)))
 
 
 class SCVideo(SCBaseItem):
@@ -272,11 +379,20 @@ class SCVideo(SCBaseItem):
 
     def gen_context(self):
         menu = []
+
+        if 'listType' in params.args:
+            menu.append([Strings.txt(Strings.CONTEXT_REMOVE), 'RunPlugin({})'.format(create_plugin_url({
+                SC.ACTION: SC.ACTION_REMOVE_FROM_LIST,
+                SC.ITEM_ID: self.data.get(SC.ITEM_ID),
+                SC.ITEM_PAGE: get_history_item_name(self.data.get('lid'))
+            }))])
+
         if get_setting('download.path'):
             menu.append([Strings.txt(Strings.CONTEXT_DOWNLOAD), 'RunPlugin({})'.format(create_plugin_url({
                 SC.ACTION: SC.ACTION_DOWNLOAD,
                 SC.ACTION_DOWNLOAD: self.data.get(SC.ITEM_URL),
             }))])
+
         menu.append([Strings.txt(Strings.CONTEXT_SELECT_STREAM), 'PlayMedia({})'.format(create_plugin_url({
             SC.ACTION_SELECT_STREAM: '1',
             SC.ITEM_URL: self.data.get(SC.ITEM_URL),
@@ -304,6 +420,15 @@ class SCAction(SCBaseItem):
 
 
 class SCPlayItem(SCBaseItem):
+    QUALITY_LIST = {
+        'SD': 1,
+        '720p': 2,
+        '1080p': 3,
+        '3D-SBS': 3,
+        '4K': 4,
+        '8K': 5
+    }
+
     def __init__(self, data, resolve=True):
         self.input = data
         self.streams = []
@@ -327,42 +452,127 @@ class SCPlayItem(SCBaseItem):
             return
 
         if get_setting_as_bool('stream.autoselect'):
-            megabit = 1000000
-            max_bitrate = get_setting_as_int('stream.max.bitrate') * megabit
             lang1 = get_setting('stream.lang1').lower()
             lang2 = get_setting('stream.lang2').lower()
             if Sc.parental_control_is_active():
                 lang1 = get_setting('parental.control.lang1').lower()
                 lang2 = get_setting('parental.control.lang2').lower()
 
+            score = {pos: 0 for pos, s in enumerate(self.streams)}
             for pos, s in enumerate(self.streams):
-                debug('stream: bitrate: {} quality: {} lagn: {}'.format(s.get('bitrate', 0), s.get('quality', 'N/A'),
+                debug('-----------------------------------------------------------------------------------------------')
+                debug('stream: bitrate: {} quality: {} lang: {}'.format(s.get('bitrate', 0), s.get('quality', 'N/A'),
                                                                         s.get('linfo', 'N/A')))
-                bitrate = int(s.get('bitrate', 0))
-                if max_bitrate >= 100 * megabit:
-                    debug('vsetky bitrate su dobre, bitrate {}'.format(bitrate))
-                    add = True
-                elif bitrate < max_bitrate:
-                    debug('nizsi bitrate {} < {}'.format(bitrate, max_bitrate))
-                    add = True
-                else:
-                    debug('velky bitrate {} > {}'.format(bitrate, max_bitrate))
-                    add = False
+                self.video_score(score, pos, s)
 
+                stream_info = s.get('stream_info', {})
                 linfo = s.get('linfo', [])
-                if add and not (lang1 in linfo or lang2 in linfo):
-                    debug('Nemame {} ani {} v {}'.format(lang1, lang2, linfo))
-                    add = False
-
-                if add:
-                    debug('vyberam stream {} / {}'.format(pos, s))
-                    self.streams = [s]
-                    self.selected = s
-                    return
+                if lang1 in linfo:
+                    score = self.audio_score(lang1, pos, score, stream_info, 3)
+                elif lang2 in linfo:
+                    score = self.audio_score(lang2, pos, score, stream_info, 1)
                 else:
-                    debug('NE prindavam stream {}'.format(s))
+                    debug('Nemame primarny, ani sekundarny jazyk')
+
+                debug('-----------------------------------------------------------------------------------------------')
+                debug('final score: {}'.format(score[pos]))
+
+            score = {k: v for k, v in sorted(score.items(), key=lambda item: item[1], reverse=True)}
+            sel = list(score.keys())[0]
+            debug('score: {} / {}'.format(score, sel))
+            self.selected = self.streams[sel]
+            self.streams = [self.selected]
+            return
 
         debug('autoselect nic nevybral, tak nechame usera vybrat')
+
+    def video_score(self, score, pos, s):
+        megabit = 1000000
+        max_bitrate = get_setting_as_int('stream.max.bitrate') * megabit
+
+        quality = s.get('quality', 'SD')
+        max_quality = get_setting('stream.max.quality')
+        debug('qualita {} vs {} | {} >= {}'.format(quality, max_quality, self.QUALITY_LIST[max_quality], self.QUALITY_LIST[quality]))
+        if quality in self.QUALITY_LIST:
+            if max_quality == '-':
+                score[pos] += self.QUALITY_LIST[quality]
+                debug('quality point 1: {} / {}'.format(self.QUALITY_LIST[quality], score[pos]))
+            elif self.QUALITY_LIST[max_quality] >= self.QUALITY_LIST[quality]:
+                w = self.QUALITY_LIST[max_quality] - (self.QUALITY_LIST[max_quality] - self.QUALITY_LIST[quality] - 1)
+                score[pos] += w
+                debug('quality point 2: {} / {}'.format(w, score[pos]))
+            else:
+                debug('nehodnotime rozlisenie 1')
+        else:
+            debug('nehodnotime rozlisenie 2')
+
+        bitrate = int(s.get('bitrate', 0))
+        if max_bitrate >= 100 * megabit:
+            score[pos] += 1
+            debug('vsetky bitrate su dobre, bitrate {} / {}'.format(bitrate, score[pos]))
+        elif bitrate < max_bitrate:
+            score[pos] += 1
+            debug('nizsi bitrate {} < {} / {}'.format(bitrate, max_bitrate, score[pos]))
+        else:
+            score[pos] -= 10
+            debug('prilis velky bitrate {} > {} / {}'.format(bitrate, max_bitrate, score[pos]))
+
+        stream_info = s.get('stream_info', {})
+        video = stream_info.get('video', {})
+        vcodec = video.get('codec')
+
+        if get_setting_as_bool('stream.adv'):
+            if vcodec in get_setting('stream.adv.blacklist.codec'):
+                score[pos] -= 10
+                debug('blacklist codec {} / {}'.format(vcodec, score[pos]))
+
+            if vcodec in get_setting('stream.adv.whitelist.codec'):
+                score[pos] += 1
+                debug('whitelist codec {} / {}'.format(vcodec, score[pos]))
+
+            if get_setting_as_bool('stream.adv.exclude.3d') and '3D' in quality:
+                score[pos] -= 10
+                debug('penalize 3D content {}'.format(score[pos]))
+
+            if get_setting_as_bool('stream.adv.exclude.hdr') and stream_info.get('HDR'):
+                score[pos] -= 10
+                debug('penalize HDR content {}'.format(score[pos]))
+
+            if get_setting_as_bool('stream.adv.prefer.hdr') and stream_info.get('HDR'):
+                score[pos] += 1
+                debug('prefer HDR {}'.format(score[pos]))
+
+        return score
+
+    def audio_score(self, lang1, pos, score, stream_info, weight=3):
+        if get_setting_as_bool('stream.adv') and 'streams' in stream_info:
+            ascore = {apos: 0 for apos, _ in enumerate(stream_info['streams'])}
+            for apos, _ in enumerate(stream_info['streams']):
+                acodec, channels, lang = _
+                lang = lang.lower()
+                debug(' - lang {}/{}'.format(lang, lang1))
+                if acodec in get_setting('stream.adv.whitelist.codec'):
+                    debug(' - audio whitelist acodec {}'.format(acodec))
+                    ascore[apos] += 1
+
+                if acodec in get_setting('stream.adv.blacklist.codec'):
+                    debug(' - audio blacklist acodec {}'.format(acodec))
+                    ascore[apos] -= 10
+
+                if lang == lang1:
+                    if get_setting_as_bool('stream.adv.audio.channels'):
+                        weight = weight + (channels - 3) if 3 > channels > weight else weight
+                    debug(' - audio adv prefered lang {} => {}'.format(lang1, weight))
+                    ascore[apos] += weight
+            ascore = {k: v for k, v in sorted(ascore.items(), key=lambda item: item[1], reverse=True)}
+            sel = list(ascore.keys())[0]
+            score[pos] += ascore[sel]
+            debug('audio score: {} -> {} / {}'.format(ascore, sel, score[pos]))
+        else:
+            score[pos] += weight
+            debug('audio basic prefered lang {} => {} / {}'.format(lang1, weight, score[pos]))
+
+        return score
 
     def resolve(self):
         data = self.data
@@ -391,7 +601,7 @@ class SCPlayItem(SCBaseItem):
             itm.setProperty('old_title', itm.getLabel())
             itm.setLabel(' '.join(matrix[i]))
 
-        if len(items) > 1:
+        if len(items) > 1 or SC.ACTION_SELECT_STREAM in self.params or SC.ACTION_DOWNLOAD in self.params:
             pos = dselect(items, heading=items[0].getProperty('old_title'), use_details=True)
             # info('post: {} | {}'.format(pos, json.dumps(self.data)))
             if pos is False or pos == -1:
@@ -405,7 +615,7 @@ class SCPlayItem(SCBaseItem):
             raise BaseException
 
         url = res.getPath()
-        info('vybrany stream: {} / {}'.format(res.getPath(), self.selected))
+        # info('vybrany stream: {} / {}'.format(res.getPath(), self.selected))
         if res.getProperty(SC.ITEM_PROVIDER) == SC.PROVIDER:
             resp = Sc.get(res.getPath())
             kr = Kraska()
@@ -447,11 +657,32 @@ class SCUpNext:
         self.play_item = SCPlayItem(data, resolve=False)
         self.build()
 
+    def build_cur(self):
+        tvshowid = self.data.get('info', {}).get('id')
+        return dict(
+            episodeid='{}-{}-{}'.format(tvshowid, get_info_label('VideoPlayer.Season'), get_info_label('VideoPlayer'
+                                                                                                       '.Episode')),
+            tvshowid=tvshowid,
+            title=get_info_label('Player.Title'),
+            art={
+                'tvshow.fanart': get_info_label('ListItem.Art(tvshow.fanart)'),
+                'tvshow.poster': get_info_label('ListItem.Art(tvshow.poster)'),
+            },
+            season=get_info_label('VideoPlayer.Season'),
+            episode=get_info_label('VideoPlayer.Episode'),
+            showtitle=get_info_label('VideoPlayer.TVShowTitle'),
+            plot=get_info_label('VideoPlayer.Plot'),
+            playcount=0,
+            rating=0,
+            firstaired='',
+        )
+
     def build(self):
         item = self.play_item.item
-        next = dict(
-            # episodeid='',
-            # tvshowid='',
+        tvshowid = self.data.get('info', {}).get('id')
+        next_episode = dict(
+            episodeid='{}-{}-{}'.format(tvshowid, item.getProperty('season'), item.getProperty('episode')),
+            tvshowid=tvshowid,
             title=item.getLabel(),
             art={
                 'thumb': item.getArt('thumb'),
@@ -464,16 +695,21 @@ class SCUpNext:
             episode=item.getProperty('episode'),
             showtitle=item.getProperty('showtitle'),
             plot=item.getProperty('plot'),
-            # playcount='',
-            # rating='',
-            # firstaired='',
+            playcount=0,
+            rating=0,
+            firstaired='',
             # runtime=''
         )
+        play_info = {
+            SC.ITEM_URL: '{}'.format(self.data.get('info', {}).get(SC.ITEM_URL))
+        }
         self.out = dict(
-            next_episode=next,
-            play_url=item.getPath()
+            current_episode=self.build_cur(),
+            next_episode=next_episode,
+            # play_url=item.getPath()
+            play_info=play_info
         )
-        debug('next_info: {}'.format(self.out))
+        # debug('next_info: {}'.format(self.out))
         pass
 
     def get(self):

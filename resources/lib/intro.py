@@ -3,6 +3,7 @@ from resources.lib.common.logger import info
 from resources.lib.gui.dialog import dyesno, dinput, dok
 from resources.lib.kodiutils import get_setting, set_setting, open_settings
 from resources.lib.language import Strings
+from resources.lib.services.Settings import settings
 
 
 def intro(step=None):
@@ -25,14 +26,14 @@ def intro(step=None):
         info(Strings.INTRO_STEP1_H1)
         info(Strings.txt(Strings.INTRO_STEP1_H1))
         info('RET: {}'.format(user))
-        set_setting('kraska.user', user)
+        settings.set_setting('kraska.user', user)
 
         return intro(step + 1) if user != '' else 0
 
     if step == 3:
         password = dinput(Strings.txt(Strings.INTRO_STEP3_H1), '')
         info('RET: {}'.format(password))
-        set_setting('kraska.pass', password)
+        settings.set_setting('kraska.pass', password)
         kr = Kraska()
         data = kr.user_info()
         return intro(step + 1) if data is False else intro(step + 2)

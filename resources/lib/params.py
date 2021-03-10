@@ -1,3 +1,5 @@
+from __future__ import print_function, unicode_literals
+
 import sys
 from resources.lib.kodiutils import params as decode
 

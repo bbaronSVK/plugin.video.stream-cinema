@@ -12,7 +12,7 @@ home_win = xbmcgui.Window(10000)  # komunikacne okno
 
 
 def get_cond_visibility(text):
-    debug('get_cond_visibility: {}'.format(text))
+    # debug('get_cond_visibility: {}'.format(text))
     if 'sc://' in text:
         return translate_cond_visibility(text)
 
@@ -20,18 +20,21 @@ def get_cond_visibility(text):
         text = text.replace("Integer.IsGreater", "IntegerGreaterThan")
         text = text.replace("String.Contains", "SubString")
         text = text.replace("String.IsEqual", "StringCompare")
-    debug('final: {} / {}'.format(text, xbmc.getCondVisibility(text)))
+    # debug('final: {} / {}'.format(text, xbmc.getCondVisibility(text)))
     return xbmc.getCondVisibility(text)
 
 
 def translate_cond_visibility(text):
     m = re.search('sc://(?P<typ>[^\(]+)\((?P<param1>[^\s,\)]+),(?P<param2>[^\s,\)]+)\)', text)
-    debug('najdene: {} / {} ({}, {})'.format(m.group(0), m.group('typ'), m.group('param1'), m.group('param2')))
+    # debug('najdene: {} / {} ({}, {})'.format(m.group(0), m.group('typ'), m.group('param1'), m.group('param2')))
+    ret = text
     if m.group('typ') == 'config':
-        return '{}'.format(get_setting(m.group('param1'))) == '{}'.format(m.group('param2'))
+        # debug('{} vs {}'.format(get_setting(m.group('param1')), m.group('param2')))
+        ret = '{}'.format(get_setting(m.group('param1'))) == '{}'.format(m.group('param2'))
     elif m.group('typ') == 'history':
         from resources.lib.gui.item import get_history_item_name
         name = get_history_item_name(m.group('param1'))
         st = List(name)
-        return len(st.get()) > int(m.group('param2'))
-    return text
+        ret = len(st.get()) > int(m.group('param2'))
+    # debug('{} -> {}'.format(text, ret))
+    return ret

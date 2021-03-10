@@ -1,4 +1,5 @@
 from __future__ import print_function, unicode_literals
+
 import json
 import math
 import os
@@ -19,10 +20,20 @@ from base64 import b64encode
 
 from resources.lib.constants import ADDON_ID, PY2, SC
 from resources.lib.common.logger import debug
-from resources.lib.language import translate
-from resources.lib.common.txt import _decode
 
 addon = xbmcaddon.Addon(id=ADDON_ID)
+
+
+def encode(s, encoding='utf-8', errors='strict'):
+    if PY2 and isinstance(s, unicode):
+        s = s.encode(encoding, errors)
+    return s
+
+
+def decode(s, encoding='utf-8', errors='strict'):
+    if PY2 and isinstance(s, str):
+        s = s.decode(encoding, errors)
+    return s
 
 
 def translate_path(path):
@@ -65,13 +76,12 @@ def set_system_debug(new_val):
 
 
 def get_app_name():
-    cmd = ('{"jsonrpc":"2.0", "method":"Application.GetProperties",'
-           '"params": {"properties": ["name"]}, "id":1}')
     try:
-        data = json.loads(xbmc.executeJSONRPC(cmd))
+        data = jsonrpc(method='Application.GetProperties', params=dict(properties=["name"]))
         if "result" in data and "name" in data["result"]:
             return data["result"]["name"]
     except:
+        debug('ERR app name: {}'.format(traceback.format_exc()))
         pass
     return "EKodi"
 
@@ -364,7 +374,7 @@ def create_plugin_url(param):
         ]:
             continue
 
-        value = '{}'.format(translate(param[key]))
+        value = '{}'.format(decode(param[key]))
 
         # Ignore empty
         if not value:
@@ -403,11 +413,14 @@ def make_table(matrix):
 
 
 def upnext_signal(sender, next_info):
-    data = [_decode(b64encode(json.dumps(next_info).encode()))]
+    j = json.dumps(next_info).encode()
+    data = [b64encode(j).decode()]
     notify(sender=sender + '.SIGNAL', message='upnext_data', data=data)
 
 
 def notify(sender, message, data):
+    debug('notify: method={}, sender={}, message={}, data={}'.format('JSONRPC.NotifyAll',
+                                                                     sender, message, data))
     result = jsonrpc(method='JSONRPC.NotifyAll', params=dict(
         sender=sender,
         message=message,
@@ -484,6 +497,27 @@ def microtime():
 
 def get_percentage(val, total):
     return int(val / total * 100)
+
+
+def mkdir(path):
+    xbmcvfs.mkdir(make_legal_filename(path))
+
+
+def make_nfo_content(item, typ='movie'):
+    out = []
+    if SC.ITEM_UIDS in item:
+        uids = item[SC.ITEM_UIDS]
+        if 'csfd' in uids:
+            out.append('https://www.csfd.cz/film/{}'.format(uids['csfd']))
+        if 'imdb' in uids:
+            out.append('https://www.imdb.com/title/tt{}'.format(uids['imdb']))
+        if 'tmdb' in uids:
+            out.append('https://www.themoviedb.org/{}/{}-'.format(typ, uids['tmdb']))
+        if 'tvdb' in uids:
+            out.append('https://www.thetvdb.com/dereferrer/series/{}'.format(uids['tvdb']))
+        if 'trakt' in uids:
+            out.append('https://trakt.tv/{}/{}'.format(typ, uids['trakt']))
+    return "\n".join(out)
 
 
 def download(url, dest, name):

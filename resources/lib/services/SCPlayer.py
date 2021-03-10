@@ -1,3 +1,6 @@
+from __future__ import print_function, unicode_literals
+
+import traceback
 from datetime import datetime
 from json import loads
 from time import time
@@ -11,7 +14,7 @@ from resources.lib.common.logger import debug
 from resources.lib.constants import ADDON_ID
 from resources.lib.gui import home_win, get_cond_visibility as gcv
 from resources.lib.gui.item import SCUpNext
-from resources.lib.kodiutils import upnext_signal
+from resources.lib.kodiutils import upnext_signal, sleep
 
 
 class SCPlayer(Player):
@@ -34,11 +37,15 @@ class SCPlayer(Player):
         pass
 
     def set_item(self, item):
+        self.up_next = False
         # self.item = item
         item_data = loads(self.win.getProperty('SC.play_item'))
+        self.win.clearProperty('SC.play_item')
         self.item = item_data.get('info')
+        debug('ITEM: {}'.format(self.item.get('info', {}).get('unique_ids')))
         linfo = item_data.get('strms').get('linfo')
         ids = self.win.getProperty('{}.ids'.format(ADDON_ID))
+        self.win.clearProperty('{}.ids'.format(ADDON_ID))
         self.ids = loads(ids) if ids else {}
         self.my_id = self.ids.get('sc') if self.ids.get('sc') else None
         debug('my ids: {}'.format(self.ids))
@@ -79,55 +86,56 @@ class SCPlayer(Player):
         return False
 
     def onAVStarted(self):
-        debug('onAVStarted')
+        debug('player onAVStarted')
 
     def onAVChange(self):
-        debug('onAVChange')
+        debug('player onAVChange')
         if self.is_my_plugin is True:
             debug('moj plugin')
 
     def onPlayBackEnded(self):
-        debug('onPlayBackEnded')
+        debug('player onPlayBackEnded')
         self.end_playback()
         pass
 
     def onPlayBackStopped(self):
-        debug('onPlayBackStopped')
+        debug('player onPlayBackStopped')
         self.end_playback()
         pass
 
     def onPlayBackError(self):
-        debug('onPlayBackError')
+        debug('player onPlayBackError')
         self.end_playback()
         pass
 
     def onPlayBackPaused(self):
-        debug('onPlayBackPaused')
+        debug('player onPlayBackPaused')
         self.end_playback()
         pass
 
     def onPlayBackResumed(self):
-        debug('onPlayBackResumed')
+        debug('player onPlayBackResumed')
         pass
 
     def onQueueNextItem(self):
-        debug('onQueueNextItem')
+        debug('player onQueueNextItem')
         pass
 
     def onPlayBackSpeedChanged(self, speed):
-        debug('onPlayBackSpeedChanged {}'.format(speed))
+        debug('player onPlayBackSpeedChanged {}'.format(speed))
         pass
 
     def onPlayBackSeek(self, time, seekOffset):
-        debug('onPlayBackSeek {} {}'.format(time, seekOffset))
+        debug('player onPlayBackSeek {} {}'.format(time, seekOffset))
         pass
 
     def onPlayBackSeekChapter(self, chapter):
-        debug('onPlayBackSeekChapter {}'.format(chapter))
+        debug('player onPlayBackSeekChapter {}'.format(chapter))
         pass
 
     def clean(self):
-        self.win.clearProperty('{}.ids'.format(ADDON_ID))
+        debug('player SCPlayer Clean')
+        #
         self.current_time = 0
         self.ids = {}
         self.is_my_plugin = False
@@ -162,16 +170,22 @@ class SCPlayer(Player):
 
     def check_up_next(self, percent_played):
         return gcv('System.hasAddon(service.upnext)') and self.item and self.item['info'].get(
-            'episode') is not None and self.up_next is False and percent_played >= 10
+            'episode') is not None and self.up_next is False
 
     def send_up_next(self):
-        series = self.item['info'].get('season')
-        episode = self.item['info'].get('episode')
-        data = Sc.get('/upNext/{}/{}/{}'.format(self.my_id, series, episode))
-        if 'info' in data:
-            debug('Mame nex item: {}'.format(data['info']))
-            d = SCUpNext(data)
-            upnext_signal(ADDON_ID, d.get())
+        try:
+            series = self.item['info'].get('season')
+            episode = self.item['info'].get('episode')
+            url = '/upNext/{}/{}/{}'.format(self.my_id, series, episode)
+            debug('upnext call {}'.format(url))
+            data = Sc.get(url)
+            if 'info' in data:
+                debug('Mame next item: {}'.format(data))
+                d = SCUpNext(data)
+                # sleep(3 * 1000)
+                upnext_signal(ADDON_ID, d.get())
+        except:
+            debug('send_up_next ERR {}'.format(traceback.format_exc()))
 
     def periodical_check(self):
         if not self.isPlayingVideo() or self.is_my_plugin is False:
@@ -189,9 +203,11 @@ class SCPlayer(Player):
             self.watched = True
         if self.check_up_next(percent_played):
             debug('Mame upnext nainstalovane')
-            self.send_up_next()
+            try:
+                self.send_up_next()
+            except:
+                pass
             self.up_next = True
-            pass
 
 
 player = SCPlayer()

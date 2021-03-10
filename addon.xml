@@ -1,8 +1,9 @@
-<addon id="plugin.video.stream-cinema" name="Stream Cinema CZ a SK" provider-name="bbaron" version="2.0.5+k19">
+<addon id="plugin.video.stream-cinema" name="Stream Cinema CZ a SK" provider-name="bbaron" version="2.0.6+k19">
     <requires>
         <import addon="xbmc.python" version="3.0.0"/>
         <import addon="script.module.requests" version="2.12.4"/>
-        <import addon="script.module.trakt" version="4.2.0"/>
+        <import addon="script.module.trakt" version="4.2.0" optional="true"/>
+        <import addon="service.upnext" version="1.1.5" optional="true"/>
     </requires>
     <extension library="main.py" point="xbmc.python.pluginsource">
         <provides>video</provides>

@@ -1,5 +1,7 @@
 from __future__ import print_function, unicode_literals
 
+from json import dumps
+
 from resources.lib.common.storage import Storage, KodiDb
 from resources.lib.common.logger import debug
 from resources.lib.kodiutils import hexlify
@@ -34,7 +36,10 @@ class List(object):
         if self.sorted is True and item in self.data \
                 or remove_only is True:
             # debug('--- remove {}'.format(item))
-            self.data.remove(item)
+            try:
+                self.data.remove(item)
+            except:
+                pass
 
         if remove_only is False \
                 or (self.sorted is False and item not in self.data and remove_only is False):
