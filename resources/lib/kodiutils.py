@@ -162,25 +162,24 @@ def get_uuid():
 
 def _get_system_uuid():
     uuid_value = get_setting('system.uuid')
-    if uuid_value:
+    if uuid_value and "'" not in uuid_value:
         debug('UUID from settings: {}'.format(uuid_value))
         return uuid_value
 
-    uuid_value = None
     system = get_system_platform()
     if system in ['windows', 'uwp']:
         uuid_value = _get_windows_uuid()
         debug('Windows UUID Found')
-    elif system == 'android':
-        uuid_value = _get_android_uuid()
-        debug('Android UUID Found')
+    # elif system == 'android':
+    #     uuid_value = _get_android_uuid()
+    #     debug('Android UUID Found')
     elif system == 'linux':
         uuid_value = _get_linux_uuid()
         debug('Linux UUID Found')
     elif system == 'osx':
         uuid_value = _get_macos_uuid()
         debug('OSX, IOS UUID Found {}'.format(uuid_value))
-    if not uuid_value:
+    if not uuid_value or "'" in uuid_value:
         debug('It is not possible to get a system UUID creating a new UUID')
         uuid_value = get_setting('system.uuid')
         debug('UUID from settings: {}'.format(uuid_value))
@@ -243,7 +242,7 @@ def _get_android_uuid():
     values = ''
     try:
         # Due to the new android security we cannot get any type of serials
-        sys_prop = ['ro.product.board', 'ro.product.brand', 'ro.product.device', 'ro.product.locale'
+        sys_prop = ['ro.product.board', 'ro.product.brand', 'ro.product.device', 'ro.product.locale',
                                                                                  'ro.product.manufacturer',
                     'ro.product.model', 'ro.product.platform',
                     'persist.sys.timezone', 'persist.sys.locale', 'net.hostname']

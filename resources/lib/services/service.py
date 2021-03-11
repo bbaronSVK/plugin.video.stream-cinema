@@ -31,7 +31,7 @@ class Service:
 
     def __init__(self):
         set_setting('system.ver', ADDON.getAddonInfo('version'))
-        set_setting('system.uuid', get_uuid())
+        get_uuid()
         if get_setting('androidtv.path'):
             self.atv = AndroidTv()
 

@@ -13,7 +13,7 @@ from resources.lib.debug import try_catch
 from resources.lib.gui import get_cond_visibility as gcv, home_win
 from resources.lib.gui.dialog import dselect, dok
 from resources.lib.kodiutils import create_plugin_url, convert_bitrate, get_setting_as_bool, get_setting_as_int, \
-    get_setting, get_info_label, get_system_platform, decode
+    get_setting, get_info_label, get_system_platform, decode, make_nfo_content
 from resources.lib.language import Strings
 from resources.lib.params import params
 from resources.lib.system import SYSTEM_LANG_CODE
@@ -318,27 +318,46 @@ class SCNFO(SCBaseItem):
         'dateadded',
     ]
 
+    XML_ITEM = '\n<{0}>{1}</{0}>'
+    XML_ACTOR = '<actor><name>{name:}</name><role>{role:}</role><order>{order:}</order><thumb>{thumbnail:}</thumb></actor>'
+    XML_THUMB = '<thumb aspect="{0}">{1}</thumb>'
+    XML_MOVIE = '<movie>{}</movie>'
+    DEFAULT_ACTOR = {'name': '', 'role': '', 'order': '', 'thumbnail': ''}
+
     def __init__(self, data):
         SCBaseItem.__init__(self, data)
 
     def xml(self):
         out = []
+
         for pos, item in enumerate(self.info):
             if item in self.ITEMS_XML:
                 if isinstance(self.info[item], list):
-                    out.append('\n<{0}>{1}</{0}>'.format(decode(item), ' / '.join(self.info[item])))
+                    out.append(self.XML_ITEM.format(decode(item), ' / '.join(self.info[item])))
                 else:
-                    out.append('\n<{0}>{1}</{0}>'.format(decode(item), decode(self.info[item])))
+                    out.append(self.XML_ITEM.format(decode(item), decode(self.info[item])))
+
+        for actor in self.data.get('cast', {}):
+            d = self.DEFAULT_ACTOR.copy()
+            d.update(actor)
+            debug('actor data: {}'.format(d))
+            out.append(self.XML_ACTOR.format(**d))
 
         i18n = self.data.get(SC.ITEM_I18N_ART)
         lang = SYSTEM_LANG_CODE
         if lang not in i18n:
             lang = SC.DEFAULT_LANG
+
         art = i18n.get(lang)
         for pos, item in enumerate(art):
-            out.append('\n<thumb aspect="{0}">{1}</thumb>'.format(item, art[item]))
+            out.append(self.XML_THUMB.format(item, art[item]))
 
-        return decode('<movie>{}</movie>'.format(''.join(out)))
+        return decode(self.XML_MOVIE.format(''.join(out)))
+
+    def nfo(self):
+        typ = self.data(SC.ITEM_INFO, {}).get('mediatype', 'movie')
+        typ = typ if typ == 'movie' else 'tvshow'
+        return make_nfo_content(self.data, typ)
 
 
 class SCVideo(SCBaseItem):
