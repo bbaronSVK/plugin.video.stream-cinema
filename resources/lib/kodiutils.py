@@ -181,8 +181,6 @@ def _get_system_uuid():
         debug('OSX, IOS UUID Found {}'.format(uuid_value))
     if not uuid_value or "'" in uuid_value:
         debug('It is not possible to get a system UUID creating a new UUID')
-        uuid_value = get_setting('system.uuid')
-        debug('UUID from settings: {}'.format(uuid_value))
         if not uuid_value:
             debug('get fake uuid')
             uuid_value = _get_fake_uuid()
