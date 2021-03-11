@@ -165,6 +165,8 @@ def _get_system_uuid():
     if uuid_value and "'" not in uuid_value:
         debug('UUID from settings: {}'.format(uuid_value))
         return uuid_value
+    else:
+        uuid_value = ''
 
     system = get_system_platform()
     if system in ['windows', 'uwp']:
@@ -237,7 +239,7 @@ def _get_android_uuid():
     # pylint: disable=broad-except
     import subprocess
     import re
-    values = ''
+    values = 'xxx'
     try:
         # Due to the new android security we cannot get any type of serials
         sys_prop = ['ro.product.board', 'ro.product.brand', 'ro.product.device', 'ro.product.locale',
