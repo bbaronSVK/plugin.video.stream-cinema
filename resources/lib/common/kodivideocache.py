@@ -27,7 +27,7 @@ def set_kodi_cache_size():
         if not res:
             return False
 
-    cache_size = min(500, int(free_mem / 3 * (coefficient/100)))
+    cache_size = int(min(500, int(free_mem / 3 * (coefficient/100))) * 1e6)
     debug('Nova cache {}'.format(cache_size))
     advanced_settings = '<advancedsettings>' \
                         '<cache><memorysize>{}</memorysize>' \
