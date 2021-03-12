@@ -519,6 +519,14 @@ def make_nfo_content(item, typ='movie'):
     return "\n".join(out)
 
 
+def update_addon():
+    from resources.lib.common.storage import KodiAddonsDb
+    addon_db = KodiAddonsDb()
+    addon_db.enable_auto_update()
+    exec_build_in('UpdateAddonRepos')
+    exec_build_in("UpdateLocalAddons")
+
+
 def download(url, dest, name):
     from resources.lib.gui.dialog import dprogressgb
     filename = make_legal_filename('{}'.format(os.path.join(translate_path(dest), name)))

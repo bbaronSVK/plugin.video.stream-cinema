@@ -10,7 +10,7 @@ from json import dumps
 
 from resources.lib.common.kodivideocache import set_kodi_cache_size
 from resources.lib.kodiutils import params, container_refresh, urlencode, container_update, create_plugin_url, \
-    exec_build_in, download, get_setting
+    exec_build_in, download, get_setting, update_addon
 from resources.lib.common.logger import info, debug
 from resources.lib.common.lists import List
 from resources.lib.constants import SORT_METHODS, SC, GUI
@@ -105,6 +105,8 @@ class Scinema:
             self.action_add_custom_filter(True)
         elif action == SC.ACTION_REMOVE_FROM_LIST:
             self.action_remove_from_list()
+        elif action == SC.ACTION_UPDATE_ADDON:
+            update_addon()
         else:
             info('Neznama akcia: {}'.format(action))
         pass

@@ -209,10 +209,10 @@ msgctxt "#30055"
 msgid "Preferred audio with multiple audio channels"
 msgstr "Preferované audio s více audio kanály"
 
-#msgctxt "#30056"
-#msgid ""
-#msgstr ""
-#
+msgctxt "#30056"
+msgid "Run addons update"
+msgstr "Spustit aktualizaci doplňků"
+
 #msgctxt "#30057"
 #msgid ""
 #msgstr ""
@@ -332,4 +332,8 @@ msgstr "Připnout na hlavní stránku"
 msgctxt "#30126"
 msgid "Remove"
 msgstr "Odobrat"
+
+msgctxt "#30127"
+msgid "Addon is not installed from our repository. Please install addon from our repository."
+msgstr "Addon není nainstalován z našeho repozitáře. Nainstalujte si doplněk z našeho repozitáře."
 

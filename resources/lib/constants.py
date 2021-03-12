@@ -43,6 +43,7 @@ class SC:
     ACTION_PLAY_URL = 'playUrl'
     ACTION_REMOVE_FROM_LIST = 'remove_from_list'
     ACTION_SELECT_STREAM = 'selectStream'
+    ACTION_UPDATE_ADDON = 'update_addon'
     CMD = 'cmd'
     DEFAULT_LANG = 'cs'
     ITEM_ACTION = 'action'
@@ -105,11 +106,11 @@ class HTTP:
 
 
 class KodiDbMap:
-    MyVideos = {16: 99, 17: 107, 18: 116, 19: 119}
-    MyMusic = {16: 56, 17: 60, 18: 72, 19: 82}
-    Textures = {16: 13, 17: 13, 18: 13, 19: 13}
-    Addons = {16: 20, 17: 27, 18: 27, 19: 33}
-    ViewModes = {16: 6, 17: 6, 18: 6, 19: 6}
+    MyVideos = {16: 99, 17: 107, 18: 116, 19: 119, 20: 119}
+    MyMusic = {16: 56, 17: 60, 18: 72, 19: 82, 20: 82}
+    Textures = {16: 13, 17: 13, 18: 13, 19: 13, 20: 13}
+    Addons = {16: 20, 17: 27, 18: 27, 19: 33, 20: 33}
+    ViewModes = {16: 6, 17: 6, 18: 6, 19: 6, 20: 6}
 
 
 SORT_METHODS = {

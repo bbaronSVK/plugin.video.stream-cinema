@@ -5,8 +5,9 @@ import os
 import sqlite3
 from json import loads, dumps
 
-from resources.lib.constants import ADDON, KodiDbMap
+from resources.lib.constants import ADDON, KodiDbMap, ADDON_ID
 from resources.lib.common.logger import debug
+from resources.lib.gui.dialog import dok
 from resources.lib.kodiutils import translate_path
 from resources.lib.system import SYSTEM_VERSION
 
@@ -35,6 +36,28 @@ class Sqlite(object):
             c = conn.cursor()
             c.execute(query, args)
             return c
+
+
+class KodiAddonsDb:
+    def __init__(self):
+        path = 'special://database/Addons{}.db'.format(KodiDbMap.Addons[SYSTEM_VERSION])
+        self._db = Sqlite(path)
+
+    def check_repo(self):
+        query = 'select id from repo where id in (' \
+                'select idRepo from addonlinkrepo where idAddon in (' \
+                'select id from addons where addonID=?))'
+        res = self._db.execute(query, ADDON_ID).fetchone()
+        if res is not None:
+            return True
+        return False
+
+    def enable_auto_update(self):
+        if not self.check_repo():
+            from resources.lib.language import Strings
+            dok(Strings.txt(Strings.SYSTEM_H1), Strings.txt(Strings.SYSTEM_NOT_INSTALLED_FROM_REPOSITORY))
+        query = 'delete from update_rules where addonID=?'
+        self._db.execute(query, ADDON_ID)
 
 
 class KodiDb:
