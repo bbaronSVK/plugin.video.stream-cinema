@@ -28,7 +28,7 @@ class Settings(xbmc.Monitor):
 
     def set_setting(self, key, val):
         debug('set_settings {} {}'.format(key, val))
-        return self.addon.setSetting(key, '{}'.format(val))
+        return xbmcaddon.Addon(ADDON_ID).setSetting(key, '{}'.format(val))
 
     def get_setting_as_bool(self, key):
         try:

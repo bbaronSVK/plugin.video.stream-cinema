@@ -1,12 +1,16 @@
 from __future__ import absolute_import, division, print_function
 
-from resources.lib.common.logger import debug
-from resources.lib.kodiutils import get_setting, set_setting, get_setting_as_bool
-from resources.lib.gui.dialog import dok, dprogress
-from resources.lib.common.storage import Storage
-from resources.lib.common.lists import List, SCKODIItem
-from resources.lib.services.SCPlayer import player
+import traceback
+
 from resources.lib.api.sc import Sc
+from resources.lib.common.lists import List, SCKODIItem
+from resources.lib.common.logger import debug
+from resources.lib.common.storage import Storage
+from resources.lib.gui.dialog import dok, dprogress, dprogressgb
+from resources.lib.gui.item import SCItem
+from resources.lib.kodiutils import set_setting, get_setting_as_bool, set_setting_as_bool
+from resources.lib.services.SCPlayer import player
+from resources.lib.services.Settings import settings
 
 from trakt import Trakt
 from json import loads, dumps
@@ -15,6 +19,7 @@ import dateutil.parser
 from datetime import datetime
 from dateutil.tz import tzutc
 from xbmcaddon import Addon
+
 
 time.strptime("1970-01-01 12:00:00", "%Y-%m-%d %H:%M:%S")
 
@@ -31,12 +36,10 @@ class TraktAPI(object):
         'watched.shows': List('trakt.watched.shows', sorted=False),
     }
     authorization = {}
+    initialized = False
 
     def __init__(self, force=False):
         debug("TRAKT Initializing.")
-
-        if not get_setting_as_bool('trakt.enabled'):
-            return
 
         Trakt.configuration.defaults.client(
             id=self.__client_id,
@@ -48,8 +51,22 @@ class TraktAPI(object):
         Trakt.configuration.defaults.oauth(refresh=True)
         Trakt.configuration.defaults.http(retry=True, timeout=90)
 
-        if get_setting('trakt.authorization') and not force:
-            self.authorization = loads(get_setting('trakt.authorization'))
+        from resources.lib.services.Monitor import monitor
+        self.monitor = monitor
+
+        if not get_setting_as_bool('trakt.enabled'):
+            return
+
+        self.initialize(force=force)
+
+    def initialize(self, force=False):
+        self.initialized = True
+
+        if settings.get_setting('trakt.authorization') and not force:
+            self.authorization = loads(settings.get_setting('trakt.authorization'))
+            Trakt.configuration.defaults.oauth.from_response(
+                self.authorization
+            )
         else:
             self.login()
 
@@ -116,9 +133,10 @@ class TraktAPI(object):
     # ##################################################################################################################
 
     def update_user(self):
-        user = self.get_user()
+        data = self.get_user()
+        debug('trakt user: {}'.format(dumps(data)))
+        user = data['user']['username'] if 'username' in data.get('user', {}) else data['user']['name']
         set_setting('trakt.user', user)
-        pass
 
     def get_user(self):
         with Trakt.configuration.oauth.from_response(self.authorization):
@@ -148,6 +166,12 @@ class TraktAPI(object):
                 Trakt['sync/watched'].movies(movies, exceptions=True)
         return movies
 
+    def get_episode_info(self, id, season, episode, extended=None):
+        with Trakt.configuration.oauth.from_response(self.authorization):
+            with Trakt.configuration.http(retry=True, timeout=90):
+                res = Trakt['shows'].episode(id, season, episode, extended, parse=False).json()
+        return res
+
     def get_last_activities(self):
         with Trakt.configuration.oauth.from_response(self.authorization):
             with Trakt.configuration.http(retry=True):
@@ -166,14 +190,19 @@ class TraktAPI(object):
                 result = Trakt['sync/history'].remove(item)
                 return result
 
+    def get_lists(self, user='me'):
+        return Trakt['users/*/lists'].get(username=user)
+
+    def get_list_items(self, id, user='me'):
+        return Trakt['users/*/lists/*'].get(username=user, id=id)
+
     @staticmethod
     def script_trakt():
         return Addon('script.trakt')
 
     @staticmethod
     def is_enabled():
-        return False
-        # return get_setting_as_bool('trakt.enabled') and get_setting('trakt.authorization')
+        return settings.get_setting_as_bool('trakt.enabled') and settings.get_setting('trakt.authorization')
 
     @staticmethod
     def can_check():
@@ -181,20 +210,28 @@ class TraktAPI(object):
 
     def check_trakt(self):
         if TraktAPI.can_check():
+            if self.initialized is False:
+                self.initialize()
             debug('check trakt')
-            data = trakt.get_last_activities()
+            data = self.get_last_activities()
             for b in ['movies', 'episodes']:
                 synced = False
                 item = data.get(b)
                 for a, i in enumerate(item):
+                    if i != 'paused_at':
+                        continue
                     # debug('{} {} -> {}'.format(b, i, TraktAPI.utc2timestamp(item.get(i))))
                     key = 'sync.{}'.format(b)
                     if self.storage[key].get(i) != item.get(i):
                         debug('zmena {}[{}] z {} na {}'.format(key, i, self.storage[key].get(i), item.get(i)))
                         if not synced:
-                            self.sync_local(b, self.storage[key].get(i))
                             synced = True
-                        self.storage[key].update({i: item.get(i)})
+                            try:
+                                self.sync_local(b, self.storage[key].get(i))
+                            except:
+                                debug('TRAKT ERR: {}'.format(traceback.format_exc()))
+                                pass
+                            self.storage[key].update({i: item.get(i)})
 
     def sync_playback_movies(self, last=0):
         last_at = TraktAPI.utc2timestamp(last)
@@ -204,22 +241,34 @@ class TraktAPI(object):
         tr = []
         for m in playback:
             paused_at = TraktAPI.utc2timestamp(m['paused_at'])
-            if paused_at >= last_at:
+            if paused_at is None or last_at is None or paused_at >= last_at:
                 sync.update({m['movie']['ids']['trakt']: m})
                 tr.append(m['movie']['ids']['trakt'])
         if len(sync):
             res = Sc.post('/Ftrakt2sc', data={'trakt': dumps(tr), 't': 1})
             debug('sync {} / {}     {}'.format(len(sync), len(res), res))
-            for _, scid in enumerate(res):
+            max = len(res)
+            dialog = dprogressgb()
+            dialog.create('sync_playback_movies Trakt.Movies')
+            for pos, scid in enumerate(res):
+                if self.monitor.abortRequested():
+                    return
+
+                debug('trakt {}%'.format(int(pos/max*100)))
+                dialog.update(int(pos/max*100))
                 itm = res.get(scid)
                 item = SCKODIItem(scid, trakt=itm['trakt'])
                 tr = sync.get(int(itm['trakt']))
                 progress = float(sync.get(int(itm['trakt']))['progress'])
-                watched = int(float(itm['duration']) * float(progress / 100))
+                try:
+                    watched = int(float(itm['duration']) * float(progress / 100))
+                except:
+                    watched = 0
                 debug('itm {} {} {} {} {} {}'.format(scid, itm, itm['duration'], watched, progress, tr))
                 item.set_watched(watched)
                 d = datetime.fromtimestamp(self.utc2timestamp(tr.get('paused_at')))
                 item.set_last_played(d.strftime('%Y-%m-%d %H:%M:%S'))
+            dialog.close()
         pass
 
     def sync_local(self, type, last):
@@ -227,6 +276,24 @@ class TraktAPI(object):
             self.sync_local_movies(last)
         else:
             self.sync_local_episodes(last)
+
+    def scroble(self, id, season=None, episode=None, percent=0, action='stop'):
+        data = {
+            "action": action,
+            "progress": float(percent),
+            "parse": False,
+        }
+        if season is not None:
+            # ep_info = self.get_episode_info(id, season, episode)
+            data.update({"show": {"ids": {"trakt": id}}, "episode": {"season": season, "number": episode}})
+        else:
+            data.update({"movie": {"ids": {"trakt": id}}})
+        with Trakt.configuration.oauth.from_response(self.authorization):
+            with Trakt.configuration.http(retry=True):
+                debug('scrobble obj: {}'.format(data))
+                result = Trakt['scrobble'].action(**data).json()
+                return result
+        pass
 
     def sync_get_list(self, data, typ):
         data = list(data.items())
@@ -246,19 +313,31 @@ class TraktAPI(object):
 
     def sync_local_episodes(self, last=0):
         last_at = TraktAPI.utc2timestamp(last)
+        dialog = dprogressgb()
+        dialog.create('sync_local_episodes Trakt.TVShow')
         data = self.get_shows_watched({})
         items = {}
         for trid, num, eps in data:
+            if self.monitor.abortRequested():
+                return
             items.update({trid: eps})
         res, items = self.trakt2sc(items, 3)
+        pos = 0
+        max = len(res)
         for scid, trid in res.items():
+            if self.monitor.abortRequested():
+                return
+            pos += 1
+            debug('episodes: {}%'.format(int(pos/max*100)))
+            dialog.update(int(pos/max*100))
             for s, e, watched_at in items[int(trid['trakt'])]:
                 wa = TraktAPI.utc2timestamp(watched_at)
                 item = SCKODIItem(scid, series=s, episode=e)
                 old = item.get_play_count()
-                if old is None or wa >= last_at:
+                if old is None or last_at is None or wa >= last_at:
                     debug('SCID ADD {} {}x{}'.format(scid, s, e))
                     item.set_play_count('1')
+        dialog.close()
 
         pass
 
@@ -269,10 +348,18 @@ class TraktAPI(object):
         debug('res: {}'.format(len(res)))
         all_items = self.storage['watched.movies'].get()[:]
         # debug('na zaciatku {}'.format(all_items))
+        dialog = dprogressgb()
+        dialog.create('sync_local_movies Trakt.Movies 1')
+        pos = 0
+        max = len(res)
         for scid, trid in res.items():
+            if self.monitor.abortRequested():
+                return
+            pos += 1
+            dialog.update(int(pos/max*100))
             # debug('SCID: {}'.format(scid))
             # debug('w {}'.format(self.storage['watched.{}'.format(type)]))
-            item = SCKODIItem(scid, trakt=trid)
+            item = SCKODIItem(scid)
             if scid not in all_items:
                 debug('pridavam do zoznamu {}'.format(scid))
                 self.storage['watched.movies'].add(scid)
@@ -281,13 +368,22 @@ class TraktAPI(object):
                 all_items.remove(scid)
             pass
             # debug('{} -> {}'.format(scid, movies.get(trid)))
+        dialog.close()
+        dialog.create('sync_local_movies Trakt.Movies 2')
         # debug('Zostali nam po synchre: {}'.format(all_items))
         if len(all_items) > 0:
+            max = len(all_items)
+            pos = 0
             for scid in all_items:
+                if self.monitor.abortRequested():
+                    return
+                pos += 1
+                dialog.update(int(pos / max * 100))
                 # debug('mazem {}'.format(scid))
                 self.storage['watched.movies'].add(scid, remove_only=True)
                 item = SCKODIItem(scid)
                 item.set_play_count(None)
+        dialog.close()
         # debug('res: {}/{}'.format(len(res), res))
 
     @staticmethod
@@ -309,17 +405,75 @@ class TraktAPI(object):
 
     def set_watched(self, trid, times=None, season=None, episode=None):
         if season is None:
-            obj = {"movies": [{"ids": {"trakt": trid}}]}
+            if 'trakt' in trid:
+                obj = {"movies": [{"ids": {"trakt": int(trid.get('trakt'))}}]}
+            else:
+                obj = {"movies": [{"ids": {"trakt": int(trid)}}]}
         else:
-            obj = {"shows": [{"ids": {"trakt": trid}, "seasons": {"number": season, "episodes": [{"number": episode}]}}]}
+            ep_info = self.get_episode_info(int(trid), season, episode)
+            debug('EP INFO: {}'.format(ep_info))
+            if ep_info:
+                obj = {"episodes": [{"ids": ep_info.get('ids', {})}]}
+            else:
+                obj = {"shows": [
+                    {"ids": {
+                        "trakt": int(trid)},
+                        "seasons": {
+                            "number": season,
+                            "episodes": [
+                                {"number": episode}
+                            ]
+                        }
+                    }
+                ]}
         debug('posielam obj: {}'.format(dumps(obj)))
         if times is not None and int(times) > 0:
-            self.add_to_history(obj)
+            ret = self.add_to_history(obj)
         else:
-            self.remove_from_history(obj)
-        debug('Hotovo trakt history....')
+            ret = self.remove_from_history(obj)
+        debug('Hotovo trakt history.... {}'.format(ret))
+
+    def show_items(self, items, sc):
+        sc.url = '/Search/getTrakt'
+        sc.payload = {'ids': dumps(items)}
+        sc.call_url_and_response()
+
+    def action(self, action, sc):
+        from resources.lib.params import params
+        debug('trakt action: {} / {}'.format(action, params.args))
+        if action == 'trakt.login':
+            set_setting_as_bool('trakt.enabled', True)
+            self.login()
+        elif action == 'trakt.logout':
+            set_setting('trakt.authorization', '')
+            set_setting('trakt.user', '')
+        elif action == 'trakt.list':
+            u = 'me' if not params.args.get('user', None) else params.args.get('user')
+            for l in self.get_lists(user=u):
+                # l.name = l.name.encode('utf-8')
+                itm = {'type': 'action', 'title': l.name, 'action': 'trakt.list.items', 'id': l.id, 'user': u}
+                item = SCItem(itm)
+                if item.visible:
+                    sc.items.append(item.get())
+        elif action == 'trakt.list.items':
+            u = 'me' if not params.args.get('user', None) else params.args.get('user')
+            items=[]
+            for i in self.get_list_items(params.args.get('id'), u).items(parse=False).json():
+                t = i.get('type')
+                if t not in ['movie', 'tvshow']:
+                    continue
+                sc_type = 1 if t == 'movie' else 3
+                data = i.get(t, {})
+                ids = data.get('ids')
+                tr = ids.get('trakt')
+                itm = "{},{}".format(sc_type, tr)
+                items.append(itm)
+            self.show_items(items, sc)
+            debug('items: {}'.format(items))
+        else:
+            debug('Neznama akcia trakt.tv {}'.format(action))
+        sc.succeeded = True
+        sc.end()
 
 
 trakt = TraktAPI()
-# trakt.sync_playback_movies(0)
-# trakt.sync_local_episodes(0)

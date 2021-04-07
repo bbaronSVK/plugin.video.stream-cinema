@@ -52,6 +52,10 @@ def set_setting(key, val):
     return addon.setSetting(key, '{}'.format(val))
 
 
+def set_setting_as_bool(key, val):
+    set_setting(key, val is True or val == 'true' or val == 'True')
+
+
 def get_setting_as_bool(key):
     try:
         return addon.getSettingBool(key)
@@ -243,7 +247,7 @@ def _get_android_uuid():
     try:
         # Due to the new android security we cannot get any type of serials
         sys_prop = ['ro.product.board', 'ro.product.brand', 'ro.product.device', 'ro.product.locale',
-                                                                                 'ro.product.manufacturer',
+                    'ro.product.manufacturer',
                     'ro.product.model', 'ro.product.platform',
                     'persist.sys.timezone', 'persist.sys.locale', 'net.hostname']
         # Warning net.hostname property starting from android 10 is deprecated return empty
@@ -366,7 +370,7 @@ def create_plugin_url(param):
     for key in param.keys():
         # Ignore unknown params
         if key not in [
-            "dtitle", "url", "action", "list", "cmd", "down", "play",
+            "dtitle", "url", "action", "list", "cmd", "down", "play", "user",
             "force", "search-list", "search", "csearch", "search-remove",
             "search-edit", "tl", "id", "subtype", "title", "name", "imdb",
             "tvdb", "csfd", "trakt", "content", "tu", "page", "list", "selectStream"
@@ -566,3 +570,45 @@ def download(url, dest, name):
             break
     f.close()
     dialog.close()
+
+
+def convert_bitrate(mbit, with_text=True):
+    if mbit == 0 or mbit is None:
+        return "%.2f Mbps" % 0 if with_text else 0
+    p = math.pow(1000, 2)
+    s = round(mbit / p, 2)
+    return "%.2f Mbps" % s if with_text else s
+
+
+def get_isp():
+    try:
+        isp = isp_ipapi()
+        if isp.get('a') is None or isp.get('a') == 'N/A':
+            raise Exception
+    except:
+        try:
+            isp = isp_ipinfo()
+        except:
+            isp = None
+    debug('*************************************************** ISP: {}'.format(isp))
+    return isp
+
+
+def isp_ipinfo():
+    from resources.lib.system import Http
+    r = Http.get('https://ipinfo.io/widget', headers={'referer': 'https://ipinfo.io/'})
+    d = r.json()
+    debug('isp_ipinfo: {}'.format(r.text))
+    asn = d.get('asn', {}).get('asn', 'N/A')
+    return {'c': d.get('country', 'N/A'), 'a': asn.replace('AS', '')}
+
+
+def isp_ipapi():
+    from resources.lib.api.sc import Sc
+    ip = Sc.get('/IP')
+    from resources.lib.system import Http
+    url = 'https://ipapi.com/ip_api.php?ip={}'.format(ip)
+    r = Http.get(url, headers={'referer': 'https://ipapi.com/'})
+    d = r.json()
+    asn = d.get('connection', {}).get('asn', 'N/A')
+    return {'c': d.get('country_code', 'N/A'), 'a': asn}

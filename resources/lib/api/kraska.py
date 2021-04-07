@@ -19,13 +19,13 @@ class ResolveException(Exception):
 class Kraska:
     token = False
 
-    def __init__(self):
-        self.username = settings.get_setting('kraska.user')
-        self.password = settings.get_setting('kraska.pass')
+    def __init__(self, u=None, p=None):
+        self.username = u if u is not None else settings.get_setting('kraska.user')
+        self.password = p if p is not None else settings.get_setting('kraska.pass')
 
     def login(self):
         try:
-            debug('kra login start')
+            debug('kra login start {}/{}'.format(self.username, self.password))
             data = self.get_data('/api/user/login', {'data': {'username': self.username, 'password': self.password}})
             if "session_id" in data:
                 debug('kra login OK')

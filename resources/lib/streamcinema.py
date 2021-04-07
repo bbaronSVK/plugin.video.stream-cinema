@@ -4,25 +4,27 @@ from __future__ import print_function, unicode_literals
 
 import traceback
 
+import xbmcgui
 import xbmcplugin
 import xbmc
 from json import dumps
 
 from resources.lib.common.kodivideocache import set_kodi_cache_size
 from resources.lib.kodiutils import params, container_refresh, urlencode, container_update, create_plugin_url, \
-    exec_build_in, download, get_setting, update_addon
+    exec_build_in, download, get_setting, update_addon, set_setting_as_bool, notify
 from resources.lib.common.logger import info, debug
 from resources.lib.common.lists import List
-from resources.lib.constants import SORT_METHODS, SC, GUI
+from resources.lib.constants import SORT_METHODS, SC, GUI, ADDON_ID
 from resources.lib.api.sc import Sc
 from resources.lib.gui import cur_win, home_win
 from resources.lib.gui.dialog import dok, dinput
-from resources.lib.gui.item import SCItem, get_history_item_name, list_hp
-from resources.lib.common.storage import Storage
+from resources.lib.gui.item import SCItem, get_history_item_name, list_hp, SCLDir
+from resources.lib.common.storage import Storage, KodiViewModeDb
 from resources.lib.language import Strings
 from resources.lib.params import params
 from resources.lib.services.service import check_set_debug
 from resources.lib.system import SYSTEM_LANG_CODE
+from resources.lib.trakt.Trakt import TraktAPI, trakt
 
 
 class Scinema:
@@ -62,7 +64,9 @@ class Scinema:
             home_win.clearProperty('SCTitle')
 
         if SC.ACTION in self.args:
-            self.action()
+            exit_code = self.action()
+            if exit_code is True:
+                return
         elif 'play' in self.args:
             '''
             stara URL zo SC CS&SK pre play aby fungovala kniznica
@@ -107,9 +111,16 @@ class Scinema:
             self.action_remove_from_list()
         elif action == SC.ACTION_UPDATE_ADDON:
             update_addon()
+        elif 'trakt.' in action:
+            trakt.action(action, self)
+            return True
+        elif action == 'autocomplet':
+            from resources.lib.services.autocomplete import Autocomplete
+            Autocomplete(self.args)
+            return True
         else:
             info('Neznama akcia: {}'.format(action))
-        pass
+        return False
 
     def action_remove_from_list(self):
         st = List(self.args[SC.ITEM_PAGE])
@@ -200,27 +211,29 @@ class Scinema:
         container_refresh()
 
     def action_csearch(self):
-        search = dinput('')
+        self.succeeded = True
+        self.end_of_directory()
+        _id = self.args.get(SC.ITEM_ID)
+        debug('_id {}'.format(_id))
+        home_win.setProperty('SC.search', '{}'.format(_id))
+        search = dinput('', '', xbmcgui.INPUT_TYPE_TEXT)
+        home_win.clearProperty('SC.search')
         info('search string: {}'.format(search))
         if search == '':
-            self.succeeded = False
-            self.end_of_directory()
+            exec_build_in('Action(Back)')
             return
-        _id = self.args.get(SC.ITEM_ID)
         query = {'search': search, SC.ITEM_ID: _id}
         if _id.startswith('search-people'):
             query.update({'ms': '1'})
+        debug('Search ID: {}'.format(_id))
         url = '/Search/{}?{}'.format(_id, urlencode(query))
         info('search url: {}'.format(url))
         self.url = url
         self.call_url()
         if 'msgERROR' in self.response.get('system', {}):
             self.msg_error()
-            self.succeeded = False
-            self.end_of_directory()
+            exec_build_in('Action(Back)')
             return
-        self.succeeded = True
-        self.end_of_directory()
         plugin_url = create_plugin_url({'url': url})
         container_update(plugin_url)
         return
@@ -244,6 +257,7 @@ class Scinema:
             else:
                 dok(Strings.txt(Strings.SYSTEM_H1), '{}'.format(data))
         else:
+            debug('ERROR response: {}'.format(self.response))
             dok(Strings.txt(Strings.SYSTEM_H1), Strings.txt(Strings.SYSTEM_API_ERROR_L1))
 
     def pinned_key(self):
@@ -290,7 +304,7 @@ class Scinema:
             info('HP item: {}'.format(itm))
             item = SCItem({'type': SC.ITEM_HPDIR, 'title': itm.get(SC.ITEM_ID), 'url': itm.get(SC.ITEM_URL)})
             if item.visible:
-                # info('Pridavam item na HP: {}'.format(itm.get(SC.ITEM_ID)))
+                info('Pridavam item na HP: {}'.format(itm.get(SC.ITEM_ID)))
                 item.li().setProperty('SpecialSort', GUI.TOP)
                 self.items_pinned.append(item.get())
 
@@ -351,8 +365,8 @@ class Scinema:
             debug('----------------------------------------------------------------------------------------------------')
             debug('play url: {}'.format(self.url))
             debug('play selected: {}'.format(dumps(selected)))
-            debug('play response: {}'.format(dumps(self.response)))
-            debug('play item: {}'.format(li))
+            # debug('play response: {}'.format(dumps(self.response)))
+            # debug('play item: {}'.format(li))
             debug('----------------------------------------------------------------------------------------------------')
             self.response['strms'] = selected
             home_win.setProperty('SC.play_item', dumps(self.response))
@@ -399,7 +413,28 @@ class Scinema:
         if SC.ITEM_SYSTEM in self.response:
             self.system_after()
 
+    def notify(self, filter):
+        try:
+            plugin_url = 'plugin://{}/{}'.format(ADDON_ID, params.orig_args if params.orig_args else '')
+            kv = KodiViewModeDb()
+            sort = kv.get_sort(plugin_url)
+            if sort is not None:
+                j = dumps({'m': sort[0], 'o': sort[1], 'u': plugin_url, 'f': filter}).encode()
+            else:
+                j = dumps({'m': 0, 'o': 1, 'u': plugin_url, 'f': filter}).encode()
+            from base64 import b64encode
+            data = b64encode(j).decode()
+            notify(sender=ADDON_ID, message='List.Sort', data=data)
+        except:
+            debug('notify List.Sort ERR: {}'.format(traceback.format_exc()))
+            pass
+
     def system(self):
+        if 'filter' in self.response:
+            self.notify(self.response.get('filter', {}))
+        else:
+            self.notify({})
+
         data = self.response.get(SC.ITEM_SYSTEM, {})
         if 'setContent' in data:
             xbmcplugin.setContent(params.handle, data['setContent'])

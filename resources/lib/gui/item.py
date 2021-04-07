@@ -1,7 +1,10 @@
 from __future__ import print_function, unicode_literals
 
+import re
+import traceback
 from json import dumps
 
+import xbmcvfs
 from xbmcgui import ListItem
 
 from resources.lib.api.kraska import Kraska, ResolveException
@@ -13,9 +16,11 @@ from resources.lib.debug import try_catch
 from resources.lib.gui import get_cond_visibility as gcv, home_win
 from resources.lib.gui.dialog import dselect, dok
 from resources.lib.kodiutils import create_plugin_url, convert_bitrate, get_setting_as_bool, get_setting_as_int, \
-    get_setting, get_info_label, get_system_platform, decode, make_nfo_content
+    get_setting, get_info_label, get_system_platform, decode, make_nfo_content, translate_path, make_legal_filename, \
+    microtime, get_isp
 from resources.lib.language import Strings
 from resources.lib.params import params
+from resources.lib.services.Settings import settings
 from resources.lib.system import SYSTEM_LANG_CODE
 
 list_item = ListItem
@@ -57,7 +62,9 @@ class SCItem:
         elif item_type == SC.ITEM_ACTION:
             self.item = SCAction(data)
         elif item_type == SC.ITEM_NEXT:
-            self.item = SCAction(data)
+            self.item = SCNext(data)
+        elif item_type == 'ldir':
+            self.item = SCLDir(data)
         elif item_type == 'add_custom_filter':
             self.item = SCAction(data)
         else:
@@ -139,7 +146,6 @@ class SCBaseItem:
     @try_catch('_set_info')
     def _set_info(self, item_info):
         # debug('set_info {}'.format(item_info))
-        debug('SET INFO: {} {}x{}'.format(item_info.get('mediatype'), item_info.get('episode', 'X'), item_info.get('season', 'Y')))
         self.info.update(item_info)
         try:
             if SC.ITEM_TITLE in item_info:
@@ -225,6 +231,21 @@ class SCDirContext:
         pass
 
 
+class SCLDir(SCBaseItem):
+    def __init__(self, data):
+        SCBaseItem.__init__(self, data)
+        if SC.ITEM_URL in data:
+            url = self.translate_path(data[SC.ITEM_URL])
+            self.item.setPath(url)
+
+    def translate_path(self, path):
+        import re
+        found = re.search('sc://(?P<typ>[^\(]+)\((?P<param1>[^\s,\)]+)\)', path)
+        if found.group('typ') == 'config':
+            path = make_legal_filename(translate_path(get_setting(found.group('param1'))))
+        return path
+
+
 class SCDir(SCBaseItem):
     build_ctx = True
 
@@ -296,8 +317,7 @@ class SCCustomFilterDir(SCDir):
 class SCNext(SCDir):
     def __init__(self, data):
         self.build_ctx = False
-        SCDir.__init__(data)
-        info('Mame next polozku')
+        SCDir.__init__(self, data)
         self.item.setProperty('SpecialSort', GUI.BOTTOM)
 
 
@@ -340,7 +360,6 @@ class SCNFO(SCBaseItem):
         for actor in self.data.get('cast', {}):
             d = self.DEFAULT_ACTOR.copy()
             d.update(actor)
-            debug('actor data: {}'.format(d))
             out.append(self.XML_ACTOR.format(**d))
 
         i18n = self.data.get(SC.ITEM_I18N_ART)
@@ -367,13 +386,13 @@ class SCVideo(SCBaseItem):
                                 episode=data.get('info', {}).get('episode'), trakt=trakt)
         internal_info = {}
         play_count = self.movie.get_play_count()
-        if play_count is not None and play_count > 0:
+        if play_count is not None and int(play_count) > 0:
             internal_info.update({'playcount': play_count})
         last_played = self.movie.get_last_played()
         if last_played:
             internal_info.update({'lastplayed': last_played})
         if internal_info != {}:
-            debug('update info: {}'.format(internal_info))
+            # debug('update info: {}'.format(internal_info))
             data.get(SC.ITEM_INFO).update(internal_info)
 
         SCBaseItem.__init__(self, data)
@@ -453,6 +472,7 @@ class SCPlayItem(SCBaseItem):
         self.streams = []
         self.selected = None
         self.params = params.args
+        self.hls = '#EXTM3U\n'
         item_info = self.input.get(SC.ITEM_INFO)
         SCBaseItem.__init__(self, item_info)
         if resolve:
@@ -461,6 +481,65 @@ class SCPlayItem(SCBaseItem):
     @try_catch('get')
     def get(self):
         return self.item.getPath(), self.item, True, self.selected
+
+    @try_catch('build_hls')
+    def build_hls(self):
+        kr = Kraska()
+        for pos, s in enumerate(self.streams):
+            ident = s.get('xxx')
+            debug('STREAM: {} => {}'.format(ident, s))
+            url = kr.resolve(ident)
+            sinfo = s.get('stream_info', {}).get('video', {})
+            self.hls += '\n#EXT-X-STREAM-INF:BANDWIDTH={},RESOLUTION={}x{}'.format(s.get('bitrate'), sinfo.get('width', 0), sinfo.get('height', 0))
+            self.hls += '\n{}\n'.format(url)
+        debug('HLS: {}'.format(self.hls))
+        filename = make_legal_filename('special://profile/input.m3u8')
+        fs = xbmcvfs.File(filename, 'w')
+        fs.write(self.hls)
+        fs.close()
+
+    @try_catch('speedtest')
+    def speedtest(self, isp):
+        kr = Kraska()
+        url = kr.resolve('15VFNFJrCKHn')
+        smin = 999999999
+        smax = 0
+        hosts = ['b01', 's01', 'v01']
+        for h in hosts:
+            u = re.sub(r':\/\/([^.]+)', '://{}'.format(h), url)
+            debug('speedtest URL {}'.format(u))
+            s = self.calculate_speed(u)
+            debug('speedtest host {} speed: {}'.format(h, convert_bitrate(s)))
+            smin = min(s, smin)
+            smax = max(s, smax)
+            isp.update({h: s})
+        debug('min/max {}/{}'.format(convert_bitrate(smin), convert_bitrate(smax)))
+        debug('res: {}'.format(isp))
+        try:
+            st = Sc.post('/Stats/speedtest', json=isp)
+            debug('Speed stats: {}'.format(st))
+        except:
+            pass
+        speed = smin
+        settings.set_setting('stream.adv.speedtest', speed)
+        settings.set_setting('stream.adv.speedtest.asn', isp.get('a', 'N/A'))
+
+    @try_catch('calculate_speed')
+    def calculate_speed(self, url):
+        start = microtime()
+        from resources.lib.system import Http
+        r = Http.get(url, stream=True)
+        total_length = int(r.headers.get('content-length', 0))
+        chunk = 4 * 1024
+        for _ in r.iter_content(chunk):
+            pass
+        end = microtime()
+        dur = (end - start) / 1000
+        return int(total_length / dur * 8)  # bps
+
+    @try_catch('ISP')
+    def isp(self):
+        return get_isp()
 
     @try_catch('filter')
     def filter(self):
@@ -471,6 +550,14 @@ class SCPlayItem(SCBaseItem):
             return
 
         if get_setting_as_bool('stream.autoselect'):
+            isp = self.isp()
+            asn = settings.get_setting('stream.adv.speedtest.asn')
+            asn_changed = str(isp.get('a')) != str(asn)
+            wrong_speed = settings.get_setting_as_int('stream.adv.speedtest') < 1
+            debug('ASN: {} / {} [{}] / SPEED: {} [{}]'.format(asn, isp.get('a'), asn_changed, settings.get_setting_as_int('stream.adv.speedtest'), wrong_speed))
+            if get_setting_as_int('stream.max.bitrate') == 100 and (asn_changed or wrong_speed):
+                self.speedtest(isp)
+
             lang1 = get_setting('stream.lang1').lower()
             lang2 = get_setting('stream.lang2').lower()
             if Sc.parental_control_is_active():
@@ -507,7 +594,12 @@ class SCPlayItem(SCBaseItem):
 
     def video_score(self, score, pos, s):
         megabit = 1000000
-        max_bitrate = get_setting_as_int('stream.max.bitrate') * megabit
+        speed = settings.get_setting_as_int('stream.adv.speedtest')
+        if speed > 0:
+            max_bitrate = int(speed * 0.8)
+        else:
+            max_bitrate = get_setting_as_int('stream.max.bitrate') * megabit
+        debug('video max_bitrate: {}'.format(max_bitrate))
 
         quality = s.get('quality', 'SD')
         max_quality = get_setting('stream.max.quality')

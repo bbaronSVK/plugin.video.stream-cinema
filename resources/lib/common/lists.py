@@ -61,6 +61,10 @@ class List(object):
 
 
 class SCKODIItem(Storage):
+    SCROBBLE_START = 'start'
+    SCROBBLE_PAUSE = 'pause'
+    SCROBBLE_STOP = 'stop'
+
     def __init__(self, name, series=None, episode=None, trakt=None):
         super(SCKODIItem, self).__init__('SCKODIItem-{}'.format(name))
         if series is not None:
@@ -107,40 +111,46 @@ class SCKODIItem(Storage):
         self._set('play_count', times)
         if self.kodi_db:
             self.kodi_db.set_watched_path(self.kodi_path, times)
-        if self.trakt:
-            pass
-            # from resources.lib.trakt.Trakt import trakt, TraktAPI
-            # debug('trakt enabled: {} / {}'.format(TraktAPI.is_enabled(), trakt.is_enabled()))
-            # if trakt.is_enabled() is True:
-            #     trakt.set_watched(self.trakt, times, season=self.series, episode=self.episode)
+
+        from resources.lib.trakt.Trakt import trakt, TraktAPI
+        if self.trakt is not None and trakt.is_enabled():
+            trakt.set_watched(self.trakt, times, season=self.series, episode=self.episode)
+
+    def scrobble(self, percent, action):
+        from resources.lib.trakt.Trakt import trakt
+        if self.trakt is not None and trakt.is_enabled():
+            ret = trakt.scroble(self.trakt, self.series, self.episode, percent, action)
+            debug('scrobble resp: {}'.format(ret))
 
     def get_play_count(self):
-        kodi_play_count = None
-        play_count = self._get('play_count')
-        return play_count
+        play_count = int(self._get('play_count')) if self._get('play_count') is not None else 0
 
-        if self.kodi_db is not None:
+        if self.kodi_db:
             res = self.kodi_db.get_watched_path(self.kodi_path)
             if res and res[3] is not None:
-                kodi_play_count = res[3]
+                kodi_play_count = int(res[3])
+                if kodi_play_count > play_count:
+                    play_count = kodi_play_count
 
-        if kodi_play_count is not None and kodi_play_count > 0 and (
-                play_count is None or play_count == 0) and kodi_play_count != play_count:
-            # debug('setujem item ako videny')
-            self.set_play_count(kodi_play_count)
-            play_count = kodi_play_count
-            # if self.trakt:
-            #     from resources.lib.trakt.Trakt import trakt
-            #     trakt.set_watched(trid=self.trakt, times=kodi_play_count, season=self.series, episode=self.episode)
-        elif play_count != kodi_play_count:
-            # debug('setujem item ako NE videny {}/{}'.format(kodi_play_count, play_count))
-            self.set_play_count(kodi_play_count)
-            # if self.trakt:
-            #     from resources.lib.trakt.Trakt import trakt
-            #     trakt.set_watched(trid=self.trakt, times=kodi_play_count, season=self.series, episode=self.episode)
-            play_count = kodi_play_count
-
-        # debug('return play count: {}'.format(play_count))
         return play_count
+
+        # if kodi_play_count is not None and kodi_play_count > 0 and (
+        #         play_count is None or play_count == 0) and kodi_play_count != play_count:
+        #     # debug('setujem item ako videny')
+        #     self.set_play_count(kodi_play_count)
+        #     play_count = kodi_play_count
+        #     # if self.trakt:
+        #     #     from resources.lib.trakt.Trakt import trakt
+        #     #     trakt.set_watched(trid=self.trakt, times=kodi_play_count, season=self.series, episode=self.episode)
+        # elif play_count != kodi_play_count:
+        #     # debug('setujem item ako NE videny {}/{}'.format(kodi_play_count, play_count))
+        #     self.set_play_count(kodi_play_count)
+        #     # if self.trakt:
+        #     #     from resources.lib.trakt.Trakt import trakt
+        #     #     trakt.set_watched(trid=self.trakt, times=kodi_play_count, season=self.series, episode=self.episode)
+        #     play_count = kodi_play_count
+        #
+        # # debug('return play count: {}'.format(play_count))
+        # return play_count
 
 

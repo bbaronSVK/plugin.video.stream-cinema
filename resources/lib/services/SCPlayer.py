@@ -30,15 +30,15 @@ class SCPlayer(Player):
         self.ids = {}
         self.watched = False
         self.up_next = False
-        pass
 
     def onPlayBackStarted(self):
         self.onAVStarted()
-        pass
 
     def set_item(self, item):
         self.up_next = False
         # self.item = item
+        if not self.win.getProperty('SC.play_item'):
+            return
         item_data = loads(self.win.getProperty('SC.play_item'))
         self.win.clearProperty('SC.play_item')
         self.item = item_data.get('info')
@@ -54,7 +54,8 @@ class SCPlayer(Player):
             self.is_my_plugin = True
             series = self.item['info'].get('season')
             episode = self.item['info'].get('episode')
-            self.movie = SCKODIItem(self.my_id, series=series, episode=episode)
+            self.movie = SCKODIItem(self.my_id, series=series, episode=episode, trakt=self.ids.get('trakt'))
+            self.movie.scrobble(self.percent_played(), SCKODIItem.SCROBBLE_START)
             audio = self.getAvailableAudioStreams()
             if linfo:
                 audio = linfo
@@ -96,42 +97,35 @@ class SCPlayer(Player):
     def onPlayBackEnded(self):
         debug('player onPlayBackEnded')
         self.end_playback()
-        pass
 
     def onPlayBackStopped(self):
         debug('player onPlayBackStopped')
         self.end_playback()
-        pass
 
     def onPlayBackError(self):
         debug('player onPlayBackError')
         self.end_playback()
-        pass
 
     def onPlayBackPaused(self):
         debug('player onPlayBackPaused')
         self.end_playback()
-        pass
 
     def onPlayBackResumed(self):
         debug('player onPlayBackResumed')
-        pass
+        if self.movie is not None:
+            self.movie.scrobble(self.percent_played(), SCKODIItem.SCROBBLE_START)
 
     def onQueueNextItem(self):
         debug('player onQueueNextItem')
-        pass
 
     def onPlayBackSpeedChanged(self, speed):
         debug('player onPlayBackSpeedChanged {}'.format(speed))
-        pass
 
     def onPlayBackSeek(self, time, seekOffset):
         debug('player onPlayBackSeek {} {}'.format(time, seekOffset))
-        pass
 
     def onPlayBackSeekChapter(self, chapter):
         debug('player onPlayBackSeekChapter {}'.format(chapter))
-        pass
 
     def clean(self):
         debug('player SCPlayer Clean')
@@ -150,12 +144,17 @@ class SCPlayer(Player):
         self.set_watched()
         self.clean()
 
+    def percent_played(self):
+        try:
+            return self.current_time / self.total_time * 100
+        except:
+            return 0
+
     def set_watched(self):
         if self.is_my_plugin:
-            try:
-                percent_played = self.current_time / self.total_time * 100
-            except:
-                percent_played = 0
+            percent_played = self.percent_played()
+
+            self.movie.scrobble(percent_played, SCKODIItem.SCROBBLE_STOP)
 
             if percent_played > 80:
                 play_count = self.movie.get_play_count()

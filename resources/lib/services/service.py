@@ -1,12 +1,18 @@
 from __future__ import print_function, unicode_literals
 
+import traceback
+
+import xbmcvfs
+
 from resources.lib.api.kraska import Kraska
 from resources.lib.common.android import AndroidTv
-# from resources.lib.trakt.Trakt import trakt
+from resources.lib.common.logger import debug
+from resources.lib.services import websocket
+from resources.lib.trakt.Trakt import trakt
 from resources.lib.constants import ADDON, ADDON_ID
 from resources.lib.gui.dialog import dok
 from resources.lib.kodiutils import sleep, set_setting, get_uuid, get_setting, get_system_debug, set_system_debug, \
-    exec_build_in, get_setting_as_bool
+    exec_build_in, get_setting_as_bool, make_legal_filename, translate_path
 from resources.lib.language import Strings
 from resources.lib.services.Monitor import monitor
 from resources.lib.services.SCPlayer import player
@@ -36,7 +42,7 @@ class Service:
             self.atv = AndroidTv()
 
     def run(self):
-
+        debug('START SERVICE....................................................................')
         if get_setting_as_bool('system.autoexec'):
             try:
                 exec_build_in('ActivateWindow(videos,plugin://{})'.format(ADDON_ID))
@@ -47,17 +53,44 @@ class Service:
             kra = Kraska()
             kra.check_user()
 
+        if get_setting_as_bool('system.ws.remote.enable'):
+            ws = websocket.WS()
+            ws.reconnect()
+
         while not monitor.abortRequested():
-            self.periodical_check()
+            try:
+                self.periodical_check()
+            except:
+                debug('error: {}'.format(traceback.format_exc()))
+                pass
             sleep(1000 * 1)
 
     def periodical_check(self):
         if monitor.can_check():
-            player.periodical_check()
-            monitor.periodical_check()
-            if self.atv:
-                self.atv.run()
-            # trakt.check_trakt()
-            # debug("settings {}/{}".format(settings.get_setting('stream.lang1'), settings.get_setting('stream.lang2')))
+            try:
+                player.periodical_check()
+            except:
+                debug('player err: {}'.format(traceback.format_exc()))
+                pass
+
+            try:
+                monitor.periodical_check()
+            except:
+                debug('monitor err: {}'.format(traceback.format_exc()))
+                pass
+
+            try:
+                if self.atv:
+                    self.atv.run()
+            except:
+                debug('android tv err: {}'.format(traceback.format_exc()))
+                pass
+
+            try:
+                trakt.check_trakt()
+            except:
+                debug('trakt err: {}'.format(traceback.format_exc()))
+                pass
+
 
 service = Service()

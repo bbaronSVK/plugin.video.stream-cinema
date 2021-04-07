@@ -2,11 +2,16 @@
 
 from __future__ import print_function, unicode_literals
 import datetime
+import json
+import traceback
 
-from resources.lib.constants import BASE_URL, API_VERSION
-from resources.lib.system import user_agent, Http
+from resources.lib import params as query
 from resources.lib.common.logger import debug
-from resources.lib.kodiutils import get_uuid, get_skin_name, get_setting_as_bool, get_setting_as_int, get_setting
+from resources.lib.common.storage import KodiViewModeDb
+from resources.lib.constants import BASE_URL, API_VERSION, ADDON_ID, SORT_METHODS_INVERT
+from resources.lib.system import user_agent, Http, SYSTEM_LANG_CODE
+from resources.lib.kodiutils import get_uuid, get_skin_name, get_setting_as_bool, get_setting_as_int, get_setting, \
+    notify
 
 try:
     # Python 3
@@ -59,7 +64,20 @@ class Sc:
             'ver': API_VERSION,
             'uid': get_uuid(),
             'skin': get_skin_name(),
+            'lang': SYSTEM_LANG_CODE
         }
+        plugin_url = 'plugin://{}/{}'.format(ADDON_ID, query.params.orig_args if query.params.orig_args else '')
+        try:
+            kv = KodiViewModeDb()
+            sort = kv.get_sort(plugin_url)
+        except:
+            sort = (0, 1)
+        try:
+            if sort is not None:
+                params.update({'sm': '{},{}'.format(sort[0], sort[1])})
+        except:
+            debug('ERR API SORT: {}'.format(traceback.format_exc()))
+            pass
         parental_control = Sc.parental_control_is_active()
         if get_setting_as_bool('stream.dubed') or (parental_control and get_setting_as_bool('parental.control.dubed')):
             params.update({'dub': 1})

@@ -126,7 +126,7 @@ class AndroidTv(KodiDb):
                             })
                             base_name = '{}{:04d}'.format(path_name, pos)
                             fn = make_legal_filename('{}.strm'.format(base_name))
-                            debug('{} -> {} {} {}'.format(pos, fn, url, s.get(SC.ITEM_UIDS)))
+                            # debug('{} -> {} {} {}'.format(pos, fn, url, s.get(SC.ITEM_UIDS)))
                             fs = xbmcvfs.File(fn, 'w')
                             fs.write('{}'.format(url))
                             fs.close()

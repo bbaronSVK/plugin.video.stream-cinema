@@ -157,3 +157,8 @@ SORT_METHODS = {
     20: xbmcplugin.SORT_METHOD_VIDEO_USER_RATING,
     18: xbmcplugin.SORT_METHOD_VIDEO_YEAR
 }
+
+if PY2:
+    SORT_METHODS_INVERT = {v: k for k, v in SORT_METHODS.iteritems()}
+else:
+    SORT_METHODS_INVERT = {v: k for k, v in SORT_METHODS.items()}

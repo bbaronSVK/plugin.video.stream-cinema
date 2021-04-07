@@ -8,7 +8,7 @@ from json import loads, dumps
 from resources.lib.constants import ADDON, KodiDbMap, ADDON_ID
 from resources.lib.common.logger import debug
 from resources.lib.gui.dialog import dok
-from resources.lib.kodiutils import translate_path
+from resources.lib.kodiutils import translate_path, get_skin_name
 from resources.lib.system import SYSTEM_VERSION
 
 import xbmcvfs
@@ -30,7 +30,7 @@ class Sqlite(object):
         return self._connection
 
     def execute(self, query, *args):
-        debug('SQL: {} <- {}'.format(query, args))
+        # debug('SQL: {} <- {}'.format(query, args))
         # debug('SQL')
         with self._get_conn() as conn:
             c = conn.cursor()
@@ -175,3 +175,12 @@ class Storage(object):
     def data(self):
         return self._data
 
+
+class KodiViewModeDb:
+    def __init__(self):
+        path = 'special://database/ViewModes{}.db'.format(KodiDbMap.ViewModes[SYSTEM_VERSION])
+        self._db = Sqlite(path)
+
+    def get_sort(self, url):
+        query = 'select sortMethod, sortOrder from view where path=? and skin=?'
+        return self._db.execute(query, url, get_skin_name()).fetchone()

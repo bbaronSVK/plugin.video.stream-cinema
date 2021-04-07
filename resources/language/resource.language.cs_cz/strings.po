@@ -213,17 +213,17 @@ msgctxt "#30056"
 msgid "Run addons update"
 msgstr "Spustit aktualizaci doplňků"
 
-#msgctxt "#30057"
-#msgid ""
-#msgstr ""
-#
-#msgctxt "#30058"
-#msgid ""
-#msgstr ""
-#
-#msgctxt "#30059"
-#msgid ""
-#msgstr ""
+msgctxt "#30057"
+msgid "Enable trakt.tv"
+msgstr "Povolit trakt.tv"
+
+msgctxt "#30058"
+msgid "Login to trakt.tv"
+msgstr "Přihlasení na trakt.tv"
+
+msgctxt "#30059"
+msgid "Logout from trakt.tv"
+msgstr "Odhlášení z trakt.tv"
 
 msgctxt "#30100"
 msgid "Welcome"
