@@ -2,8 +2,6 @@ from __future__ import print_function, unicode_literals
 
 import traceback
 
-import xbmcvfs
-
 from resources.lib.api.kraska import Kraska
 from resources.lib.common.android import AndroidTv
 from resources.lib.common.logger import debug
@@ -12,7 +10,7 @@ from resources.lib.trakt.Trakt import trakt
 from resources.lib.constants import ADDON, ADDON_ID
 from resources.lib.gui.dialog import dok
 from resources.lib.kodiutils import sleep, set_setting, get_uuid, get_setting, get_system_debug, set_system_debug, \
-    exec_build_in, get_setting_as_bool, make_legal_filename, translate_path
+    exec_build_in, get_setting_as_bool
 from resources.lib.language import Strings
 from resources.lib.services.Monitor import monitor
 from resources.lib.services.SCPlayer import player

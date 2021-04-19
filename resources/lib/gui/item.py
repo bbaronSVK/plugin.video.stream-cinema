@@ -83,11 +83,12 @@ class SCItem:
 
 
 class SCBaseItem:
-    def __init__(self, data):
+    def __init__(self, data, debug=False):
         self.item = list_item()
         self.data = data
         self.info_set = False
         self.info = {}
+        self.debug = debug
 
         if SC.ITEM_TITLE in data:
             self.item.setLabel(data.get(SC.ITEM_TITLE))
@@ -145,13 +146,29 @@ class SCBaseItem:
 
     @try_catch('_set_info')
     def _set_info(self, item_info):
-        # debug('set_info {}'.format(item_info))
+        if self.debug:
+            debug('set_info {}'.format(item_info))
         self.info.update(item_info)
         try:
             if SC.ITEM_TITLE in item_info:
                 title = '{}'.format(item_info.get(SC.ITEM_TITLE))
                 self.item.setLabel(title)
                 del (item_info[SC.ITEM_TITLE])
+
+            if self.data.get('play'):
+                if 'otitle' in item_info:
+                    item_info.update({SC.ITEM_TITLE: item_info['otitle']})
+                    del item_info['otitle']
+
+                if 'epname' in item_info:
+                    item_info.update({SC.ITEM_TITLE: item_info['epname']})
+                    del item_info['epname']
+            else:
+                if 'epname' in item_info:
+                    del item_info['epname']
+
+                if 'otitle' in item_info:
+                    del item_info['otitle']
 
             for i, e in enumerate(item_info):
                 # debug('set info {} {}'.format(i, e))
@@ -259,6 +276,13 @@ class SCDir(SCBaseItem):
 
     def make_ctx(self):
         context_menu = []
+
+        if 'listType' in params.args:
+            context_menu.append([Strings.txt(Strings.CONTEXT_REMOVE), 'RunPlugin({})'.format(create_plugin_url({
+                SC.ACTION: SC.ACTION_REMOVE_FROM_LIST,
+                SC.ITEM_ID: self.data.get(SC.ITEM_ID),
+                SC.ITEM_PAGE: get_history_item_name(self.data.get('lid'))
+            }))])
 
         if params.args.get('url'):
             context_menu.append((Strings.txt(Strings.CONTEXT_PIN_UNPIN), 'RunPlugin({})'.format(create_plugin_url({
@@ -474,7 +498,9 @@ class SCPlayItem(SCBaseItem):
         self.params = params.args
         self.hls = '#EXTM3U\n'
         item_info = self.input.get(SC.ITEM_INFO)
-        SCBaseItem.__init__(self, item_info)
+        item_info.update({'play': True})
+
+        SCBaseItem.__init__(self, item_info, debug=True)
         if resolve:
             self.resolve()
 
@@ -499,9 +525,9 @@ class SCPlayItem(SCBaseItem):
         fs.close()
 
     @try_catch('speedtest')
-    def speedtest(self, isp):
+    def speedtest(self, isp, ident='15VFNFJrCKHn'):
         kr = Kraska()
-        url = kr.resolve('15VFNFJrCKHn')
+        url = kr.resolve(ident)
         smin = 999999999
         smax = 0
         hosts = ['b01', 's01', 'v01']

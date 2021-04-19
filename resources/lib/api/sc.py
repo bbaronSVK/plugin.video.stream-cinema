@@ -66,18 +66,18 @@ class Sc:
             'skin': get_skin_name(),
             'lang': SYSTEM_LANG_CODE
         }
-        plugin_url = 'plugin://{}/{}'.format(ADDON_ID, query.params.orig_args if query.params.orig_args else '')
-        try:
-            kv = KodiViewModeDb()
-            sort = kv.get_sort(plugin_url)
-        except:
-            sort = (0, 1)
-        try:
-            if sort is not None:
-                params.update({'sm': '{},{}'.format(sort[0], sort[1])})
-        except:
-            debug('ERR API SORT: {}'.format(traceback.format_exc()))
-            pass
+        # plugin_url = 'plugin://{}/{}'.format(ADDON_ID, query.params.orig_args if query.params.orig_args else '')
+        # try:
+        #     kv = KodiViewModeDb()
+        #     sort = kv.get_sort(plugin_url)
+        # except:
+        #     sort = (0, 1)
+        # try:
+        #     if sort is not None:
+        #         params.update({'sm': '{},{}'.format(sort[0], sort[1])})
+        # except:
+        #     debug('ERR API SORT: {}'.format(traceback.format_exc()))
+        #     pass
         parental_control = Sc.parental_control_is_active()
         if get_setting_as_bool('stream.dubed') or (parental_control and get_setting_as_bool('parental.control.dubed')):
             params.update({'dub': 1})
@@ -87,6 +87,10 @@ class Sc:
 
         if parental_control:
             params.update({"m": Sc.RATING_MAP.get(get_setting('parental.control.rating'))})
+
+        if get_setting_as_bool('plugin.show.genre'):
+            params.update({'gen': 1})
+
         return params
 
     @staticmethod

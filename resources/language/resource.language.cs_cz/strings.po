@@ -225,6 +225,10 @@ msgctxt "#30059"
 msgid "Logout from trakt.tv"
 msgstr "Odhlášení z trakt.tv"
 
+msgctxt "#30060"
+msgid "Show genre in item title"
+msgstr "Zobrazit žánr v názvu položky"
+
 msgctxt "#30100"
 msgid "Welcome"
 msgstr "Vítejte"

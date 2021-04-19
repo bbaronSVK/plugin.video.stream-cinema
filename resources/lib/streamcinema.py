@@ -414,6 +414,7 @@ class Scinema:
             self.system_after()
 
     def notify(self, filter):
+        return
         try:
             plugin_url = 'plugin://{}/{}'.format(ADDON_ID, params.orig_args if params.orig_args else '')
             kv = KodiViewModeDb()
@@ -430,10 +431,10 @@ class Scinema:
             pass
 
     def system(self):
-        if 'filter' in self.response:
-            self.notify(self.response.get('filter', {}))
-        else:
-            self.notify({})
+        # if 'filter' in self.response:
+        #     self.notify(self.response.get('filter', {}))
+        # else:
+        #     self.notify({})
 
         data = self.response.get(SC.ITEM_SYSTEM, {})
         if 'setContent' in data:
@@ -452,9 +453,10 @@ class Scinema:
                 xbmcplugin.addSortMethod(params.handle, SORT_METHODS[method])
 
         if 'SetSortMethod' in data:
-            method = SORT_METHODS[int(data.get('SetSortMethod'))]
+            #method = SORT_METHODS[int(data.get('SetSortMethod'))]
             # info('set sort method {}'.format(method))
-            xbmc.executebuiltin('Container.SetSortMethod(%d)' % method)
+            #xbmc.executebuiltin('Container.SetSortMethod(%d)' % method)
+            pass
 
         if 'setPluginFanart' in data:
             tmp = data.get('setPluginFanart')
@@ -485,8 +487,9 @@ class Scinema:
             #     xbmc.executebuiltin("Container.SetViewMode(%d)" % view_code)
 
         if 'SetSortMethod' in data:
-            method = SORT_METHODS[int(data.get('SetSortMethod'))]
-            xbmc.executebuiltin('Container.SetSortMethod(%d)' % method)
+            #method = SORT_METHODS[int(data.get('SetSortMethod'))]
+            #xbmc.executebuiltin('Container.SetSortMethod(%d)' % method)
+            pass
 
         if SC.ITEM_FOCUS in data:
             try:

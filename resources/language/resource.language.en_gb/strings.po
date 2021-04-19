@@ -225,6 +225,10 @@ msgctxt "#30059"
 msgid "Logout from trakt.tv"
 msgstr ""
 
+msgctxt "#30060"
+msgid "Show genre in item title"
+msgstr ""
+
 msgctxt "#30100"
 msgid "Welcome"
 msgstr ""

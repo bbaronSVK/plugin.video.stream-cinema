@@ -581,17 +581,16 @@ def convert_bitrate(mbit, with_text=True):
 
 
 def get_isp():
-    try:
-        isp = isp_ipapi()
-        if isp.get('a') is None or isp.get('a') == 'N/A':
-            raise Exception
-    except:
+    for fn in [isp_ipinfo, isp_ipapi, isp_dbip]:
         try:
-            isp = isp_ipinfo()
+            isp = fn()
+            if isp.get('a') is not None:
+                debug('*************************************************** ISP: {}'.format(isp))
+                return isp
         except:
-            isp = None
-    debug('*************************************************** ISP: {}'.format(isp))
-    return isp
+            debug('ERRO ISP: {}'.format(traceback.format_exc()))
+
+    return None
 
 
 def isp_ipinfo():
@@ -603,12 +602,23 @@ def isp_ipinfo():
     return {'c': d.get('country', 'N/A'), 'a': asn.replace('AS', '')}
 
 
-def isp_ipapi():
+def isp_call(url, ref):
     from resources.lib.api.sc import Sc
     ip = Sc.get('/IP')
     from resources.lib.system import Http
-    url = 'https://ipapi.com/ip_api.php?ip={}'.format(ip)
-    r = Http.get(url, headers={'referer': 'https://ipapi.com/'})
-    d = r.json()
+    url = url.format(ip)
+    r = Http.get(url, headers={'referer': ref})
+    return r.json()
+
+
+def isp_ipapi():
+    url = 'https://ipapi.com/ip_api.php?ip={}'
+    d = isp_call(url, 'https://ipapi.com/')
     asn = d.get('connection', {}).get('asn', 'N/A')
     return {'c': d.get('country_code', 'N/A'), 'a': asn}
+
+
+def isp_dbip():
+    url = 'https://db-ip.com/demo/home.php?s={}'
+    d = isp_call(url, 'https://db-ip.com/')
+    return {'c': d.get('countryCode', 'N/A'), 'a': d.get('asNumber', '')}

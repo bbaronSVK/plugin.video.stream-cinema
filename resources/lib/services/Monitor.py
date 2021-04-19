@@ -132,7 +132,7 @@ class Monitor(KMonitor):
         # debug("{}/{} => {}/{} | {}".format(sort[0], sort[1], self.sort_method, self.sort_order, self.last_url))
         if self.last_url and (sort[0] != self.sort_method or sort[1] != self.sort_order):
             debug('============ refresh {} ============'.format(self.last_url))
-            container_refresh()
+            # container_refresh()
 
     def can_check(self):
         return not self.is_screensaver and not self.is_DPMS
