@@ -50,6 +50,7 @@ class SCPlayer(Player):
         self.my_id = self.ids.get('sc') if self.ids.get('sc') else None
         debug('my ids: {}'.format(self.ids))
         if self.my_id is not None:
+            self.win.setProperty('{}.play'.format(ADDON_ID), 1)
             debug('je to moj plugin')
             self.is_my_plugin = True
             series = self.item['info'].get('season')
@@ -130,6 +131,7 @@ class SCPlayer(Player):
     def clean(self):
         debug('player SCPlayer Clean')
         #
+        self.win.clearProperty('{}.play'.format(ADDON_ID))
         self.current_time = 0
         self.ids = {}
         self.is_my_plugin = False

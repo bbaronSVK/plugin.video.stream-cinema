@@ -47,7 +47,7 @@ class Scinema:
         if SC.ITEM_URL in self.args:
             self.url = self.args.get(SC.ITEM_URL)
 
-        if self.url == '/' and xbmc.Player().isPlayingVideo():
+        if self.url == '/' and xbmc.Player().isPlayingVideo() and home_win.getProperty('{}.play'.format(ADDON_ID)):
             container_update('special://home', True)
             self.succeeded = False
             self.end_of_directory()
