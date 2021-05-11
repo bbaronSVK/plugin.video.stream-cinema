@@ -1,17 +1,12 @@
 # -*- coding: utf-8 -*-
 
 from __future__ import print_function, unicode_literals
-import datetime
-import json
-import traceback
 
-from resources.lib import params as query
-from resources.lib.common.logger import debug
-from resources.lib.common.storage import KodiViewModeDb
-from resources.lib.constants import BASE_URL, API_VERSION, ADDON_ID, SORT_METHODS_INVERT
+import datetime
+
+from resources.lib.constants import BASE_URL, API_VERSION
+from resources.lib.kodiutils import get_uuid, get_skin_name, get_setting_as_bool, get_setting_as_int, get_setting
 from resources.lib.system import user_agent, Http, SYSTEM_LANG_CODE
-from resources.lib.kodiutils import get_uuid, get_skin_name, get_setting_as_bool, get_setting_as_int, get_setting, \
-    notify
 
 try:
     # Python 3
@@ -107,3 +102,13 @@ class Sc:
             'User-Agent': user_agent(),
             'X-Uuid': get_uuid(),
         }
+
+    @staticmethod
+    def up_next(id, s, e):
+        url = '/upNext/{}/{}/{}'.format(id, s, e)
+        try:
+            data = Sc.get(url)
+        except:
+            data = {'error': 'error'}
+        return data
+

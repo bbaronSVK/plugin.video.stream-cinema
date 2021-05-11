@@ -154,6 +154,7 @@ class SCPlayer(Player):
 
     def set_watched(self):
         if self.is_my_plugin:
+            self.win.setProperty('{}.stop'.format(ADDON_ID), '1')
             percent_played = self.percent_played()
 
             self.movie.scrobble(percent_played, SCKODIItem.SCROBBLE_STOP)
@@ -163,7 +164,7 @@ class SCPlayer(Player):
                 play_count = int(play_count) + 1 if play_count is not None else 1
                 debug('playcount {}'.format(play_count))
                 d = datetime.fromtimestamp(time())
-                self.movie.set_play_count(play_count)
+                self.movie.set_play_count(play_count, True)
                 self.movie.set_last_played(d.strftime('%Y-%m-%d %H:%M:%S'))
             if 3 < percent_played < 80:
                 debug('watched {}'.format(self.current_time))

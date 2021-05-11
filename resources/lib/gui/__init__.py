@@ -4,6 +4,7 @@ import re
 
 from resources.lib.common.lists import List
 from resources.lib.common.logger import debug
+from resources.lib.common.storage import Storage
 from resources.lib.kodiutils import get_setting
 from resources.lib.system import SYSTEM_VERSION
 
@@ -44,5 +45,18 @@ def translate_cond_visibility(text):
         name = get_history_item_name(m.group('param1'))
         st = List(name)
         ret = len(st.get()) > int(m.group('param2'))
+    elif m.group('typ') == 'listlen':
+        st = List(m.group('param1'))
+        p1 = len(st.get())
+        p2 = int(m.group('param2'))
+        debug('p1 {} p2 {}'.format(p1, p2))
+        return p1 > p2
+    elif m.group('typ') == 'storagelen':
+        st = Storage(m.group('param1'))
+        p1 = len(st._data)
+        p2 = int(m.group('param2'))
+        debug('p1 {} p2 {}'.format(p1, p2))
+        return p1 > p2
+
     debug('{} -> {}'.format(text, ret))
     return ret

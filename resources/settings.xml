@@ -7,10 +7,12 @@
         <setting type="text" label="30013" id="kraska.pass" default="" option="hidden"/>
         <setting type="action" label="30014" action="RunPlugin(plugin://plugin.video.stream-cinema?action=6465627567)" />
         <setting type="action" label="30056" action="RunPlugin(plugin://plugin.video.stream-cinema?action=7570646174655f6164646f6e)" />
+<!--        <setting type="action" label="xxxx" action="RunPlugin(plugin://plugin.video.stream-cinema?action=7365617263685f6e6578745f657069736f646573)" />-->
         <setting type="text" label="30015" id="kraska.days.left" default="" enable="false"/>
         <setting type="text" label="30016" id="kraska.token" default="" enable="false"/>
         <setting type="text" label="30017" id="system.uuid" default="" enable="false"/>
         <setting type="text" label="30018" id="system.ver" default="" enable="false"/>
+        <setting type="text" id="system.changelog" default="" visible="false"/>
         <setting type="text" id="kraska.chsum" default="" visible="false"/>
     </category>
     <category label="30019">
@@ -18,6 +20,7 @@
         <setting type="bool" label="30020" id="stream.all" default="true" enable="eq(1,false) + eq(2,false)"/>
         <setting type="bool" label="30021" id="stream.dubed.titles" default="false" enable="eq(-1,false) + eq(1,false)"/>
         <setting type="bool" label="30022" id="stream.dubed" default="false" enable="eq(-1,false) + eq(-2,false)"/>
+        <setting type="bool" label="30061" id="stream.autoplay.episode" default="false"/>
         <setting type="bool" label="30023" id="stream.autoselect" default="false"/>
         <setting type="select" label="30024" id="stream.lang1" subsetting="true" values="CZ|SK|EN|HU" visible="eq(-1,true)"
                  default="CZ"/>

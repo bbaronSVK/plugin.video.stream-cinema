@@ -169,7 +169,10 @@ class TraktAPI(object):
     def get_episode_info(self, id, season, episode, extended=None):
         with Trakt.configuration.oauth.from_response(self.authorization):
             with Trakt.configuration.http(retry=True, timeout=90):
-                res = Trakt['shows'].episode(id, season, episode, extended, parse=False).json()
+                try:
+                    res = Trakt['shows'].episode(id, season, episode, extended, parse=False).json()
+                except:
+                    res = None
         return res
 
     def get_last_activities(self):
@@ -195,6 +198,9 @@ class TraktAPI(object):
 
     def get_list_items(self, id, user='me'):
         return Trakt['users/*/lists/*'].get(username=user, id=id)
+
+    def get_watchlist(self, user='me'):
+        return Trakt['users/*/watchlist'].get(username=user, parse=False)
 
     @staticmethod
     def script_trakt():
@@ -291,7 +297,10 @@ class TraktAPI(object):
         with Trakt.configuration.oauth.from_response(self.authorization):
             with Trakt.configuration.http(retry=True):
                 debug('scrobble obj: {}'.format(data))
-                result = Trakt['scrobble'].action(**data).json()
+                try:
+                    result = Trakt['scrobble'].action(**data).json()
+                except:
+                    result = None
                 return result
         pass
 
@@ -323,20 +332,39 @@ class TraktAPI(object):
             items.update({trid: eps})
         res, items = self.trakt2sc(items, 3)
         pos = 0
-        max = len(res)
+        total = len(res)
         for scid, trid in res.items():
             if self.monitor.abortRequested():
                 return
             pos += 1
-            debug('episodes: {}%'.format(int(pos/max*100)))
-            dialog.update(int(pos/max*100))
+            max_time = 0
+            last_ep = None
+            debug('episodes: {}%'.format(int(pos / total * 100)))
+            dialog.update(int(pos / total * 100))
+            item = SCKODIItem(scid)
             for s, e, watched_at in items[int(trid['trakt'])]:
+                item.series = s
+                item.episode = e
+
+                if self.monitor.abortRequested():
+                    return
                 wa = TraktAPI.utc2timestamp(watched_at)
-                item = SCKODIItem(scid, series=s, episode=e)
+
+                if int(wa) >= int(max_time):
+                    ''' ak su epizody vsetky oznacene ako videne v rovnaky cas alebo novsie '''
+                    if int(scid) == 14666:
+                        debug('set max {}'.format(wa))
+                    max_time = wa
+                    last_ep = (s, e)
+
                 old = item.get_play_count()
                 if old is None or last_at is None or wa >= last_at:
                     debug('SCID ADD {} {}x{}'.format(scid, s, e))
                     item.set_play_count('1')
+
+            if item and last_ep is not None:
+                item.set_last_ep(last_ep[0], last_ep[1], max_time)
+                pass
         dialog.close()
 
         pass
@@ -449,6 +477,13 @@ class TraktAPI(object):
             set_setting('trakt.user', '')
         elif action == 'trakt.list':
             u = 'me' if not params.args.get('user', None) else params.args.get('user')
+            if u == 'me':
+                for i in ['watchlist']:
+                    itm = {'type': 'action', 'title': i, 'action': 'trakt.list.items', 'id': i, 'user': u}
+                    item = SCItem(itm)
+                    if item.visible:
+                        sc.items.append(item.get())
+
             for l in self.get_lists(user=u):
                 # l.name = l.name.encode('utf-8')
                 itm = {'type': 'action', 'title': l.name, 'action': 'trakt.list.items', 'id': l.id, 'user': u}
@@ -457,10 +492,16 @@ class TraktAPI(object):
                     sc.items.append(item.get())
         elif action == 'trakt.list.items':
             u = 'me' if not params.args.get('user', None) else params.args.get('user')
-            items=[]
-            for i in self.get_list_items(params.args.get('id'), u).items(parse=False).json():
+            name = params.args.get('id')
+            if name == 'watchlist':
+                data = self.get_watchlist(u).json()
+            else:
+                data = self.get_list_items(name, u).items(parse=False).json()
+            items = []
+            for i in data:
                 t = i.get('type')
-                if t not in ['movie', 'tvshow']:
+                debug('item: {} {}'.format(t, i))
+                if t not in ['movie', 'tvshow', 'show']:
                     continue
                 sc_type = 1 if t == 'movie' else 3
                 data = i.get(t, {})
@@ -468,8 +509,8 @@ class TraktAPI(object):
                 tr = ids.get('trakt')
                 itm = "{},{}".format(sc_type, tr)
                 items.append(itm)
-            self.show_items(items, sc)
             debug('items: {}'.format(items))
+            self.show_items(items, sc)
         else:
             debug('Neznama akcia trakt.tv {}'.format(action))
         sc.succeeded = True

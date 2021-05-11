@@ -11,17 +11,18 @@ from json import dumps
 
 from resources.lib.common.kodivideocache import set_kodi_cache_size
 from resources.lib.kodiutils import params, container_refresh, urlencode, container_update, create_plugin_url, \
-    exec_build_in, download, get_setting, update_addon, set_setting_as_bool, notify
+    exec_build_in, download, get_setting, update_addon, set_setting_as_bool, notify, get_setting_as_bool
 from resources.lib.common.logger import info, debug
-from resources.lib.common.lists import List
+from resources.lib.common.lists import List, SCKODIItem
 from resources.lib.constants import SORT_METHODS, SC, GUI, ADDON_ID
 from resources.lib.api.sc import Sc
 from resources.lib.gui import cur_win, home_win
 from resources.lib.gui.dialog import dok, dinput
-from resources.lib.gui.item import SCItem, get_history_item_name, list_hp, SCLDir
+from resources.lib.gui.item import SCItem, get_history_item_name, list_hp, SCLDir, SCUpNext
 from resources.lib.common.storage import Storage, KodiViewModeDb
 from resources.lib.language import Strings
 from resources.lib.params import params
+from resources.lib.services.next_episodes import NextEp
 from resources.lib.services.service import check_set_debug
 from resources.lib.system import SYSTEM_LANG_CODE
 from resources.lib.trakt.Trakt import TraktAPI, trakt
@@ -90,6 +91,10 @@ class Scinema:
             self.action_csearch()
         elif action == SC.ACTION_LAST:
             self.action_last()
+        elif action == 'nextep':
+            self.action_next_ep()
+        elif action == 'search_next_episodes':
+            self.action_search_next_episodes()
         elif action == SC.ACTION_DEBUG:
             check_set_debug(True)
         elif action == SC.ACTION_DOWNLOAD:
@@ -180,11 +185,20 @@ class Scinema:
         st = List(lid)
         if len(st.get()) > 0:
             self.url = '/Last'
-            self.payload = dict(ids=dumps(st.get()))
+            self.payload = {"ids": dumps(st.get())}
             self.call_url_and_response()
         else:
             if SC.ITEM_WIDGET not in self.args:
                 dok(Strings.txt(Strings.EMPTY_HISTORY_H1), Strings.txt(Strings.EMPTY_HISTORY_L1))
+
+    def action_next_ep(self):
+        st = NextEp().get()
+        if len(st) > 0:
+            self.url = '/Last?nextep=1'
+            self.payload = dict(ids=dumps(st))
+            self.call_url_and_response()
+        else:
+            pass
 
     def action_cmd(self):
         url = self.args.get('url')
@@ -237,6 +251,9 @@ class Scinema:
         plugin_url = create_plugin_url({'url': url})
         container_update(plugin_url)
         return
+
+    def action_search_next_episodes(self):
+        NextEp().run(True)
 
     def msg_error(self):
         if SC.ITEM_WIDGET in self.args:
@@ -497,6 +514,36 @@ class Scinema:
                 control.selectItem(int(data[SC.ITEM_FOCUS]))
             except:
                 pass
+
+        check_last_key = '{}.last_series'.format(ADDON_ID)
+        if 'checkLast' in data and get_setting_as_bool('stream.autoplay.episode'):
+            check_last = data['checkLast']
+            stop = home_win.getProperty('{}.stop'.format(ADDON_ID))
+            debug('Mame check last data: {} / {}'.format(stop, check_last))
+            item_id = int(check_last.get('id', 0))
+            ki = SCKODIItem(int(item_id))
+            last_ep = ki.get_last_ep()
+            if item_id > 0 and last_ep:
+                win_last_series = home_win.getProperty(check_last_key)
+                home_win.setProperty(check_last_key, str(item_id))
+                debug('last {} cur {}'.format(win_last_series, item_id))
+                if win_last_series == '' or win_last_series != str(item_id):
+                    debug('last ep: {}'.format(last_ep))
+                    try:
+                        data = Sc.up_next(item_id, last_ep[0], last_ep[1])
+                        d = SCUpNext(data)
+                        debug('NEXT EP: {}'.format(d.get().get('play_info')))
+                        cmd = 'PlayMedia({})'.format(create_plugin_url(d.get().get('play_info')))
+                        if stop is None or stop == '':
+                            debug('play: {}'.format(cmd))
+                            exec_build_in(cmd)
+                    except:
+                        debug('chyba: {}'.format(traceback.format_exc()))
+                        pass
+        else:
+            home_win.clearProperty(check_last_key)
+        # upraceme po sebe
+        home_win.clearProperty('{}.stop'.format(ADDON_ID))
 
 
 class Stream:

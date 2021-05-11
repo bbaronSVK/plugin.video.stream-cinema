@@ -1,7 +1,9 @@
 from __future__ import print_function, unicode_literals
 
 from json import dumps
+from time import time
 
+from resources.lib.api.sc import Sc
 from resources.lib.common.storage import Storage, KodiDb
 from resources.lib.common.logger import debug
 from resources.lib.kodiutils import hexlify
@@ -64,15 +66,18 @@ class SCKODIItem(Storage):
     SCROBBLE_START = 'start'
     SCROBBLE_PAUSE = 'pause'
     SCROBBLE_STOP = 'stop'
+    LAST_EP_KEY = 'last_ep'
+    ITEM_NAME = 'SCKODIItem'
 
     def __init__(self, name, series=None, episode=None, trakt=None):
-        super(SCKODIItem, self).__init__('SCKODIItem-{}'.format(name))
+        super(SCKODIItem, self).__init__('{}-{}'.format(self.ITEM_NAME, name))
         if series is not None:
             url = '/Play/{}/{}/{}'.format(name, series, episode)
             # debug('SCKODIItem: {}'.format(url))
             kodi_path = hexlify(url)
         else:
             kodi_path = hexlify('/Play/{}'.format(name))
+        self.name = name
         self.series = series
         self.episode = episode
         self.trakt = trakt
@@ -107,12 +112,47 @@ class SCKODIItem(Storage):
     def get_last_played(self):
         return self._get('last_played')
 
-    def set_play_count(self, times):
+    def get_last_ep(self):
+        last = self[self.LAST_EP_KEY]
+        if last is not None:
+            last = self[self.LAST_EP_KEY].split('x')
+        else:
+            last = (1, 0)
+        # debug('posielam LAST_EP {}'.format(last))
+        return last
+
+    def set_last_ep(self, s, e, last_time=None):
+        self[self.LAST_EP_KEY] = '{}x{}'.format(s, e)
+        ne = Storage('nextep')
+
+        try:
+            info = Sc.up_next(self.name, s, e)
+            if 'error' in info or ('info' in info and info.get('info') is None):
+                debug('nemame data k next EP')
+                del (ne[self.name])
+                return
+
+            new = {
+                's': s,
+                'e': e,
+                't': int(time()) if last_time is None else last_time,
+            }
+            ne[self.name] = new
+        except:
+            import traceback
+            debug('ERR: {}'.format(traceback.format_exc()))
+            del(ne[self.name])
+        debug('nastavujem LAST_EP na: {} pre {}'.format(self[self.LAST_EP_KEY], self.name))
+
+    def set_play_count(self, times, from_kodi_player=False):
         self._set('play_count', times)
         if self.kodi_db:
             self.kodi_db.set_watched_path(self.kodi_path, times)
 
-        from resources.lib.trakt.Trakt import trakt, TraktAPI
+        if from_kodi_player and self.series:
+            self.set_last_ep(self.series, self.episode)
+
+        from resources.lib.trakt.Trakt import trakt
         if self.trakt is not None and trakt.is_enabled():
             trakt.set_watched(self.trakt, times, season=self.series, episode=self.episode)
 

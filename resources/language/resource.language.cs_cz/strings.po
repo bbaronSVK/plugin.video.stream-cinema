@@ -229,6 +229,10 @@ msgctxt "#30060"
 msgid "Show genre in item title"
 msgstr "Zobrazit žánr v názvu položky"
 
+msgctxt "#30061"
+msgid "Automatically start the next episode when the series is opens"
+msgstr "Automaticky spustit další epizodu při otevření seriálu"
+
 msgctxt "#30100"
 msgid "Welcome"
 msgstr "Vítejte"

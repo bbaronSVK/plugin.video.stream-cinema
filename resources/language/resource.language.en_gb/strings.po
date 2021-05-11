@@ -229,6 +229,10 @@ msgctxt "#30060"
 msgid "Show genre in item title"
 msgstr ""
 
+msgctxt "#30061"
+msgid "Automatically start the next episode when the series is opens"
+msgstr ""
+
 msgctxt "#30100"
 msgid "Welcome"
 msgstr ""

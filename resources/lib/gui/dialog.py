@@ -6,6 +6,10 @@ def dialog():
     return xbmcgui.Dialog()
 
 
+def dtextviewer(heading, text):
+    dialog().textviewer(heading, text)
+
+
 def dyesno(heading='heading', message='message', yeslabel='yes', nolabel='no', autoclose=None):
     if autoclose is not None:
         autoclose = autoclose * 1000

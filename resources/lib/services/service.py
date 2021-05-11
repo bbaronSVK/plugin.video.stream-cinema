@@ -6,9 +6,10 @@ from resources.lib.api.kraska import Kraska
 from resources.lib.common.android import AndroidTv
 from resources.lib.common.logger import debug
 from resources.lib.services import websocket
+from resources.lib.services.next_episodes import NextEp
 from resources.lib.trakt.Trakt import trakt
 from resources.lib.constants import ADDON, ADDON_ID
-from resources.lib.gui.dialog import dok
+from resources.lib.gui.dialog import dok, dtextviewer
 from resources.lib.kodiutils import sleep, set_setting, get_uuid, get_setting, get_system_debug, set_system_debug, \
     exec_build_in, get_setting_as_bool
 from resources.lib.language import Strings
@@ -28,6 +29,7 @@ def check_set_debug(toggle=False):
 
 
 class Service:
+    next_ep = None
     monitor = None
     player = None
     trakt = None
@@ -41,6 +43,13 @@ class Service:
 
     def run(self):
         debug('START SERVICE....................................................................')
+        last_changelog = get_setting('system.changelog')
+
+        if last_changelog != ADDON.getAddonInfo('version'):
+            debug('SYSTEM.CHANGELOG: {}'.format(ADDON.getAddonInfo('changelog')))
+            set_setting('system.changelog', '{}'.format(ADDON.getAddonInfo('version')))
+            dtextviewer('', ADDON.getAddonInfo('changelog'))
+
         if get_setting_as_bool('system.autoexec'):
             try:
                 exec_build_in('ActivateWindow(videos,plugin://{})'.format(ADDON_ID))
@@ -54,6 +63,8 @@ class Service:
         if get_setting_as_bool('system.ws.remote.enable'):
             ws = websocket.WS()
             ws.reconnect()
+
+        self.next_ep = NextEp()
 
         while not monitor.abortRequested():
             try:
@@ -88,6 +99,12 @@ class Service:
                 trakt.check_trakt()
             except:
                 debug('trakt err: {}'.format(traceback.format_exc()))
+                pass
+
+            try:
+                self.next_ep.run()
+            except:
+                debug('nextep err: {}'.format(traceback.format_exc()))
                 pass
 
 
