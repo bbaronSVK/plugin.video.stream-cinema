@@ -92,6 +92,8 @@ class Kraska:
         debug('ideme na zostavajuce dni')
         try:
             days_left = self.get_days_left()
+            if days_left is None:
+                raise Exception
         except:
             dok(Strings.txt(Strings.RESOLVE_ERROR_H1), Strings.txt(Strings.KRASKA_NOTIFY_NO_SUBSCRIPTION))
             return None

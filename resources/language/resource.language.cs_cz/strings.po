@@ -371,6 +371,6 @@ msgstr "Odebrat z odběru"
 
 msgctxt "#30131"
 msgid "Active subscription required. For proper operation of this plugin you must have an active subscription at kra.sk."
-msgstr "Nemáte aktivní předplatné. Pro správné fungování doplňku je zapotřebí aktivní předplatné na úložisku kra.sk."
+msgstr "Vyžaduje se předplatné. Pro správné fungování doplňku je zapotřebí aktivní předplatné na úložisku kra.sk."
 
 

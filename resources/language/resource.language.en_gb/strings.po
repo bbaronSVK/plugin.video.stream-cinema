@@ -367,6 +367,7 @@ msgstr ""
 
 msgctxt "#30130"
 msgid "Remove from subscription"
+msgstr ""
 
 msgctxt "#30131"
 msgid "Active subscription required. For proper operation of this plugin you must have an active subscription at kra.sk."
