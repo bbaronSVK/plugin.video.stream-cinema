@@ -3,7 +3,8 @@ import traceback
 from hashlib import md5
 
 from resources.lib.common.logger import debug
-from resources.lib.gui.dialog import dnotify, dyesno
+from resources.lib.constants import ADDON
+from resources.lib.gui.dialog import dnotify, dyesno, dok
 from resources.lib.kodiutils import open_settings
 from resources.lib.language import Strings
 from resources.lib.services.Settings import settings
@@ -25,7 +26,7 @@ class Kraska:
 
     def login(self):
         try:
-            debug('kra login start {}/{}'.format(self.username, self.password))
+            debug('kra login start ****/****'.format(self.username, self.password))
             data = self.get_data('/api/user/login', {'data': {'username': self.username, 'password': self.password}})
             if "session_id" in data:
                 debug('kra login OK')
@@ -85,10 +86,16 @@ class Kraska:
         if self.get_token() is False:
             debug('nemame token v resolve a nepodarilo sa nam ani prihlasit')
             if self.login() is False:
-                raise ResolveException()
+                self.wrong_credential()
+                return None
 
         debug('ideme na zostavajuce dni')
-        days_left = self.get_days_left()
+        try:
+            days_left = self.get_days_left()
+        except:
+            dok(Strings.txt(Strings.RESOLVE_ERROR_H1), Strings.txt(Strings.KRASKA_NOTIFY_NO_SUBSCRIPTION))
+            return None
+
         if 14 >= days_left:
             debug('mame nizky pocet dni predplatneho')
             dnotify(Strings.txt(Strings.KRASKA_NOTIFY_LOW_DAYS_LEFT).format(days_left), '')
@@ -144,7 +151,9 @@ class Kraska:
             if data is False or 'data' not in data:
                 debug('mame error na info {}'.format(data))
                 raise Exception(data.get('msg', 'kraska error'))
-            settings.set_setting('kraska.days.left', data.get('data', {}).get('days_left', 0))
+            days_left = data.get('data', {}).get('days_left', 0)
+            days_left = 0 if days_left is None else days_left
+            settings.set_setting('kraska.days.left', days_left)
             debug('vracame info o userovi {}'.format(data.get('data', False)))
             return data.get('data', False)
         except Exception as e:
@@ -160,9 +169,19 @@ class Kraska:
         debug('check_user start')
         if settings.get_setting('kraska.user'):
             try:
+                if not self.user_info():
+                    raise Exception()
+            except:
+                self.wrong_credential()
+                return
+
+            try:
                 self.get_days_left()
             except:
-                res = dyesno(Strings.txt(Strings.KRASKA_NOTIFY_CREDENTIAL_H1),
-                             Strings.txt(Strings.KRASKA_NOTIFY_CREDENTIAL_L1))
-                if res:
-                    open_settings('0.0')
+                dok('{} - {}'.format(Strings.txt(Strings.RESOLVE_ERROR_H1), ADDON.getAddonInfo('name')), Strings.txt(Strings.KRASKA_NOTIFY_NO_SUBSCRIPTION))
+
+    def wrong_credential(self):
+        res = dyesno('{} - {}'.format(Strings.txt(Strings.KRASKA_NOTIFY_CREDENTIAL_H1), ADDON.getAddonInfo('name')),
+                     Strings.txt(Strings.KRASKA_NOTIFY_CREDENTIAL_L1))
+        if res:
+            open_settings('0.0')

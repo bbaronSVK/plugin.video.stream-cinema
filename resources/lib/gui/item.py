@@ -284,6 +284,28 @@ class SCDir(SCBaseItem):
                 SC.ITEM_PAGE: get_history_item_name(self.data.get('lid'))
             }))])
 
+        if settings.get_setting('tvshow.library.path'):
+            lib = List(SC.ITEM_LIBRARY)
+            item_id = self.data.get(SC.ITEM_ID)
+
+            if item_id in lib.get():
+                debug('Uz je v kniznici s odberom')
+                context_menu.append((Strings.txt(Strings.CONTEXT_REMOVE_FROM_SUB), 'RunPlugin({})'.format(create_plugin_url({
+                    SC.ITEM_ACTION: SC.ACTION_REMOVE_FROM_SUBSCRIPTION,
+                    SC.ITEM_ID: self.data.get(item_id)
+                }))))
+            else:
+                debug('Este nieje v odbere')
+                context_menu.append((Strings.txt(Strings.CONTEXT_ADD_TO_LIBRARY_WITH_SUB), 'RunPlugin({})'.format(create_plugin_url({
+                    SC.ITEM_ACTION: SC.ACTION_ADD_TO_LIBRARY_WITH_SUBSCRIPTION,
+                    SC.ITEM_ID: self.data.get(item_id)
+                }))))
+
+            context_menu.append((Strings.txt(Strings.CONTEXT_ADD_TO_LIBRARY), 'RunPlugin({})'.format(create_plugin_url({
+                SC.ITEM_ACTION: SC.ACTION_ADD_TO_LIBRARI,
+                SC.ITEM_ID: self.data.get(item_id)
+            }))))
+
         if params.args.get('url'):
             context_menu.append((Strings.txt(Strings.CONTEXT_PIN_UNPIN), 'RunPlugin({})'.format(create_plugin_url({
                 SC.ITEM_ACTION: SC.ACTION_PIN,

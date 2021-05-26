@@ -7,7 +7,6 @@ from resources.lib.common.android import AndroidTv
 from resources.lib.common.logger import debug
 from resources.lib.services import websocket
 from resources.lib.services.next_episodes import NextEp
-from resources.lib.trakt.Trakt import trakt
 from resources.lib.constants import ADDON, ADDON_ID
 from resources.lib.gui.dialog import dok, dtextviewer
 from resources.lib.kodiutils import sleep, set_setting, get_uuid, get_setting, get_system_debug, set_system_debug, \
@@ -95,11 +94,13 @@ class Service:
                 debug('android tv err: {}'.format(traceback.format_exc()))
                 pass
 
-            try:
-                trakt.check_trakt()
-            except:
-                debug('trakt err: {}'.format(traceback.format_exc()))
-                pass
+            if get_setting('trakt.user'):
+                try:
+                    from resources.lib.trakt.Trakt import trakt
+                    trakt.check_trakt()
+                except:
+                    debug('trakt err: {}'.format(traceback.format_exc()))
+                    pass
 
             try:
                 self.next_ep.run()

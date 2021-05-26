@@ -1,7 +1,7 @@
-<addon id="plugin.video.stream-cinema" name="Stream Cinema CZ a SK" provider-name="bbaron" version="2.1.7+k19">
+<addon id="plugin.video.stream-cinema" name="Stream Cinema CZ a SK" provider-name="bbaron" version="2.1.8+k19">
     <requires>
         <import addon="xbmc.python" version="3.0.0"/>
-        <import addon="script.module.requests" version="2.22.0"/>
+        <import addon="script.module.requests" version="2.25.1"/>
         <import addon="script.module.websocket" version="0.57.0"/>
         <import addon="script.module.trakt" version="4.4.0"/>
         <import addon="service.upnext" version="1.1.5"/>
@@ -42,16 +42,19 @@
             obsahu. Tento doplňek pouze vyhledáva zpřístupněný obsah na kra.sk. Použití na vlastní odpovědnost!
         </disclaimer>
         <news lang="sk">Novinky
-    * pridaná možnosť spúštať nasledujúcu epizódu po vybratí seriálu (v základnom nastavení je táto možnosť vypnutá - môžeš si ju zapnúť v nastaveniach doplnku -> streamy -> automaticky spustiť ďalšiu epizódu). Nieje teda nutné hľadať sériu a epizódu pri ktorej si skončil naposledy. Doplnok si ju zapamätá za teba. Ak máš napárovaný trakt.tv, tak sa ti synchronizujú sledované serialy s ostatnými zariadeniami.
-    * pridany watchlist do trakt.tv
+    * opravena chyba s prihlasovanim na kra.sk
+    * oprava chyb po vyprsani predplatneho
+    * oprava chyb s trakt.tv
         </news>
         <news lang="cs">Novinky
-    * přidána možnost spouštět následující epizodu po vyberu seriálu (v základním nastavení je tato možnost vypnutá - můžeš si ji zapnout v nastaveních doplňku -> streamy -> automaticky spustit další epizodu). Není tedy nutné hledat sérii a epizodu při které si skončil naposledy. Doplněk si ji zapamatuje za tebe. Pokud máš spárován trakt.tv, tak se ti synchronizují sledované serialy s ostatními zařízeními.
-    * přidán watchlist do trakt.tv
+    * oprava chyb s prihlasovanim na kra.sk
+    * oprava chyb po vyprseni predplatneho
+    * oprava chyb s trakt.tv
         </news>
         <news lang="en">News
-    * added the ability to start the next episode after selecting a series (default disabled - you can enable it is plugin settings -> streams -> automatically start the next episode). So there is no need to search for the series and episode in which you ended last. The supplement will remember it for you. If you have paired trakt.tv, then your watched serials will be synchronized with all your devices.
-    * added watchlist to trakt.tv
+    * bugfix with loging on kra.sk
+    * bugfix atfer subscription expires
+    * bugfix in trakt.tv
         </news>
     </extension>
 </addon>

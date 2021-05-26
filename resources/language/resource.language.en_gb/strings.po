@@ -233,6 +233,18 @@ msgctxt "#30061"
 msgid "Automatically start the next episode when the series is opens"
 msgstr ""
 
+msgctxt "#30062"
+msgid "Path for movie library"
+msgstr ""
+
+msgctxt "#30063"
+msgid "Path for tvshow library"
+msgstr ""
+
+msgctxt "#30064"
+msgid "Export metadata from plugin"
+msgstr ""
+
 msgctxt "#30100"
 msgid "Welcome"
 msgstr ""
@@ -343,4 +355,19 @@ msgstr ""
 
 msgctxt "#30127"
 msgid "Addon is not installed from our repository. Please install addon from our repository."
+msgstr ""
+
+msgctxt "#30128"
+msgid "Add to library"
+msgstr ""
+
+msgctxt "#30129"
+msgid "Add to library with subscription"
+msgstr ""
+
+msgctxt "#30130"
+msgid "Remove from subscription"
+
+msgctxt "#30131"
+msgid "Active subscription required. For proper operation of this plugin you must have an active subscription at kra.sk."
 msgstr ""

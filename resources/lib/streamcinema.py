@@ -23,7 +23,6 @@ from resources.lib.common.storage import Storage, KodiViewModeDb
 from resources.lib.language import Strings
 from resources.lib.params import params
 from resources.lib.services.next_episodes import NextEp
-from resources.lib.services.service import check_set_debug
 from resources.lib.system import SYSTEM_LANG_CODE
 from resources.lib.trakt.Trakt import TraktAPI, trakt
 
@@ -96,6 +95,8 @@ class Scinema:
         elif action == 'search_next_episodes':
             self.action_search_next_episodes()
         elif action == SC.ACTION_DEBUG:
+            from resources.lib.services.service import check_set_debug
+
             check_set_debug(True)
         elif action == SC.ACTION_DOWNLOAD:
             self.url = self.args.get(SC.ITEM_DOWNLOAD)

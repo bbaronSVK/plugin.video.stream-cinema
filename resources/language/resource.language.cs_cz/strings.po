@@ -233,6 +233,18 @@ msgctxt "#30061"
 msgid "Automatically start the next episode when the series is opens"
 msgstr "Automaticky spustit další epizodu při otevření seriálu"
 
+msgctxt "#30062"
+msgid "Path for movie library"
+msgstr "Složka pro knihovnu filmů"
+
+msgctxt "#30063"
+msgid "Path for tvshow library"
+msgstr "Složka pro knihovnu seriálů"
+
+msgctxt "#30064"
+msgid "Export metadata from plugin"
+msgstr "Exportuj metadata pro scraper z pluginu"
+
 msgctxt "#30100"
 msgid "Welcome"
 msgstr "Vítejte"
@@ -344,4 +356,21 @@ msgstr "Odobrat"
 msgctxt "#30127"
 msgid "Addon is not installed from our repository. Please install addon from our repository."
 msgstr "Addon není nainstalován z našeho repozitáře. Nainstalujte si doplněk z našeho repozitáře."
+
+msgctxt "#30128"
+msgid "Add to library"
+msgstr "Přidat do knihovny"
+
+msgctxt "#30129"
+msgid "Add to library with subscription"
+msgstr "Přidat do knihovny s odběrem"
+
+msgctxt "#30130"
+msgid "Remove from subscription"
+msgstr "Odebrat z odběru"
+
+msgctxt "#30131"
+msgid "Active subscription required. For proper operation of this plugin you must have an active subscription at kra.sk."
+msgstr "Nemáte aktivní předplatné. Pro správné fungování doplňku je zapotřebí aktivní předplatné na úložisku kra.sk."
+
 
