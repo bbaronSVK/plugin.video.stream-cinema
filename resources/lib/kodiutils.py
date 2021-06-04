@@ -581,7 +581,7 @@ def convert_bitrate(mbit, with_text=True):
 
 
 def get_isp():
-    for fn in [isp_ipinfo, isp_ipapi, isp_dbip]:
+    for fn in [isp_ipinfo, isp_ipapi, isp_dbip, isp_ipgeolocationioapi]:
         try:
             isp = fn()
             if isp.get('a') is not None:
@@ -622,3 +622,11 @@ def isp_dbip():
     url = 'https://db-ip.com/demo/home.php?s={}'
     d = isp_call(url, 'https://db-ip.com/')
     return {'c': d.get('countryCode', 'N/A'), 'a': d.get('asNumber', '')}
+
+
+def isp_ipgeolocationioapi():
+    url = 'https://api.ipgeolocation.io/ipgeo'
+    d = isp_call(url, 'https://api.ipgeolocation.io/')
+    asn = d.get('asn', '')
+    return {'c': d.get('country_code2', 'N/A'), 'a': asn.replace('AS', '')}
+

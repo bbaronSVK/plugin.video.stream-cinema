@@ -24,7 +24,6 @@ from resources.lib.language import Strings
 from resources.lib.params import params
 from resources.lib.services.next_episodes import NextEp
 from resources.lib.system import SYSTEM_LANG_CODE
-from resources.lib.trakt.Trakt import TraktAPI, trakt
 
 
 class Scinema:
@@ -118,6 +117,7 @@ class Scinema:
         elif action == SC.ACTION_UPDATE_ADDON:
             update_addon()
         elif 'trakt.' in action:
+            from resources.lib.trakt.Trakt import trakt
             trakt.action(action, self)
             return True
         elif action == 'autocomplet':

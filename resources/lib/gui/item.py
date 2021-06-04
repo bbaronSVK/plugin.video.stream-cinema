@@ -1,7 +1,6 @@
 from __future__ import print_function, unicode_literals
 
 import re
-import traceback
 from json import dumps
 
 import xbmcvfs
@@ -105,7 +104,7 @@ class SCBaseItem:
         if SC.ITEM_INFO in data:
             self.set_info()
         elif SC.ITEM_I18N_INFO in data:
-            self._set_info(self.i18n_info())
+            self._set_info(self.i18n_info({}))
 
         if 'cast' in data:
             self.set_cast()
@@ -196,7 +195,6 @@ class SCBaseItem:
         if lang not in i18n:
             debug('jazyk {} nemame, tak nastavujem cs'.format(lang))
             lang = SC.DEFAULT_LANG
-        # debug('jazyk {}'.format(lang))
         item_info.update(i18n.get(lang))
         return item_info
 
@@ -302,7 +300,7 @@ class SCDir(SCBaseItem):
                 }))))
 
             context_menu.append((Strings.txt(Strings.CONTEXT_ADD_TO_LIBRARY), 'RunPlugin({})'.format(create_plugin_url({
-                SC.ITEM_ACTION: SC.ACTION_ADD_TO_LIBRARI,
+                SC.ITEM_ACTION: SC.ACTION_ADD_TO_LIBRARY,
                 SC.ITEM_ID: self.data.get(item_id)
             }))))
 

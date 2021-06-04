@@ -245,6 +245,10 @@ msgctxt "#30064"
 msgid "Export metadata from plugin"
 msgstr ""
 
+msgctxt "#30065"
+msgid "Show old style menu"
+msgstr ""
+
 msgctxt "#30100"
 msgid "Welcome"
 msgstr ""

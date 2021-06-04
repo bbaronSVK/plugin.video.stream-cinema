@@ -1,4 +1,4 @@
-<addon id="plugin.video.stream-cinema" name="Stream Cinema CZ a SK" provider-name="bbaron" version="2.1.9+k19">
+<addon id="plugin.video.stream-cinema" name="Stream Cinema CZ a SK" provider-name="bbaron" version="2.1.10+k19">
     <requires>
         <import addon="xbmc.python" version="3.0.0"/>
         <import addon="script.module.requests" version="2.25.1"/>
@@ -41,20 +41,41 @@
         <disclaimer lang="cs">Autor tohoto doplňku neposkytuje žádný obsah a není nijako propojený s poskytovatelemi
             obsahu. Tento doplňek pouze vyhledáva zpřístupněný obsah na kra.sk. Použití na vlastní odpovědnost!
         </disclaimer>
-        <news lang="sk">Novinky
-    * opravena chyba s prihlasovanim na kra.sk
-    * oprava chyb po vyprsani predplatneho
-    * oprava chyb s trakt.tv
+        <news lang="sk">[B]Novinky[/B]
+              [I][B]2.1.10[/B][/I]
+            * [COLOR FF50FF42]add[/COLOR] struktura menu z KODI 18 a nizsie
+            * [COLOR FF50FF42]add[/COLOR] struktura menu z KODI 19 sa da zapnut v nastaveniach
+            * [COLOR FFFFAE42]fix[/COLOR] trakt error
+            * [COLOR FFFF5042]remove[/COLOR] oznacenie lite pluginu - uz je plna funkcionalita okrem kniznice
+
+              [I][B]2.1.9[/B][/I]
+            * [COLOR FFFFAE42]fix[/COLOR] chyba s prihlasovanim na kra.sk
+            * [COLOR FFFFAE42]fix[/COLOR] chyb po vyprsani predplatneho
+            * [COLOR FFFFAE42]fix[/COLOR] chyb s trakt.tv
         </news>
-        <news lang="cs">Novinky
-    * oprava chyb s prihlasovanim na kra.sk
-    * oprava chyb po vyprseni predplatneho
-    * oprava chyb s trakt.tv
+        <news lang="cs">[B]Novinky[/B]
+            [I][B]2.1.10[/B][/I]
+            * [COLOR FF50FF42]add[/COLOR] struktura menu z KODI 18 a nizsie
+            * [COLOR FF50FF42]add[/COLOR] struktura menu z KODI 19 sa da zapnut v nastaveniach
+            * [COLOR FFFFAE42]fix[/COLOR] trakt error
+            * [COLOR FFFF5042]remove[/COLOR] oznacenie lite pluginu - uz je plna funkcionalita okrem kniznice
+
+            [I][B]2.1.9[/B][/I]
+            * [COLOR FFFFAE42]fix[/COLOR] chyb s prihlasovanim na kra.sk
+            * [COLOR FFFFAE42]fix[/COLOR] chyb po vyprseni predplatneho
+            * [COLOR FFFFAE42]fix[/COLOR] chyb s trakt.tv
         </news>
-        <news lang="en">News
-    * bugfix with loging on kra.sk
-    * bugfix atfer subscription expires
-    * bugfix in trakt.tv
+        <news lang="en">[B]News[/B]
+            [I][B]2.1.10[/B][/I]
+            * [COLOR FF50FF42]add[/COLOR] menu structure from KODI 18 and below
+            * [COLOR FF50FF42]add[/COLOR] the menu structure from KODI 19 can be switched on in the settings
+            * [COLOR FFFFAE42]fix[/COLOR] trakt error
+            * [COLOR FFFF5042]remove[/COLOR] lite removev from name - full functionality is available except for the kodi library
+
+            [I][B]2.1.9[/B][/I]
+            * [COLOR FFFFAE42]fix[/COLOR] with loging on kra.sk
+            * [COLOR FFFFAE42]fix[/COLOR] atfer subscription expires
+            * [COLOR FFFFAE42]fix[/COLOR] in trakt.tv
         </news>
     </extension>
 </addon>

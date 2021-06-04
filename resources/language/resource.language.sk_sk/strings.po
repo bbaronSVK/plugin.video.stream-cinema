@@ -245,6 +245,10 @@ msgctxt "#30064"
 msgid "Export metadata from plugin"
 msgstr "Exportuj metadata pre scraper z pluginu"
 
+msgctxt "#30065"
+msgid "Show old style menu"
+msgstr "Zobraz starú štrukturu menu"
+
 msgctxt "#30100"
 msgid "Welcome"
 msgstr "Vitajte"

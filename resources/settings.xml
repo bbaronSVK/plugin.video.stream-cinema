@@ -17,6 +17,7 @@
     </category>
     <category label="30019">
         <setting type="bool" label="30060" id="plugin.show.genre" default="false"/>
+        <setting type="bool" label="30065" id="plugin.show.old.menu" default="true"/>
         <setting type="bool" label="30020" id="stream.all" default="true" enable="eq(1,false) + eq(2,false)"/>
         <setting type="bool" label="30021" id="stream.dubed.titles" default="false" enable="eq(-1,false) + eq(1,false)"/>
         <setting type="bool" label="30022" id="stream.dubed" default="false" enable="eq(-1,false) + eq(-2,false)"/>

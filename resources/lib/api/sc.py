@@ -4,6 +4,7 @@ from __future__ import print_function, unicode_literals
 
 import datetime
 
+from resources.lib.common.logger import debug
 from resources.lib.constants import BASE_URL, API_VERSION
 from resources.lib.kodiutils import get_uuid, get_skin_name, get_setting_as_bool, get_setting_as_int, get_setting
 from resources.lib.system import user_agent, Http, SYSTEM_LANG_CODE
@@ -28,6 +29,7 @@ class Sc:
     @staticmethod
     def get(path, params=None):
         sorted_values, url = Sc.prepare(params, path)
+        debug('CALL {} PARAMS {}'.format(url, sorted_values))
         res = Http.get(url, headers=Sc.headers(), params=sorted_values)
         res.raise_for_status()
         return res.json()
@@ -85,6 +87,9 @@ class Sc:
 
         if get_setting_as_bool('plugin.show.genre'):
             params.update({'gen': 1})
+
+        if get_setting_as_bool('plugin.show.old.menu'):
+            params.update({'old': 1})
 
         return params
 

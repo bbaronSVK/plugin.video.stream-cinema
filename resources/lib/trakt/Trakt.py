@@ -11,7 +11,6 @@ from resources.lib.gui.item import SCItem
 from resources.lib.kodiutils import set_setting, get_setting_as_bool, set_setting_as_bool
 from resources.lib.services.SCPlayer import player
 from resources.lib.services.Settings import settings
-
 from trakt import Trakt
 from json import loads, dumps
 import time
