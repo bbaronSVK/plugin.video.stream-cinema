@@ -42,6 +42,10 @@
             obsahu. Tento doplňek pouze vyhledáva zpřístupněný obsah na kra.sk. Použití na vlastní odpovědnost!
         </disclaimer>
         <news lang="sk">[B]Novinky[/B]
+              [I][B]2.1.11[/B][/I]
+            * [COLOR FFFFAE42]fix[/COLOR] trakt.tv obnova tokenu
+            * [COLOR FFFFAE42]fix[/COLOR] oneskorena synchronizacia po starte
+
               [I][B]2.1.10[/B][/I]
             * [COLOR FF50FF42]add[/COLOR] struktura menu z KODI 18 a nizsie
             * [COLOR FF50FF42]add[/COLOR] struktura menu z KODI 19 sa da zapnut v nastaveniach
@@ -54,25 +58,33 @@
             * [COLOR FFFFAE42]fix[/COLOR] chyb s trakt.tv
         </news>
         <news lang="cs">[B]Novinky[/B]
-            [I][B]2.1.10[/B][/I]
+              [I][B]2.1.11[/B][/I]
+            * [COLOR FFFFAE42]fix[/COLOR] trakttv refresh token
+            * [COLOR FFFFAE42]fix[/COLOR] oneskorena synchronizace po startu
+
+              [I][B]2.1.10[/B][/I]
             * [COLOR FF50FF42]add[/COLOR] struktura menu z KODI 18 a nizsie
             * [COLOR FF50FF42]add[/COLOR] struktura menu z KODI 19 sa da zapnut v nastaveniach
             * [COLOR FFFFAE42]fix[/COLOR] trakt error
             * [COLOR FFFF5042]remove[/COLOR] oznacenie lite pluginu - uz je plna funkcionalita okrem kniznice
 
-            [I][B]2.1.9[/B][/I]
+              [I][B]2.1.9[/B][/I]
             * [COLOR FFFFAE42]fix[/COLOR] chyb s prihlasovanim na kra.sk
             * [COLOR FFFFAE42]fix[/COLOR] chyb po vyprseni predplatneho
             * [COLOR FFFFAE42]fix[/COLOR] chyb s trakt.tv
         </news>
         <news lang="en">[B]News[/B]
-            [I][B]2.1.10[/B][/I]
+              [I][B]2.1.11[/B][/I]
+            * [COLOR FFFFAE42]fix[/COLOR] trakttv refresh token
+            * [COLOR FFFFAE42]fix[/COLOR] delayed synchronization on startup
+
+              [I][B]2.1.10[/B][/I]
             * [COLOR FF50FF42]add[/COLOR] menu structure from KODI 18 and below
             * [COLOR FF50FF42]add[/COLOR] the menu structure from KODI 19 can be switched on in the settings
             * [COLOR FFFFAE42]fix[/COLOR] trakt error
             * [COLOR FFFF5042]remove[/COLOR] lite removev from name - full functionality is available except for the kodi library
 
-            [I][B]2.1.9[/B][/I]
+              [I][B]2.1.9[/B][/I]
             * [COLOR FFFFAE42]fix[/COLOR] with loging on kra.sk
             * [COLOR FFFFAE42]fix[/COLOR] atfer subscription expires
             * [COLOR FFFFAE42]fix[/COLOR] in trakt.tv
