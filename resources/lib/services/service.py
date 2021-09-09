@@ -10,7 +10,7 @@ from resources.lib.services.next_episodes import NextEp
 from resources.lib.constants import ADDON, ADDON_ID
 from resources.lib.gui.dialog import dok, dtextviewer
 from resources.lib.kodiutils import sleep, set_setting, get_uuid, get_setting, get_system_debug, set_system_debug, \
-    exec_build_in, get_setting_as_bool
+    exec_build_in, get_setting_as_bool, update_addon
 from resources.lib.language import Strings
 from resources.lib.services.Monitor import monitor
 from resources.lib.services.SCPlayer import player
@@ -43,6 +43,8 @@ class Service:
     def run(self):
         debug('START SERVICE....................................................................')
         last_changelog = get_setting('system.changelog')
+
+        update_addon()
 
         if last_changelog != ADDON.getAddonInfo('version'):
             debug('SYSTEM.CHANGELOG: {}'.format(ADDON.getAddonInfo('changelog')))

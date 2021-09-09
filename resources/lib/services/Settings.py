@@ -24,7 +24,7 @@ class Settings(xbmc.Monitor):
         self.addon = xbmcaddon.Addon(ADDON_ID)
 
     def get_setting(self, key):
-        return self.addon.getSetting(key)
+        return xbmcaddon.Addon(ADDON_ID).getSetting(key)
 
     def set_setting(self, key, val):
         debug('set_settings {} {}'.format(key, val))
@@ -32,15 +32,15 @@ class Settings(xbmc.Monitor):
 
     def get_setting_as_bool(self, key):
         try:
-            return self.addon.getSettingBool(key)
+            return xbmcaddon.Addon(ADDON_ID).getSettingBool(key)
         except:
             return self.get_setting(key) == 'True' or self.get_setting(key) == 'true'
 
     def get_setting_as_int(self, key):
         try:
-            return self.addon.getSettingInt(key)
+            return xbmcaddon.Addon(ADDON_ID).getSettingInt(key)
         except:
-            return int(self.addon.getSetting(key)) if self.addon.getSetting(key) else None
+            return int(xbmcaddon.Addon(ADDON_ID).getSetting(key)) if xbmcaddon.Addon(ADDON_ID).getSetting(key) else None
 
 
 settings = Settings()

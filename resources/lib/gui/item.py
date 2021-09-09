@@ -1,6 +1,7 @@
 from __future__ import print_function, unicode_literals
 
 import re
+import time
 from json import dumps
 
 import xbmcvfs
@@ -480,6 +481,9 @@ class SCVideo(SCBaseItem):
             SC.ITEM_URL: self.data.get(SC.ITEM_URL),
         }))])
 
+        if self.data.get(SC.ITEM_INFO, {}).get('trailer'):
+            menu.append(['Trailer', 'PlayMedia({})'.format(self.data.get(SC.ITEM_INFO, {}).get('trailer'))])
+
         self.item.addContextMenuItems(items=menu)
 
     def _key(self, name):
@@ -569,6 +573,7 @@ class SCPlayItem(SCBaseItem):
         speed = smin
         settings.set_setting('stream.adv.speedtest', speed)
         settings.set_setting('stream.adv.speedtest.asn', isp.get('a', 'N/A'))
+        settings.set_setting('stream.adv.speedtest.last', int(time.time()))
 
     @try_catch('calculate_speed')
     def calculate_speed(self, url):
@@ -595,14 +600,21 @@ class SCPlayItem(SCBaseItem):
             debug('nieje autoselect, alebo je vynuteny vyber streamu alebo download')
             return
 
+        speedtest_last = get_setting_as_int('stream.adv.speedtest.last')
+        now = time.time()
+        force = True if speedtest_last is None or (speedtest_last + (24 * 3600 * 7)) < now else False
+
+        isp = self.isp()
+        asn = settings.get_setting('stream.adv.speedtest.asn')
+        asn_changed = str(isp.get('a')) != str(asn)
+        wrong_speed = settings.get_setting_as_int('stream.adv.speedtest') < 1
+        debug('Force: {} ASN: {} / {} [{}] / SPEED: {} [{}]'.format(force, asn, isp.get('a'), asn_changed,
+                                                          settings.get_setting_as_int('stream.adv.speedtest'),
+                                                          wrong_speed))
+        if force or (get_setting_as_int('stream.max.bitrate') == 100 and (asn_changed or wrong_speed)):
+            self.speedtest(isp)
+
         if get_setting_as_bool('stream.autoselect'):
-            isp = self.isp()
-            asn = settings.get_setting('stream.adv.speedtest.asn')
-            asn_changed = str(isp.get('a')) != str(asn)
-            wrong_speed = settings.get_setting_as_int('stream.adv.speedtest') < 1
-            debug('ASN: {} / {} [{}] / SPEED: {} [{}]'.format(asn, isp.get('a'), asn_changed, settings.get_setting_as_int('stream.adv.speedtest'), wrong_speed))
-            if get_setting_as_int('stream.max.bitrate') == 100 and (asn_changed or wrong_speed):
-                self.speedtest(isp)
 
             lang1 = get_setting('stream.lang1').lower()
             lang2 = get_setting('stream.lang2').lower()

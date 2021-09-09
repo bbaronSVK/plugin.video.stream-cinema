@@ -1,5 +1,7 @@
 from time import time
 
+import xbmc
+
 from resources.lib.api.sc import Sc
 from resources.lib.common.lists import SCKODIItem
 from resources.lib.common.logger import debug
@@ -16,13 +18,14 @@ class NextEp:
 
     def __init__(self):
         self.list = Storage('nextep')
-        self.last_run = settings.get_setting_as_int('system.next_ep.last_run')
-        if self.last_run is None:
-            self.last_run = 0
+        # dal som to sem natvrdo, aby sa oneskoril sync o 10 minut po starte
+        self.last_run = time() - 3000 #settings.get_setting_as_int('system.next_ep.last_run')
+        # if self.last_run is None:
+        #     self.last_run = time() - 3000
 
     def run(self, force=False):
         now = time()
-        if force or self.last_run + 3600 < now:
+        if not xbmc.Player().isPlayingVideo() and (force or self.last_run + 3600 < now):
             self.update_items()
             self.last_run = now
             settings.set_setting('system.next_ep.last_run', '{}'.format(int(now)))

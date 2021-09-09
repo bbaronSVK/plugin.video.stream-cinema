@@ -79,6 +79,14 @@ def set_system_debug(new_val):
     return jsonrpc(method='Settings.SetSettingValue', params=dict(setting="debug.showloginfo", value=new_val))
 
 
+def set_update_addons(new_val):
+    return jsonrpc(method='Settings.SetSettingValue', params=dict(setting="addons.updatemode", value=new_val))
+
+
+def set_general_addonupdates(new_val):
+    return jsonrpc(method='Settings.SetSettingValue', params=dict(setting="general.addonupdates", value=new_val))
+
+
 def get_app_name():
     try:
         data = jsonrpc(method='Application.GetProperties', params=dict(properties=["name"]))
@@ -525,6 +533,9 @@ def make_nfo_content(item, typ='movie'):
 
 def update_addon():
     from resources.lib.common.storage import KodiAddonsDb
+    set_general_addonupdates(0)
+    set_update_addons(1)
+
     addon_db = KodiAddonsDb()
     addon_db.enable_auto_update()
     exec_build_in('UpdateAddonRepos')

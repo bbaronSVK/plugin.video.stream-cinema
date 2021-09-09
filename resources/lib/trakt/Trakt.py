@@ -22,6 +22,11 @@ from xbmcaddon import Addon
 
 time.strptime("1970-01-01 12:00:00", "%Y-%m-%d %H:%M:%S")
 
+CHECK_SYNC = {
+    'movies': ['watched_at', 'paused_at'],
+    'episodes': ['watched_at', 'paused_at'],
+}
+
 
 class TraktAPI(object):
     __client_id = "bb21f3665cf0fa07f2a1a420ec6990317c49dee91af8e012cb836d66674e75c4"
@@ -54,6 +59,7 @@ class TraktAPI(object):
         self.monitor = monitor
 
         if not get_setting_as_bool('trakt.enabled'):
+            debug('Trak nieje zapnuty')
             return
 
         self.initialize(force=force)
@@ -64,7 +70,8 @@ class TraktAPI(object):
         if settings.get_setting('trakt.authorization') and not force:
             self.authorization = loads(settings.get_setting('trakt.authorization'))
             Trakt.configuration.defaults.oauth.from_response(
-                self.authorization
+                self.authorization,
+                refresh=True
             )
         else:
             self.login()
@@ -219,24 +226,26 @@ class TraktAPI(object):
                 self.initialize()
             debug('check trakt')
             data = self.get_last_activities()
-            for b in ['movies', 'episodes']:
+            if data is None:
+                debug('trakt data is NONE')
+                return None
+
+            for check in CHECK_SYNC.items():
                 synced = False
-                item = data.get(b)
+                item = data.get(check[0])
                 for a, i in enumerate(item):
-                    if i != 'paused_at':
-                        continue
-                    # debug('{} {} -> {}'.format(b, i, TraktAPI.utc2timestamp(item.get(i))))
-                    key = 'sync.{}'.format(b)
-                    if self.storage[key].get(i) != item.get(i):
-                        debug('zmena {}[{}] z {} na {}'.format(key, i, self.storage[key].get(i), item.get(i)))
-                        if not synced:
-                            synced = True
-                            try:
-                                self.sync_local(b, self.storage[key].get(i))
-                            except:
-                                debug('TRAKT ERR: {}'.format(traceback.format_exc()))
-                                pass
-                            self.storage[key].update({i: item.get(i)})
+                    if i in check[1]:
+                        key = 'sync.{}'.format(check[0])
+                        if self.storage[key].get(i) != item.get(i):
+                            debug('zmena {}[{}] z {} na {}'.format(key, i, self.storage[key].get(i), item.get(i)))
+                            if not synced:
+                                synced = True
+                                try:
+                                    self.sync_local(check[0], self.storage[key].get(i))
+                                except:
+                                    debug('TRAKT ERR: {}'.format(traceback.format_exc()))
+                                    pass
+                                self.storage[key].update({i: item.get(i)})
 
     def sync_playback_movies(self, last=0):
         last_at = TraktAPI.utc2timestamp(last)
