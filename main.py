@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+import time
 import traceback
 import xbmc
 
@@ -12,7 +13,10 @@ from resources.lib.streamcinema import Scinema
 from resources.lib.common.logger import info
 
 try:
+    start = time.time()
     Scinema().run()
+    end = time.time()
+    info('{0} took {1:.2f}ms'.format('ALL', (end - start) * 1000))
 except:
 
     info('-----------------------------------------------------------------')

@@ -68,23 +68,29 @@ class SCKODIItem(Storage):
     SCROBBLE_STOP = 'stop'
     LAST_EP_KEY = 'last_ep'
     ITEM_NAME = 'SCKODIItem'
+    _watched = None
 
     def __init__(self, name, series=None, episode=None, trakt=None):
         super(SCKODIItem, self).__init__('{}-{}'.format(self.ITEM_NAME, name))
         if series is not None:
-            url = '/Play/{}/{}/{}'.format(name, series, episode)
-            # debug('SCKODIItem: {}'.format(url))
-            kodi_path = hexlify(url)
+            item = '{}/{}/{}'.format(name, series, episode)
         else:
-            kodi_path = hexlify('/Play/{}'.format(name))
+            item = '{}'.format(name)
+        kodi_path = hexlify('/Play/{}'.format(item))
+
+        if SCKODIItem._watched is None:
+            SCKODIItem._watched = List('all_watched')
+            # debug('__: {}'.format(SCKODIItem._watched.get()))
+
+        self.watched = SCKODIItem._watched
+        self.item = item
         self.name = name
         self.series = series
         self.episode = episode
         self.trakt = trakt
         self.kodi_path = '%{}%'.format(kodi_path)
         self.kodi_db = None
-        if self.kodi_path is not None:
-            self.kodi_db = KodiDb()
+        self.kodi_db = KodiDb()
 
     def _set(self, key, val):
         if val is None:
@@ -146,6 +152,12 @@ class SCKODIItem(Storage):
 
     def set_play_count(self, times, from_kodi_player=False):
         self._set('play_count', times)
+
+        if times:
+            self._watched.add(self.item)
+        else:
+            self._watched.add(self.item, True)
+
         if self.kodi_db:
             self.kodi_db.set_watched_path(self.kodi_path, times)
 
@@ -163,14 +175,25 @@ class SCKODIItem(Storage):
             debug('scrobble resp: {}'.format(ret))
 
     def get_play_count(self):
-        play_count = int(self._get('play_count')) if self._get('play_count') is not None else 0
+        if self.item in self._watched.get():
+            return 1
 
-        if self.kodi_db:
-            res = self.kodi_db.get_watched_path(self.kodi_path)
-            if res and res[3] is not None:
-                kodi_play_count = int(res[3])
-                if kodi_play_count > play_count:
-                    play_count = kodi_play_count
+        pc = self._get('play_count')
+        play_count = int(pc) if pc is not None else 0
+        if pc is not None:
+            self._watched.add(self.item)
+            return play_count
+
+        # if self.kodi_db:
+        #     res = self.kodi_db.get_watched_path(self.kodi_path)
+        #     if res and res[3] is not None:
+        #         kodi_play_count = int(res[3])
+        #         if kodi_play_count > play_count:
+        #             play_count = kodi_play_count
+        #         self._watched.add(self.item)
+        #         self.set_play_count(play_count)
+        #     else:
+        #         self.set_play_count(0)
 
         return play_count
 

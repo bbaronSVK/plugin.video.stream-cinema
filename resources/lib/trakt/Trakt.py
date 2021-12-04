@@ -224,7 +224,7 @@ class TraktAPI(object):
         if TraktAPI.can_check():
             if self.initialized is False:
                 self.initialize()
-            debug('check trakt')
+            # debug('check trakt')
             data = self.get_last_activities()
             if data is None:
                 debug('trakt data is NONE')
@@ -360,8 +360,6 @@ class TraktAPI(object):
 
                 if int(wa) >= int(max_time):
                     ''' ak su epizody vsetky oznacene ako videne v rovnaky cas alebo novsie '''
-                    if int(scid) == 14666:
-                        debug('set max {}'.format(wa))
                     max_time = wa
                     last_ep = (s, e)
 

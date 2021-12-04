@@ -10,6 +10,7 @@ import xbmc
 from json import dumps
 
 from resources.lib.common.kodivideocache import set_kodi_cache_size
+from resources.lib.debug import performance
 from resources.lib.kodiutils import params, container_refresh, urlencode, container_update, create_plugin_url, \
     exec_build_in, download, get_setting, update_addon, set_setting_as_bool, notify, get_setting_as_bool
 from resources.lib.common.logger import info, debug
@@ -120,6 +121,20 @@ class Scinema:
             from resources.lib.trakt.Trakt import trakt
             trakt.action(action, self)
             return True
+        elif action in ['add_to_library', 'add_to_library_sub']:
+            lib = List(SC.ITEM_LIBRARY)
+            lib.add(self.args.get(SC.ITEM_ID))
+            if action == 'add_to_library_sub':
+                sub = List(SC.ITEM_LIBRARY_SUB)
+                sub.add(self.args.get(SC.ITEM_ID))
+            container_refresh()
+        elif action == 'remove_from_sub':
+            lib = List(SC.ITEM_LIBRARY)
+            lib.add(self.args.get(SC.ITEM_ID), True)
+            if action == 'remove_from_sub':
+                sub = List(SC.ITEM_LIBRARY_SUB)
+                sub.add(self.args.get(SC.ITEM_ID), True)
+            container_refresh()
         elif action == 'autocomplet':
             from resources.lib.services.autocomplete import Autocomplete
             Autocomplete(self.args)
@@ -303,6 +318,7 @@ class Scinema:
             else:
                 self.response = Sc.get(self.url)
         except:
+            debug('CALL URL ERR: {}'.format(traceback.format_exc()))
             self.response = {}
 
     def parse_response(self):

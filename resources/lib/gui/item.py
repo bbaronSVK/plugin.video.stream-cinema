@@ -230,6 +230,9 @@ class SCStreamSelect(SCBaseItem):
         if 'src' in strm_nfo:
             label2 += '   src: [B]{}[/B]'.format(strm_nfo['src'])
 
+        if 'video' in strm_nfo and 'aspect' in strm_nfo['video']:
+            label2 += '   asp: [B]{}[/B]'.format(SCStreamSelect.calculate_aspct_ratio(strm_nfo['video']['aspect']))
+
         if SC.ITEM_URL in data:
             url = data.get(SC.ITEM_URL)
             self.item.setPath(url)
@@ -240,6 +243,41 @@ class SCStreamSelect(SCBaseItem):
         if SC.ITEM_ID in data:
             self.item.setProperty(SC.ITEM_ID, data.get('id'))
         self.item.setLabel2(label2)
+
+    def calculate_aspct_ratio(aspect):
+        ret = '{}:1'.format(aspect)
+        if aspect == '1.25':
+            ret = '5:4'
+        elif aspect == '1.33':
+            ret = '4:3'
+        elif aspect == '1.37' or aspect == '1.375':
+            ret = 'Academy Ratio'
+        elif aspect == '1.43':
+            ret = 'IMAX'
+        elif aspect == '1.5':
+            ret = '3:2'
+        elif aspect == '56':
+            ret = '14:9'
+        elif aspect == '1.6' or aspect == '1.60':
+            ret = '16:10'
+        elif aspect == '1.66':
+            ret = 'Super 16'
+        elif aspect == '1.78' or aspect == '1.77':
+            ret = '16:9'
+        elif aspect == '1.85':
+            ret = 'Letterbox'
+        elif aspect == '2.2':
+            ret = 'Super Panavision'
+        elif aspect == '2.33' or aspect == '2.4' or aspect == '2.40':
+            ret = '21:9'
+        elif aspect == '2.35' or aspect == '2.55' or aspect == '2.75':
+            ret = 'CinemaScope'
+        elif aspect == '2.59' or aspect == '2.39':
+            ret = 'Cinema'
+        elif aspect == '2.76':
+            ret = 'MGM 65'
+
+        return ret
 
 
 class SCDirContext:
@@ -267,6 +305,12 @@ class SCDir(SCBaseItem):
 
     def __init__(self, data):
         SCBaseItem.__init__(self, data)
+        self.lib = List(SC.ITEM_LIBRARY)
+        item_id = self.data.get(SC.ITEM_ID)
+        if item_id and item_id in self.lib.get():
+            label = "[COLOR red]*[/COLOR] {0}".format(self.item.getLabel())
+            self.item.setLabel(label)
+
         if SC.ITEM_URL in data:
             url = create_plugin_url(data)
             self.item.setPath(url)
@@ -283,22 +327,24 @@ class SCDir(SCBaseItem):
                 SC.ITEM_PAGE: get_history_item_name(self.data.get('lid'))
             }))])
 
-        if settings.get_setting('tvshow.library.path'):
-            lib = List(SC.ITEM_LIBRARY)
-            item_id = self.data.get(SC.ITEM_ID)
+        item_id = self.data.get(SC.ITEM_URL)
+        # debug('ITEM: {}'.format(item_id))
+        if 0 and item_id and settings.get_setting('tvshow.library.path'):
 
-            if item_id in lib.get():
+            if item_id and item_id in self.lib.get():
                 debug('Uz je v kniznici s odberom')
-                context_menu.append((Strings.txt(Strings.CONTEXT_REMOVE_FROM_SUB), 'RunPlugin({})'.format(create_plugin_url({
-                    SC.ITEM_ACTION: SC.ACTION_REMOVE_FROM_SUBSCRIPTION,
-                    SC.ITEM_ID: self.data.get(item_id)
-                }))))
+                context_menu.append(
+                    (Strings.txt(Strings.CONTEXT_REMOVE_FROM_SUB), 'RunPlugin({})'.format(create_plugin_url({
+                        SC.ITEM_ACTION: SC.ACTION_REMOVE_FROM_SUBSCRIPTION,
+                        SC.ITEM_ID: item_id
+                    }))))
             else:
                 debug('Este nieje v odbere')
-                context_menu.append((Strings.txt(Strings.CONTEXT_ADD_TO_LIBRARY_WITH_SUB), 'RunPlugin({})'.format(create_plugin_url({
-                    SC.ITEM_ACTION: SC.ACTION_ADD_TO_LIBRARY_WITH_SUBSCRIPTION,
-                    SC.ITEM_ID: self.data.get(item_id)
-                }))))
+                context_menu.append(
+                    (Strings.txt(Strings.CONTEXT_ADD_TO_LIBRARY_WITH_SUB), 'RunPlugin({})'.format(create_plugin_url({
+                        SC.ITEM_ACTION: SC.ACTION_ADD_TO_LIBRARY_WITH_SUBSCRIPTION,
+                        SC.ITEM_ID: item_id
+                    }))))
 
             context_menu.append((Strings.txt(Strings.CONTEXT_ADD_TO_LIBRARY), 'RunPlugin({})'.format(create_plugin_url({
                 SC.ITEM_ACTION: SC.ACTION_ADD_TO_LIBRARY,
@@ -452,9 +498,9 @@ class SCVideo(SCBaseItem):
     def set_properties(self):
         self.item.setContentLookup(False)
         self.item.setProperty('IsPlayable', 'true')
-        info = self.data.get(SC.ITEM_INFO, {})
-        if 'duration' in info:
-            duration = info.get('duration')
+        item_info = self.data.get(SC.ITEM_INFO, {})
+        if 'duration' in item_info:
+            duration = item_info.get('duration')
             resume_time = self.movie.get(self._key('watched'))
             if resume_time and 0 < resume_time < duration:
                 self.item.setProperty('ResumeTime', '{}'.format(resume_time))
@@ -540,7 +586,9 @@ class SCPlayItem(SCBaseItem):
             debug('STREAM: {} => {}'.format(ident, s))
             url = kr.resolve(ident)
             sinfo = s.get('stream_info', {}).get('video', {})
-            self.hls += '\n#EXT-X-STREAM-INF:BANDWIDTH={},RESOLUTION={}x{}'.format(s.get('bitrate'), sinfo.get('width', 0), sinfo.get('height', 0))
+            self.hls += '\n#EXT-X-STREAM-INF:BANDWIDTH={},RESOLUTION={}x{}'.format(s.get('bitrate'),
+                                                                                   sinfo.get('width', 0),
+                                                                                   sinfo.get('height', 0))
             self.hls += '\n{}\n'.format(url)
         debug('HLS: {}'.format(self.hls))
         filename = make_legal_filename('special://profile/input.m3u8')
@@ -609,8 +657,8 @@ class SCPlayItem(SCBaseItem):
         asn_changed = str(isp.get('a')) != str(asn)
         wrong_speed = settings.get_setting_as_int('stream.adv.speedtest') < 1
         debug('Force: {} ASN: {} / {} [{}] / SPEED: {} [{}]'.format(force, asn, isp.get('a'), asn_changed,
-                                                          settings.get_setting_as_int('stream.adv.speedtest'),
-                                                          wrong_speed))
+                                                                    settings.get_setting_as_int('stream.adv.speedtest'),
+                                                                    wrong_speed))
         if force or (get_setting_as_int('stream.max.bitrate') == 100 and (asn_changed or wrong_speed)):
             self.speedtest(isp)
 
@@ -661,7 +709,8 @@ class SCPlayItem(SCBaseItem):
 
         quality = s.get('quality', 'SD')
         max_quality = get_setting('stream.max.quality')
-        debug('qualita {} vs {} | {} >= {}'.format(quality, max_quality, self.QUALITY_LIST[max_quality], self.QUALITY_LIST[quality]))
+        debug('qualita {} vs {} | {} >= {}'.format(quality, max_quality, self.QUALITY_LIST[max_quality],
+                                                   self.QUALITY_LIST[quality]))
         if quality in self.QUALITY_LIST:
             if max_quality == '-':
                 score[pos] += self.QUALITY_LIST[quality]
@@ -790,7 +839,7 @@ class SCPlayItem(SCBaseItem):
             kr = Kraska()
             try:
                 ident = resp.get(SC.ITEM_IDENT)
-                debug('ideme resolvovat iden {} na kra.sk'.format(ident))
+                debug('ideme resolvovat ident {} na kra.sk'.format(ident))
                 url = kr.resolve(ident)
             except ResolveException as e:
                 dok(Strings.txt(Strings.RESOLVE_ERROR_H1), Strings.txt(Strings.RESOLVE_ERROR_L1))

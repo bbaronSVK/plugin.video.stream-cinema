@@ -61,9 +61,13 @@ class KodiAddonsDb:
 
 
 class KodiDb:
+    _static_db = None
+
     def __init__(self):
         path = 'special://database/MyVideos{}.db'.format(KodiDbMap.MyVideos[SYSTEM_VERSION])
-        self._db = Sqlite(path)
+        if KodiDb._static_db is None:
+            KodiDb._static_db = Sqlite(path)
+        self._db = KodiDb._static_db
         # debug('tables: {}'.format(self._db.execute('SELECT name FROM sqlite_master WHERE type =\'table\'').fetchall()))
 
     def get_watched_path(self, path):
@@ -78,8 +82,12 @@ class KodiDb:
     def set_watched_path(self, path, times):
         res = self.get_watched_path(path)
         if res and res[0]:
+            # debug('MAME PATH: {}'.find(path))
             sql = 'update files set playcount=? where idfile=?'
             self._db.execute(sql, times, res[0])
+        else:
+            debug('Nemame PATH: {}'.format(path))
+            pass
 
     def get_watched(self):
         try:
@@ -103,6 +111,7 @@ class Storage(object):
     _sql_get = 'SELECT item_value FROM storage WHERE item_key = ?'
     _sql_del = 'DELETE FROM storage WHERE item_key = ?'
     _data = {}
+    _static_db = None
 
     def __init__(self, name):
         path = ADDON.getAddonInfo("profile")
@@ -110,7 +119,9 @@ class Storage(object):
             debug("storage path: {}".format(repr(path)))
             xbmcvfs.mkdir(path)
         path = os.path.join(path, 'storage.db')
-        self._db = Sqlite(path=path)
+        if Storage._static_db is None:
+            Storage._static_db = Sqlite(path=path)
+        self._db = Storage._static_db
         global checked
         self._data = {}
         self._last_saved = {}

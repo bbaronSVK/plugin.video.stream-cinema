@@ -3,9 +3,11 @@
 from __future__ import print_function, unicode_literals
 
 import datetime
+import time
 
-from resources.lib.common.logger import debug
-from resources.lib.constants import BASE_URL, API_VERSION
+from resources.lib.common.cache import SimpleCache, use_cache
+from resources.lib.common.logger import debug, info
+from resources.lib.constants import BASE_URL, API_VERSION, SC
 from resources.lib.kodiutils import get_uuid, get_skin_name, get_setting_as_bool, get_setting_as_int, get_setting
 from resources.lib.system import user_agent, Http, SYSTEM_LANG_CODE
 
@@ -26,13 +28,26 @@ class Sc:
         "4": 18,
     }
 
+    cache = SimpleCache()
+
     @staticmethod
     def get(path, params=None):
         sorted_values, url = Sc.prepare(params, path)
-        debug('CALL {} PARAMS {}'.format(url, sorted_values))
-        res = Http.get(url, headers=Sc.headers(), params=sorted_values)
-        res.raise_for_status()
-        return res.json()
+        key = '{}{}'.format(url, sorted_values)
+        debug('CALL {} PARAMS {} KEY {}'.format(url, sorted_values, key))
+        start = time.time()
+        ret = Sc.cache.get(key)
+        if ret is None:
+            res = Http.get(url, headers=Sc.headers(), params=sorted_values)
+            res.raise_for_status()
+            ret = res.json()
+            Sc.save_cache(ret, key)
+        else:
+            info('GET from cache')
+        end = time.time()
+
+        debug('GET took {0:.2f}ms'.format((end - start) * 1000))
+        return ret
 
     @staticmethod
     def prepare(params, path):
@@ -52,7 +67,10 @@ class Sc:
     @staticmethod
     def post(path, **kwargs):
         sorted_values, url = Sc.prepare(path=path, params={})
+        start = time.time()
         res = Http.post(url, params=sorted_values, headers=Sc.headers(), **kwargs)
+        end = time.time()
+        debug('POST took {0:.2f}ms'.format((end - start) * 1000))
         return res.json()
 
     @staticmethod
@@ -117,3 +135,11 @@ class Sc:
             data = {'error': 'error'}
         return data
 
+    @staticmethod
+    def save_cache(ret, key):
+        ttl = 1800
+        if SC.ITEM_SYSTEM in ret and 'TTL' in ret[SC.ITEM_SYSTEM]:
+            ttl = int(ret[SC.ITEM_SYSTEM]['TTL'])
+
+        info('SAVE TO CACHE {} / {}'.format(ttl, key))
+        Sc.cache.set(key, ret, datetime.timedelta(seconds=ttl))

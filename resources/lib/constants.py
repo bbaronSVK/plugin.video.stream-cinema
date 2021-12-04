@@ -65,6 +65,7 @@ class SC:
     ITEM_IDENT = 'ident'
     ITEM_INFO = 'info'
     ITEM_LIBRARY = 'library'
+    ITEM_LIBRARY_SUB = 'library_sub'
     ITEM_LANG = 'lang'
     ITEM_MENU = 'menu'
     ITEM_NEXT = 'next'

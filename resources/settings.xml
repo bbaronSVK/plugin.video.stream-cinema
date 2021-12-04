@@ -43,15 +43,17 @@
         <setting type="bool" label="priota poctu kanalov" id="stream.adv.audio.channels" default="true" visible="eq(-15,true) + eq(-10,true)" subsetting="true"/>
         <setting type="number" visible="false" id="stream.adv.speedtest" default=""/>
         <setting type="text" visible="false" id="stream.adv.speedtest.asn" default=""/>
+        <setting type="text" visible="false" id="stream.adv.speedtest.last" default=""/>
+        <setting type="text" visible="false" id="system.next_ep.last_run" default=""/>
 <!--        <setting type="bool" label="" id="" default="" enable="eq(-12,true)" subsetting="true"/>-->
 <!--        <setting type="bool" label="" id="" default="" enable="eq(-13,true)" subsetting="true"/>-->
     </category>
     <category label="30038">
         <setting type="folder" label="30039" id="download.path" source=""/>
         <setting type="folder" label="30041" id="androidtv.path" source=""/>
-<!--        <setting type="folder" label="30063" id="movie.library.path" source=""/>-->
-<!--        <setting type="folder" label="30063" id="tvshow.library.path" source=""/>-->
-<!--        <setting type="bool" label="30064" id="library.extract.metadata" source="" enable="!eq(-1,)" subsetting="true"/>-->
+<!--        <setting type="folder" label="30062" id="movie.library.path" source=""/>-->
+<!--        <setting type="folder" label="30065" id="tvshow.library.path" source=""/>-->
+        <setting type="bool" label="30064" id="library.extract.metadata" source="" enable="!eq(-1,)|!eq(-2,)" subsetting="true"/>
     </category>
     <category label="30027">
         <setting type="bool" label="30028" id="parental.control.enabled" default="false"/>
