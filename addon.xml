@@ -1,4 +1,4 @@
-<addon id="plugin.video.stream-cinema" name="Stream Cinema CZ a SK" provider-name="bbaron" version="2.1.12+k19">
+<addon id="plugin.video.stream-cinema" name="Stream Cinema CZ a SK" provider-name="bbaron" version="2.1.13+k19">
     <requires>
         <import addon="xbmc.python" version="3.0.0"/>
         <import addon="script.module.requests" version="2.25.1"/>
@@ -42,6 +42,13 @@
             obsahu. Tento doplňek pouze vyhledáva zpřístupněný obsah na kra.sk. Použití na vlastní odpovědnost!
         </disclaimer>
         <news lang="sk">[B]Novinky[/B]
+              [I][B]2.1.13[/B][/I]
+            * [COLOR FFFFAE42]fix[/COLOR] settings
+
+              [I][B]2.1.12[/B][/I]
+            * [COLOR FFFFAE42]fix[/COLOR] trakt.tv rychlost
+            * [COLOR FFFFAE42]fix[/COLOR] cache
+
               [I][B]2.1.11[/B][/I]
             * [COLOR FFFFAE42]fix[/COLOR] trakt.tv obnova tokenu
             * [COLOR FFFFAE42]fix[/COLOR] oneskorena synchronizacia po starte
@@ -58,6 +65,13 @@
             * [COLOR FFFFAE42]fix[/COLOR] chyb s trakt.tv
         </news>
         <news lang="cs">[B]Novinky[/B]
+              [I][B]2.1.13[/B][/I]
+            * [COLOR FFFFAE42]fix[/COLOR] settings
+
+              [I][B]2.1.12[/B][/I]
+            * [COLOR FFFFAE42]fix[/COLOR] trakt.tv rychlost
+            * [COLOR FFFFAE42]fix[/COLOR] cache
+
               [I][B]2.1.11[/B][/I]
             * [COLOR FFFFAE42]fix[/COLOR] trakttv refresh token
             * [COLOR FFFFAE42]fix[/COLOR] oneskorena synchronizace po startu
@@ -74,6 +88,13 @@
             * [COLOR FFFFAE42]fix[/COLOR] chyb s trakt.tv
         </news>
         <news lang="en">[B]News[/B]
+              [I][B]2.1.13[/B][/I]
+            * [COLOR FFFFAE42]fix[/COLOR] settings
+
+              [I][B]2.1.12[/B][/I]
+            * [COLOR FFFFAE42]fix[/COLOR] trakt.tv speedup
+            * [COLOR FFFFAE42]fix[/COLOR] cache
+
               [I][B]2.1.11[/B][/I]
             * [COLOR FFFFAE42]fix[/COLOR] trakttv refresh token
             * [COLOR FFFFAE42]fix[/COLOR] delayed synchronization on startup

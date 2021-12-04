@@ -53,7 +53,7 @@
         <setting type="folder" label="30041" id="androidtv.path" source=""/>
 <!--        <setting type="folder" label="30062" id="movie.library.path" source=""/>-->
 <!--        <setting type="folder" label="30065" id="tvshow.library.path" source=""/>-->
-        <setting type="bool" label="30064" id="library.extract.metadata" source="" enable="!eq(-1,)|!eq(-2,)" subsetting="true"/>
+<!--        <setting type="bool" label="30064" id="library.extract.metadata" source="" enable="!eq(-1,)|!eq(-2,)" subsetting="true"/>-->
     </category>
     <category label="30027">
         <setting type="bool" label="30028" id="parental.control.enabled" default="false"/>
