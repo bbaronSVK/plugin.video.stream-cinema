@@ -1,0 +1,378 @@
+# XBMC Media Center language file
+# Addon Name: Stream Cinema CZ a SK
+# Addon id: plugin.video.stream-cinema
+# Addon version: 2.0.0
+# Addon Provider: bbaron
+msgid ""
+msgstr ""
+"Project-Id-Version: XBMC-Addons\n"
+"Report-Msgid-Bugs-To: alanwww1@xbmc.org\n"
+"POT-Creation-Date: 2019-09-02 16:28+0000\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Language: en\n"
+"Plural-Forms: nplurals=2; plural=(n != 1)\n"
+
+msgctxt "Addon Summary"
+msgid "stream-cinema.online - play content from kra.sk[CR]For operation it is necessary to [I]register at kra.sk and have an active subscription[/I]."
+msgstr ""
+
+msgctxt "Addon Disclaimer"
+msgid "The author of this addon does not provide any content and has no affiliation with content providers. This addon only searches shared content on kra.sk. Use at your own risk!"
+msgstr ""
+
+msgctxt "#30010"
+msgid "Accounts"
+msgstr ""
+
+msgctxt "#30011"
+msgid "Please enter your login details for kra.sk"
+msgstr ""
+
+msgctxt "#30012"
+msgid "Username (kra.sk)"
+msgstr ""
+
+msgctxt "#30013"
+msgid "Password (kra.sk)"
+msgstr ""
+
+msgctxt "#30014"
+msgid "Turn debug on/off"
+msgstr ""
+
+msgctxt "#30015"
+msgid "Subscription days left"
+msgstr ""
+
+msgctxt "#30016"
+msgid "Token (kra.sk)"
+msgstr ""
+
+msgctxt "#30017"
+msgid "UUID"
+msgstr ""
+
+msgctxt "#30018"
+msgid "Plugin version"
+msgstr ""
+
+msgctxt "#30019"
+msgid "Streams"
+msgstr ""
+
+msgctxt "#30020"
+msgid "Display all streams (orig., orig.+tit, dub.)"
+msgstr ""
+
+msgctxt "#30021"
+msgid "Display only streams with dubbing or subtitles"
+msgstr ""
+
+msgctxt "#30022"
+msgid "Display only streams with dubbing"
+msgstr ""
+
+msgctxt "#30023"
+msgid "Autoselect stream"
+msgstr ""
+
+msgctxt "#30024"
+msgid "Primary language for audio streams"
+msgstr ""
+
+msgctxt "#30025"
+msgid "Secondary language for audio streams"
+msgstr ""
+
+msgctxt "#30026"
+msgid "Max. bitrate in Mbps"
+msgstr ""
+
+msgctxt "#30027"
+msgid "Parental control"
+msgstr ""
+
+msgctxt "#30028"
+msgid "Enable parental control"
+msgstr ""
+
+msgctxt "#30029"
+msgid "Parental control starts at (hour)"
+msgstr ""
+
+msgctxt "#30030"
+msgid "Parental control ends at (hour)"
+msgstr ""
+
+msgctxt "#30031"
+msgid "Parental control rating (years)"
+msgstr ""
+
+msgctxt "#30032"
+msgid "Primary language for audio streams (parental control)"
+msgstr ""
+
+msgctxt "#30033"
+msgid "Secondary language for audio streams (parental control)"
+msgstr ""
+
+msgctxt "#30034"
+msgid "Display only dubed (CZ/SK) streams while parental control"
+msgstr ""
+
+msgctxt "#30035"
+msgid "Trakt.tv"
+msgstr ""
+
+msgctxt "#30036"
+msgid "Trakt.tv user"
+msgstr ""
+
+msgctxt "#30037"
+msgid "Trakt.tv authorization"
+msgstr ""
+
+msgctxt "#30038"
+msgid "Folders"
+msgstr ""
+
+msgctxt "#30039"
+msgid "Download folder"
+msgstr ""
+
+msgctxt "#30040"
+msgid "Setup KODI video cache"
+msgstr ""
+
+msgctxt "#30041"
+msgid "AndroidTV playlist folder"
+msgstr ""
+
+msgctxt "#30042"
+msgid "Run the add-on at startup"
+msgstr ""
+
+msgctxt "#30043"
+msgid "Startup"
+msgstr ""
+
+msgctxt "#30044"
+msgid "Max. resolution"
+msgstr ""
+
+msgctxt "#30045"
+msgid "Advanced"
+msgstr ""
+
+msgctxt "#30046"
+msgid "Exclude 3D"
+msgstr ""
+
+msgctxt "#30047"
+msgid "Exclude HDR"
+msgstr ""
+
+msgctxt "#30048"
+msgid "Prefer HDR"
+msgstr ""
+
+msgctxt "#30049"
+msgid "Preferred codecs"
+msgstr ""
+
+msgctxt "#30050"
+msgid "Not prefered codecs"
+msgstr ""
+
+msgctxt "#30051"
+msgid "Preferred groups"
+msgstr ""
+
+msgctxt "#30052"
+msgid "Not preferred groups"
+msgstr ""
+
+msgctxt "#30053"
+msgid "Preferred source"
+msgstr ""
+
+msgctxt "#30054"
+msgid "Not preferred source"
+msgstr ""
+
+msgctxt "#30055"
+msgid "Preferred audio with multiple audio channels"
+msgstr ""
+
+msgctxt "#30056"
+msgid "Run addons update"
+msgstr ""
+
+msgctxt "#30057"
+msgid "Enable trakt.tv"
+msgstr ""
+
+msgctxt "#30058"
+msgid "Login to trakt.tv"
+msgstr ""
+
+msgctxt "#30059"
+msgid "Logout from trakt.tv"
+msgstr ""
+
+msgctxt "#30060"
+msgid "Show genre in item title"
+msgstr ""
+
+msgctxt "#30061"
+msgid "Automatically start the next episode when the series is opens"
+msgstr ""
+
+msgctxt "#30062"
+msgid "Path for movie library"
+msgstr ""
+
+msgctxt "#30063"
+msgid "Path for tvshow library"
+msgstr ""
+
+msgctxt "#30064"
+msgid "Export metadata from plugin"
+msgstr ""
+
+msgctxt "#30065"
+msgid "Show old style menu"
+msgstr ""
+
+msgctxt "#30100"
+msgid "Welcome"
+msgstr ""
+
+msgctxt "#30101"
+msgid "Thank you for installing stream cinema plugin. Do you wish to configure login credentials right now?"
+msgstr ""
+
+msgctxt "#30102"
+msgid "Login error"
+msgstr ""
+
+msgctxt "#30103"
+msgid "You have entered invalid credentials."
+msgstr ""
+
+msgctxt "#30104"
+msgid "Login successful"
+msgstr ""
+
+msgctxt "#30105"
+msgid "Do you wish to open plugin settings?"
+msgstr ""
+
+msgctxt "#30106"
+msgid "Subscription days left: {}"
+msgstr ""
+
+msgctxt "#30107"
+msgid "Login error"
+msgstr ""
+
+msgctxt "#30108"
+msgid "Invalid credentials. Do you wish to open plugin settings?"
+msgstr ""
+
+msgctxt "#30109"
+msgid "System"
+msgstr ""
+
+msgctxt "#30110"
+msgid "Debug enabled"
+msgstr ""
+
+msgctxt "#30111"
+msgid "Debug disabled"
+msgstr ""
+
+msgctxt "#30112"
+msgid "Error"
+msgstr ""
+
+msgctxt "#30113"
+msgid "Problem retrieving file link"
+msgstr ""
+
+msgctxt "#30114"
+msgid "Connection error"
+msgstr ""
+
+msgctxt "#30115"
+msgid "Pin/Unpin"
+msgstr ""
+
+msgctxt "#30116"
+msgid "Select stream manually"
+msgstr ""
+
+msgctxt "#30117"
+msgid "History"
+msgstr ""
+
+msgctxt "#30118"
+msgid "History is empty"
+msgstr ""
+
+msgctxt "#30119"
+msgid "Download"
+msgstr ""
+
+msgctxt "#30120"
+msgid "{}MB free memory"
+msgstr ""
+
+msgctxt "#30121"
+msgid "Warning! An KODI advanced setting has already been set. This operation will erase all your settings! Did you still want to continue?"
+msgstr ""
+
+msgctxt "#30122"
+msgid "You need to restart KODI for the new settings to work. Did you restart KODI?"
+msgstr ""
+
+msgctxt "#30123"
+msgid "You need to restart KODI for the new settings to work. Please turn off KODI and start it again."
+msgstr ""
+
+msgctxt "#30124"
+msgid "Add to Android TV"
+msgstr ""
+
+msgctxt "#30125"
+msgid "Add item to HP"
+msgstr ""
+
+msgctxt "#30126"
+msgid "Remove"
+msgstr ""
+
+msgctxt "#30127"
+msgid "Addon is not installed from our repository. Please install addon from our repository."
+msgstr ""
+
+msgctxt "#30128"
+msgid "Add to library"
+msgstr ""
+
+msgctxt "#30129"
+msgid "Add to library with subscription"
+msgstr ""
+
+msgctxt "#30130"
+msgid "Remove from subscription"
+msgstr ""
+
+msgctxt "#30131"
+msgid "Active subscription required. For proper operation of this plugin you must have an active subscription at kra.sk."
+msgstr ""

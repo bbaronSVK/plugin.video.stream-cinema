@@ -1,22 +1,27 @@
-﻿<?xml version='1.0' encoding='utf-8'?>
-    <addon id="plugin.video.stream-cinema" name="Stream Cinema CZ a SK" provider-name="bbaron" version="1.3.28">
+<addon id="plugin.video.stream-cinema" name="Stream Cinema CZ a SK" provider-name="bbaron" version="2.1.13+k19">
     <requires>
-        <import addon="xbmc.python" version="2.24.0" />
-        <import addon="script.module.stream.resolver" version="1.6.60" />
-        <import addon="script.module.buggalo" version="1.1.2" />
-        <import addon="script.module.elementtree" version="1.2.8" />
+        <import addon="xbmc.python" version="3.0.0"/>
+        <import addon="script.module.requests" version="2.25.1"/>
+        <import addon="script.module.websocket" version="0.58.0"/>
+        <import addon="script.module.trakt" version="4.4.0"/>
+        <import addon="service.upnext" version="1.1.5"/>
     </requires>
-    <extension library="default.py" point="xbmc.python.pluginsource">
+    <extension library="main.py" point="xbmc.python.pluginsource">
         <provides>video</provides>
     </extension>
     <extension library="service.py" point="xbmc.service" start="startup">
         <provides>service</provides>
     </extension>
-    <extension library="lib" point="xbmc.python.module" />
     <extension point="xbmc.addon.metadata">
-        <summary lang="en">stream-cinema.online - play content from web storage[CR]For proper functioning, it is necessary to [I]register at kra.sk or kra.sk and have payed account[/I].</summary>
-        <summary lang="cs">stream-cinema.online - prehravani obsahu z web ulozisk[CR]Pro spravne fungovani je potreba se [I]registrovat na kra.sk anebo kra.sk a mit aktivovane predplatne[/I].</summary>
-        <summary lang="sk">stream-cinema.online - prehravanie obsahu z webovych ulozisk[CR]Pre spravne fungovanie je potrebne sa [I]registrovat na kra.sk alebo kra.sk a mat aktivovane predplatne[/I].</summary>
+        <summary lang="en">stream-cinema.online - play content from kra.sk[CR]For operation it is necessary to
+            [I]register at kra.sk and have an active subscription[/I].
+        </summary>
+        <summary lang="cs">stream-cinema.online - přehrávání obsahu z kra.sk[CR]Pre provoz je potřebná
+            [I]registrace na kra.sk s aktivním předplatným[/I].
+        </summary>
+        <summary lang="sk">stream-cinema.online - prehrávanie obsahu z kra.sk[CR]Pre prevádzku je potrebná
+            [I]registrácia na kra.sk s aktívnym predplatným[/I].
+        </summary>
         <platform>all</platform>
         <license>GNU GENERAL PUBLIC LICENSE. Version 3, 29 June 2007</license>
         <source>https://github.com/bbaronSVK/plugin.video.stream-cinema.git</source>
@@ -27,10 +32,83 @@
             <screenshot>resources/screenshots/screenshot-02.jpg</screenshot>
             <screenshot>resources/screenshots/screenshot-03.jpg</screenshot>
         </assets>
-        <disclaimer lang="en">The author of this addon do not host any of the content which is found and have no affiliation with of the content providers. This addon simply search on web storages for content. Use at your own risk!</disclaimer>
-        <disclaimer lang="sk">Autor tohto addonu nemá žiaden obsah, ktorý sa v ňom nachádza a nemá žiadnu príslušnosť k poskytovateľovi obsahu. Tento addon iba vyhľadá obsah na web uloziskach. Používajte na vlastné riziko!</disclaimer>
-        <disclaimer lang="cs">Autor tohto addonu nemá žáden obsah, který se v ňem nachází a nemá žádnou příslušnost k poskytovateli obsahu. Tento addon jen vyhledává obsah na webovych uloziskach. Používejte na vlastní riziko!</disclaimer>
-        <news>uloziska kra.sk a kra.sk</news>
+        <disclaimer lang="en">The author of this addon does not provide any content and has no affiliation with content
+            providers. This addon only searches shared content on kra.sk. Use at your own risk!
+        </disclaimer>
+        <disclaimer lang="sk">Autor tohto doplnku neposkytuje žiaden obsah a nie je nijak prepojený s poskytovateľmi
+            obsahu. Tento doplnok iba vyhľadáva sprístupnený obsah na kra.sk. Použitie na vlastnú zodpovednosť!
+        </disclaimer>
+        <disclaimer lang="cs">Autor tohoto doplňku neposkytuje žádný obsah a není nijako propojený s poskytovatelemi
+            obsahu. Tento doplňek pouze vyhledáva zpřístupněný obsah na kra.sk. Použití na vlastní odpovědnost!
+        </disclaimer>
+        <news lang="sk">[B]Novinky[/B]
+              [I][B]2.1.13[/B][/I]
+            * [COLOR FFFFAE42]fix[/COLOR] settings
+
+              [I][B]2.1.12[/B][/I]
+            * [COLOR FFFFAE42]fix[/COLOR] trakt.tv rychlost
+            * [COLOR FFFFAE42]fix[/COLOR] cache
+
+              [I][B]2.1.11[/B][/I]
+            * [COLOR FFFFAE42]fix[/COLOR] trakt.tv obnova tokenu
+            * [COLOR FFFFAE42]fix[/COLOR] oneskorena synchronizacia po starte
+
+              [I][B]2.1.10[/B][/I]
+            * [COLOR FF50FF42]add[/COLOR] struktura menu z KODI 18 a nizsie
+            * [COLOR FF50FF42]add[/COLOR] struktura menu z KODI 19 sa da zapnut v nastaveniach
+            * [COLOR FFFFAE42]fix[/COLOR] trakt error
+            * [COLOR FFFF5042]remove[/COLOR] oznacenie lite pluginu - uz je plna funkcionalita okrem kniznice
+
+              [I][B]2.1.9[/B][/I]
+            * [COLOR FFFFAE42]fix[/COLOR] chyba s prihlasovanim na kra.sk
+            * [COLOR FFFFAE42]fix[/COLOR] chyb po vyprsani predplatneho
+            * [COLOR FFFFAE42]fix[/COLOR] chyb s trakt.tv
+        </news>
+        <news lang="cs">[B]Novinky[/B]
+              [I][B]2.1.13[/B][/I]
+            * [COLOR FFFFAE42]fix[/COLOR] settings
+
+              [I][B]2.1.12[/B][/I]
+            * [COLOR FFFFAE42]fix[/COLOR] trakt.tv rychlost
+            * [COLOR FFFFAE42]fix[/COLOR] cache
+
+              [I][B]2.1.11[/B][/I]
+            * [COLOR FFFFAE42]fix[/COLOR] trakttv refresh token
+            * [COLOR FFFFAE42]fix[/COLOR] oneskorena synchronizace po startu
+
+              [I][B]2.1.10[/B][/I]
+            * [COLOR FF50FF42]add[/COLOR] struktura menu z KODI 18 a nizsie
+            * [COLOR FF50FF42]add[/COLOR] struktura menu z KODI 19 sa da zapnut v nastaveniach
+            * [COLOR FFFFAE42]fix[/COLOR] trakt error
+            * [COLOR FFFF5042]remove[/COLOR] oznacenie lite pluginu - uz je plna funkcionalita okrem kniznice
+
+              [I][B]2.1.9[/B][/I]
+            * [COLOR FFFFAE42]fix[/COLOR] chyb s prihlasovanim na kra.sk
+            * [COLOR FFFFAE42]fix[/COLOR] chyb po vyprseni predplatneho
+            * [COLOR FFFFAE42]fix[/COLOR] chyb s trakt.tv
+        </news>
+        <news lang="en">[B]News[/B]
+              [I][B]2.1.13[/B][/I]
+            * [COLOR FFFFAE42]fix[/COLOR] settings
+
+              [I][B]2.1.12[/B][/I]
+            * [COLOR FFFFAE42]fix[/COLOR] trakt.tv speedup
+            * [COLOR FFFFAE42]fix[/COLOR] cache
+
+              [I][B]2.1.11[/B][/I]
+            * [COLOR FFFFAE42]fix[/COLOR] trakttv refresh token
+            * [COLOR FFFFAE42]fix[/COLOR] delayed synchronization on startup
+
+              [I][B]2.1.10[/B][/I]
+            * [COLOR FF50FF42]add[/COLOR] menu structure from KODI 18 and below
+            * [COLOR FF50FF42]add[/COLOR] the menu structure from KODI 19 can be switched on in the settings
+            * [COLOR FFFFAE42]fix[/COLOR] trakt error
+            * [COLOR FFFF5042]remove[/COLOR] lite removev from name - full functionality is available except for the kodi library
+
+              [I][B]2.1.9[/B][/I]
+            * [COLOR FFFFAE42]fix[/COLOR] with loging on kra.sk
+            * [COLOR FFFFAE42]fix[/COLOR] atfer subscription expires
+            * [COLOR FFFFAE42]fix[/COLOR] in trakt.tv
+        </news>
     </extension>
-    <extension library="lib" point="xbmc.python.module" />
 </addon>

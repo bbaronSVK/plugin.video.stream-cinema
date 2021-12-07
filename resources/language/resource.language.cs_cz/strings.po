@@ -1,0 +1,380 @@
+# XBMC Media Center language file
+# Addon Name: Stream Cinema CZ a SK
+# Addon id: plugin.video.stream-cinema
+# Addon version: 1.3.18
+# Addon Provider: bbaron
+msgid ""
+msgstr ""
+"Project-Id-Version: XBMC-Addons\n"
+"Report-Msgid-Bugs-To: alanwww1@xbmc.org\n"
+"POT-Creation-Date: 2019-09-02 16:28+0000\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Language: cs\n"
+"Plural-Forms: nplurals=3; plural=(n==1) ? 0 : (n>=2 && n<=4) ? 1 : 2\n"
+
+msgctxt "Addon Summary"
+msgid "stream-cinema.online - play content from kra.sk[CR]For operation it is necessary to [I]register at kra.sk and have an active subscription[/I]."
+msgstr "stream-cinema.online - přehrávání obsahu z kra.sk[CR]Pre provoz je potřebná [I]registrace na kra.sk s aktivním předplatným[/I]."
+
+msgctxt "Addon Disclaimer"
+msgid "The author of this addon does not provide any content and has no affiliation with content providers. This addon only searches shared content on kra.sk. Use at your own risk!"
+msgstr "Autor tohoto doplňku neposkytuje žádný obsah a není nijako propojený s poskytovatelemi obsahu. Tento doplňek pouze vyhledáva zpřístupněný obsah na kra.sk. Použití na vlastní odpovědnost!"
+
+msgctxt "#30010"
+msgid "Accounts"
+msgstr "Účty"
+
+msgctxt "#30011"
+msgid "Please enter your login details for kra.sk"
+msgstr "Prosím zadej své přihlašovací údaje na kra.sk"
+
+msgctxt "#30012"
+msgid "Username (kra.sk)"
+msgstr "Uživatelské jméno (kra.sk)"
+
+msgctxt "#30013"
+msgid "Password (kra.sk)"
+msgstr "Heslo (kra.sk)"
+
+msgctxt "#30014"
+msgid "Turn debug on/off"
+msgstr "Zapnout nebo vypnout debug"
+
+msgctxt "#30015"
+msgid "Subscription days left"
+msgstr "Počet zbývajících dní předplatného"
+
+msgctxt "#30016"
+msgid "Token (kra.sk)"
+msgstr ""
+
+msgctxt "#30017"
+msgid "UUID"
+msgstr ""
+
+msgctxt "#30018"
+msgid "Plugin version"
+msgstr "Verze doplňku"
+
+msgctxt "#30019"
+msgid "Streams"
+msgstr "Streamy"
+
+msgctxt "#30020"
+msgid "Display all streams (orig., orig.+tit, dub.)"
+msgstr "Zobrazit všechny streamy (orig., orig.+tit, dab.)"
+
+msgctxt "#30021"
+msgid "Display only streams with dubbing or subtitles"
+msgstr "Zobrazit pouze streamy s dabingem nebo s titulkama"
+
+msgctxt "#30022"
+msgid "Display only streams with dubbing"
+msgstr "Zobrazit pouze streamy s dabingem"
+
+msgctxt "#30023"
+msgid "Autoselect stream"
+msgstr "Automatický výběr streamu"
+
+msgctxt "#30024"
+msgid "Primary language for audio streams"
+msgstr "Prvořadý jazyk pro zvukové stopy"
+
+msgctxt "#30025"
+msgid "Secondary language for audio streams"
+msgstr "Druhořadý jazyk pro zvukové stopy"
+
+msgctxt "#30026"
+msgid "Max. bitrate in Mbps"
+msgstr "Max. tok dat v Mbps"
+
+msgctxt "#30027"
+msgid "Parental control"
+msgstr "Rodičovský zámek"
+
+msgctxt "#30028"
+msgid "Enable parental control"
+msgstr "Zapnout rodičovský zámek"
+
+msgctxt "#30029"
+msgid "Parental control starts at (hour)"
+msgstr "Rodičovský zámek je aktivní od (hodina)"
+
+msgctxt "#30030"
+msgid "Parental control ends at (hour)"
+msgstr "Rodičovský zámek je aktivní do (hodina)"
+
+msgctxt "#30031"
+msgid "Parental control rating (years)"
+msgstr "Veková přístupnost (rodičovský zámek) v rocích"
+
+msgctxt "#30032"
+msgid "Primary language for audio streams (parental control)"
+msgstr "Prvořadý jazyk pro zvukové stopy (rodičovský zámek)"
+
+msgctxt "#30033"
+msgid "Secondary language for audio streams (parental control)"
+msgstr "Druhořadý jazyk pro zvukové stopy (rodičovský zámek)"
+
+msgctxt "#30034"
+msgid "Display only dubed (CZ/SK) streams while parental control"
+msgstr "Zobrazit v rodičovském zámku pouze dabované streamy (CZ/SK)"
+
+msgctxt "#30035"
+msgid "Trakt.tv"
+msgstr ""
+
+msgctxt "#30036"
+msgid "Trakt.tv user"
+msgstr "Trakt.tv uživatel"
+
+msgctxt "#30037"
+msgid "Trakt.tv authorization"
+msgstr "Trakt.tv autorizace"
+
+msgctxt "#30038"
+msgid "Folders"
+msgstr "Adresáře"
+
+msgctxt "#30039"
+msgid "Download folder"
+msgstr "Složka pro stahování"
+
+msgctxt "#30040"
+msgid "Setup KODI video cache"
+msgstr "Nastavení Kodi video cache podle volné RAM"
+
+msgctxt "#30041"
+msgid "AndroidTV playlist folder"
+msgstr "Adresář pro AndroidTV"
+
+msgctxt "#30042"
+msgid "Run the add-on at startup"
+msgstr "Spustit doplněk pri startu"
+
+msgctxt "#30043"
+msgid "Startup"
+msgstr "Po startu"
+
+msgctxt "#30044"
+msgid "Max. resolution"
+msgstr "Max. rozlišení"
+
+msgctxt "#30045"
+msgid "Advanced"
+msgstr "Rozšířený výběr"
+
+msgctxt "#30046"
+msgid "Exclude 3D"
+msgstr "Vynechat 3D"
+
+msgctxt "#30047"
+msgid "Exclude HDR"
+msgstr "Vynechat HDR"
+
+msgctxt "#30048"
+msgid "Prefer HDR"
+msgstr "Preferuj HDR"
+
+msgctxt "#30049"
+msgid "Preferred codecs"
+msgstr "Preferované kodeky"
+
+msgctxt "#30050"
+msgid "Not prefered codecs"
+msgstr "Nepreferované kodeky"
+
+msgctxt "#30051"
+msgid "Preferred groups"
+msgstr "Preferované skupiny"
+
+msgctxt "#30052"
+msgid "Not preferred groups"
+msgstr "Nepreferované skupiny"
+
+msgctxt "#30053"
+msgid "Preferred source"
+msgstr "Preferovaný zdroj"
+
+msgctxt "#30054"
+msgid "Not preferred source"
+msgstr "Nepreferovaný zdroj"
+
+msgctxt "#30055"
+msgid "Preferred audio with multiple audio channels"
+msgstr "Preferované audio s více audio kanály"
+
+msgctxt "#30056"
+msgid "Run addons update"
+msgstr "Spustit aktualizaci doplňků"
+
+msgctxt "#30057"
+msgid "Enable trakt.tv"
+msgstr "Povolit trakt.tv"
+
+msgctxt "#30058"
+msgid "Login to trakt.tv"
+msgstr "Přihlasení na trakt.tv"
+
+msgctxt "#30059"
+msgid "Logout from trakt.tv"
+msgstr "Odhlášení z trakt.tv"
+
+msgctxt "#30060"
+msgid "Show genre in item title"
+msgstr "Zobrazit žánr v názvu položky"
+
+msgctxt "#30061"
+msgid "Automatically start the next episode when the series is opens"
+msgstr "Automaticky spustit další epizodu při otevření seriálu"
+
+msgctxt "#30062"
+msgid "Path for movie library"
+msgstr "Složka pro knihovnu filmů"
+
+msgctxt "#30063"
+msgid "Path for tvshow library"
+msgstr "Složka pro knihovnu seriálů"
+
+msgctxt "#30064"
+msgid "Export metadata from plugin"
+msgstr "Exportuj metadata pro scraper z pluginu"
+
+msgctxt "#30065"
+msgid "Show old style menu"
+msgstr "Zobraz starou strukturu menu"
+
+msgctxt "#30100"
+msgid "Welcome"
+msgstr "Vítejte"
+
+msgctxt "#30101"
+msgid "Thank you for installing stream cinema plugin. Do you wish to configure login credentials right now?"
+msgstr "Ďekujeme za instalaci doplňku Stream Cinema. Přejete si nastavit přihlašovací údaje?"
+
+msgctxt "#30102"
+msgid "Login error"
+msgstr "Chyba při přihlášení"
+
+msgctxt "#30103"
+msgid "You have entered invalid credentials."
+msgstr "Jsou zadané nesprávné přihlašovací údaje."
+
+msgctxt "#30104"
+msgid "Login successful"
+msgstr "Přihlášení úspěšné"
+
+msgctxt "#30105"
+msgid "Do you wish to open plugin settings?"
+msgstr "Přeješ si otevřít nastavení doplnku?"
+
+msgctxt "#30106"
+msgid "Subscription days left: {}"
+msgstr "Zbývající dny předplatného: {}"
+
+msgctxt "#30107"
+msgid "Login error"
+msgstr "Chyba při přihlášení"
+
+msgctxt "#30108"
+msgid "Invalid credentials. Do you wish to open plugin settings?"
+msgstr "Nesprávné přihlašovací údaje. Přeješ si otevřít nastavení doplnku?"
+
+msgctxt "#30109"
+msgid "System"
+msgstr "Systém"
+
+msgctxt "#30110"
+msgid "Debug enabled"
+msgstr "Debug zapnutý"
+
+msgctxt "#30111"
+msgid "Debug disabled"
+msgstr "Debug vypnutý"
+
+msgctxt "#30112"
+msgid "Error"
+msgstr "Chyba"
+
+msgctxt "#30113"
+msgid "Problem retrieving file link"
+msgstr "Problém při stahování odkazu k souboru"
+
+msgctxt "#30114"
+msgid "Connection error"
+msgstr "Chyba při připojení"
+
+msgctxt "#30115"
+msgid "Pin/Unpin"
+msgstr "Připnout/Odepnout"
+
+msgctxt "#30116"
+msgid "Select stream manually"
+msgstr "Vybrat stream manuálně"
+
+msgctxt "#30117"
+msgid "History"
+msgstr "Historie"
+
+msgctxt "#30118"
+msgid "History is empty"
+msgstr "Historie zatím neobsahuje žádné položky"
+
+msgctxt "#30119"
+msgid "Download"
+msgstr "Stáhnout"
+
+msgctxt "#30120"
+msgid "{}MB free memory"
+msgstr "{}MB z dostupné paměti"
+
+msgctxt "#30121"
+msgid "Warning! An KODI advanced setting has already been set. This operation will erase all your settings! Did you still want to continue?"
+msgstr "Pozor! Našlo se už rozšířené nastavení KODI. Touto operací zrušíš všechny původní nastavení! Přeješ si přesto pokračovat?"
+
+msgctxt "#30122"
+msgid "You need to restart KODI for the new settings to work. Did you restart KODI?"
+msgstr "Aby nové nastavenie začalo fungovať, je potrebné reštartovať KODI. Želáš si reštartovať KODI?"
+
+msgctxt "#30123"
+msgid "You need to restart KODI for the new settings to work. Please turn off KODI and start it again."
+msgstr "Aby nové nastavení začalo fungovat, je nutné restartovat KODI. Vypni prosím KODI a znovu jej spustit."
+
+msgctxt "#30124"
+msgid "Add to Android TV"
+msgstr "Přidat do Android TV"
+
+msgctxt "#30125"
+msgid "Add item to HP"
+msgstr "Připnout na hlavní stránku"
+
+msgctxt "#30126"
+msgid "Remove"
+msgstr "Odobrat"
+
+msgctxt "#30127"
+msgid "Addon is not installed from our repository. Please install addon from our repository."
+msgstr "Addon není nainstalován z našeho repozitáře. Nainstalujte si doplněk z našeho repozitáře."
+
+msgctxt "#30128"
+msgid "Add to library"
+msgstr "Přidat do knihovny"
+
+msgctxt "#30129"
+msgid "Add to library with subscription"
+msgstr "Přidat do knihovny s odběrem"
+
+msgctxt "#30130"
+msgid "Remove from subscription"
+msgstr "Odebrat z odběru"
+
+msgctxt "#30131"
+msgid "Active subscription required. For proper operation of this plugin you must have an active subscription at kra.sk."
+msgstr "Vyžaduje se předplatné. Pro správné fungování doplňku je zapotřebí aktivní předplatné na úložisku kra.sk."
+
+
