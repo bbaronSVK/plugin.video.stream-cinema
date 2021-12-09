@@ -1,4 +1,4 @@
-<addon id="plugin.video.stream-cinema" name="Stream Cinema CZ a SK" provider-name="bbaron" version="2.1.13+k19">
+<addon id="plugin.video.stream-cinema" name="Stream Cinema CZ a SK" provider-name="bbaron" version="2.1.14+k19">
     <requires>
         <import addon="xbmc.python" version="3.0.0"/>
         <import addon="script.module.requests" version="2.25.1"/>
@@ -42,6 +42,10 @@
             obsahu. Tento doplňek pouze vyhledáva zpřístupněný obsah na kra.sk. Použití na vlastní odpovědnost!
         </disclaimer>
         <news lang="sk">[B]Novinky[/B]
+              [I][B]2.1.14[/B][/I]
+            * [COLOR FFFFAE42]fix[/COLOR] fix cache
+            * [COLOR FF50FF42]add[/COLOR] v zaklade odfiltrovane Dolby Vision subory
+
               [I][B]2.1.13[/B][/I]
             * [COLOR FFFFAE42]fix[/COLOR] settings
 
@@ -65,6 +69,9 @@
             * [COLOR FFFFAE42]fix[/COLOR] chyb s trakt.tv
         </news>
         <news lang="cs">[B]Novinky[/B]
+            * [COLOR FFFFAE42]fix[/COLOR] fix cache
+            * [COLOR FF50FF42]add[/COLOR] v zakladu odfiltrovane Dolby Vision soubory
+
               [I][B]2.1.13[/B][/I]
             * [COLOR FFFFAE42]fix[/COLOR] settings
 
@@ -88,6 +95,9 @@
             * [COLOR FFFFAE42]fix[/COLOR] chyb s trakt.tv
         </news>
         <news lang="en">[B]News[/B]
+            * [COLOR FFFFAE42]fix[/COLOR] fix cache
+            * [COLOR FF50FF42]add[/COLOR] filter for excluding Dolby Vision streams (default)
+
               [I][B]2.1.13[/B][/I]
             * [COLOR FFFFAE42]fix[/COLOR] settings
 

@@ -61,7 +61,7 @@ class SimpleCache(object):
 
         return result
 
-    def set(self, endpoint, data, checksum="", expiration=datetime.timedelta(days=30)):
+    def set(self, endpoint, data, checksum="", expiration=datetime.timedelta(seconds=3600)):
         """
             set data in cache
         """

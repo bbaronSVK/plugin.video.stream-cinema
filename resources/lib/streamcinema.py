@@ -244,7 +244,6 @@ class Scinema:
         self.succeeded = True
         self.end_of_directory()
         _id = self.args.get(SC.ITEM_ID)
-        debug('_id {}'.format(_id))
         home_win.setProperty('SC.search', '{}'.format(_id))
         search = dinput('', '', xbmcgui.INPUT_TYPE_TEXT)
         home_win.clearProperty('SC.search')
@@ -255,7 +254,9 @@ class Scinema:
         query = {'search': search, SC.ITEM_ID: _id}
         if _id.startswith('search-people'):
             query.update({'ms': '1'})
-        debug('Search ID: {}'.format(_id))
+        st = List(_id)
+        st.add(search)
+        debug('SEARCH: _ID "{}" search for "{}" people "{}"'.format(_id, search, 1 if 'ms' in query else 0))
         url = '/Search/{}?{}'.format(_id, urlencode(query))
         info('search url: {}'.format(url))
         self.url = url

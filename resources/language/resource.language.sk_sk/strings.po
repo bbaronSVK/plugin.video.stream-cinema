@@ -249,6 +249,10 @@ msgctxt "#30065"
 msgid "Show old style menu"
 msgstr "Zobraz starú štrukturu menu"
 
+msgctxt "#30066"
+msgid "Exclude Dolby Vision streams"
+msgstr "Vynechať súbory s Dolby Vision"
+
 msgctxt "#30100"
 msgid "Welcome"
 msgstr "Vitajte"

@@ -249,6 +249,10 @@ msgctxt "#30065"
 msgid "Show old style menu"
 msgstr ""
 
+msgctxt "#30066"
+msgid "Exclude Dolby Vision streams"
+msgstr ""
+
 msgctxt "#30100"
 msgid "Welcome"
 msgstr ""
