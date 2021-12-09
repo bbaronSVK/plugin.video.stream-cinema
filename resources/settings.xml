@@ -31,16 +31,17 @@
                  visible="eq(-3,true)"/>
         <setting type="select" label="30044" id="stream.max.quality" default="4K" visible="eq(-4,true)" subsetting="true" values="-|SD|720p|1080p|4K|8K"/>
         <setting type="bool" label="30045" id="stream.adv" default="false" visible="eq(-5,true)"/>
-        <setting type="bool" label="30046" id="stream.adv.exclude.3d" default="true" visible="eq(-6,true) + eq(-1,true)" subsetting="true"/>
-        <setting type="bool" label="30047" id="stream.adv.exclude.hdr" default="false" visible="eq(-7,true) + eq(-2,true) + eq(1, false)" subsetting="true"/>
-        <setting type="bool" label="30048" id="stream.adv.prefer.hdr" default="true" visible="eq(-8,true) + eq(-3,true) + eq(-1, false)" subsetting="true"/>
-        <setting type="text" label="30049" id="stream.adv.whitelist.codec" default="hevc|h264|h265|av1|ac3|aac|mp3|dts|eac" visible="eq(-9,true) + eq(-4,true)" subsetting="true"/>
-        <setting type="text" label="30050" id="stream.adv.blacklist.codec" default="" visible="eq(-10,true) + eq(-5,true)" subsetting="true"/>
-        <setting type="text" label="30051" id="stream.adv.whitelist.group" default="" visible="eq(-11,true) + eq(-6,true)" subsetting="true"/>
-        <setting type="text" label="30052" id="stream.adv.blacklist.group" default="" visible="eq(-12,true) + eq(-7,true)" subsetting="true"/>
-        <setting type="text" label="30053" id="stream.adv.whitelist.src" default="" visible="eq(-13,true) + eq(-8,true)" subsetting="true"/>
-        <setting type="text" label="30054" id="stream.adv.blacklist.src" default="" visible="eq(-14,true) + eq(-9,true)" subsetting="true"/>
-        <setting type="bool" label="priota poctu kanalov" id="stream.adv.audio.channels" default="true" visible="eq(-15,true) + eq(-10,true)" subsetting="true"/>
+        <setting type="bool" label="30066" id="stream.adv.exclude.dolbyvision" visible="eq(-1,true)" default="true" subsetting="true"/>
+        <setting type="bool" label="30046" id="stream.adv.exclude.3d" default="true" visible="eq(-7,true) + eq(-2,true)" subsetting="true"/>
+        <setting type="bool" label="30047" id="stream.adv.exclude.hdr" default="false" visible="eq(-8,true) + eq(-3,true) + eq(1, false)" subsetting="true"/>
+        <setting type="bool" label="30048" id="stream.adv.prefer.hdr" default="true" visible="eq(-9,true) + eq(-4,true) + eq(-1, false)" subsetting="true"/>
+        <setting type="text" label="30049" id="stream.adv.whitelist.codec" default="hevc|h264|h265|av1|ac3|aac|mp3|dts|eac" visible="eq(-10,true) + eq(-5,true)" subsetting="true"/>
+        <setting type="text" label="30050" id="stream.adv.blacklist.codec" default="" visible="eq(-11,true) + eq(-6,true)" subsetting="true"/>
+        <setting type="text" label="30051" id="stream.adv.whitelist.group" default="" visible="eq(-12,true) + eq(-7,true)" subsetting="true"/>
+        <setting type="text" label="30052" id="stream.adv.blacklist.group" default="" visible="eq(-13,true) + eq(-8,true)" subsetting="true"/>
+        <setting type="text" label="30053" id="stream.adv.whitelist.src" default="" visible="eq(-14,true) + eq(-9,true)" subsetting="true"/>
+        <setting type="text" label="30054" id="stream.adv.blacklist.src" default="" visible="eq(-15,true) + eq(-10,true)" subsetting="true"/>
+        <setting type="bool" label="priota poctu kanalov" id="stream.adv.audio.channels" default="true" visible="eq(-16,true) + eq(-11,true)" subsetting="true"/>
         <setting type="number" visible="false" id="stream.adv.speedtest" default=""/>
         <setting type="text" visible="false" id="stream.adv.speedtest.asn" default=""/>
         <setting type="text" visible="false" id="stream.adv.speedtest.last" default=""/>

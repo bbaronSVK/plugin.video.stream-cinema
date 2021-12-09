@@ -7,7 +7,7 @@ import time
 
 from resources.lib.common.cache import SimpleCache, use_cache
 from resources.lib.common.logger import debug, info
-from resources.lib.constants import BASE_URL, API_VERSION, SC
+from resources.lib.constants import BASE_URL, API_VERSION, SC, ADDON
 from resources.lib.kodiutils import get_uuid, get_skin_name, get_setting_as_bool, get_setting_as_int, get_setting
 from resources.lib.system import user_agent, Http, SYSTEM_LANG_CODE
 
@@ -33,7 +33,7 @@ class Sc:
     @staticmethod
     def get(path, params=None):
         sorted_values, url = Sc.prepare(params, path)
-        key = '{}{}'.format(url, sorted_values)
+        key = '{}{}{}'.format(ADDON.getAddonInfo('version'), url, sorted_values)
         debug('CALL {} PARAMS {} KEY {}'.format(url, sorted_values, key))
         start = time.time()
         ret = Sc.cache.get(key)
@@ -55,7 +55,7 @@ class Sc:
         o = urlparse(url)
         query = parse_qs(o.query)
         url = o._replace(query=None).geturl()
-        p = Sc.default_params()
+        p = Sc.default_params(query)
         # debug('p: {}'.format(p))
         query.update(p)
         if params is not None:
@@ -74,12 +74,12 @@ class Sc:
         return res.json()
 
     @staticmethod
-    def default_params():
+    def default_params(query):
         params = {
             'ver': API_VERSION,
             'uid': get_uuid(),
             'skin': get_skin_name(),
-            'lang': SYSTEM_LANG_CODE
+            'lang': SYSTEM_LANG_CODE,
         }
         # plugin_url = 'plugin://{}/{}'.format(ADDON_ID, query.params.orig_args if query.params.orig_args else '')
         # try:
@@ -105,6 +105,11 @@ class Sc:
 
         if get_setting_as_bool('plugin.show.genre'):
             params.update({'gen': 1})
+
+        if get_setting_as_bool('stream.adv') and 'DV' not in query:
+            params.update({'DV':  0 if get_setting_as_bool('stream.adv.exclude.dolbyvision') else 1})
+        elif 'DV' not in query:
+            params.update({'DV': 0})
 
         if get_setting_as_bool('plugin.show.old.menu'):
             params.update({'old': 1})
@@ -142,4 +147,4 @@ class Sc:
             ttl = int(ret[SC.ITEM_SYSTEM]['TTL'])
 
         info('SAVE TO CACHE {} / {}'.format(ttl, key))
-        Sc.cache.set(key, ret, datetime.timedelta(seconds=ttl))
+        Sc.cache.set(key, ret, expiration=datetime.timedelta(seconds=ttl))
