@@ -31,20 +31,22 @@ class Sc:
     cache = SimpleCache()
 
     @staticmethod
-    def get(path, params=None):
+    def get(path, params=None, ttl=None):
         sorted_values, url = Sc.prepare(params, path)
         key = '{}{}{}'.format(ADDON.getAddonInfo('version'), url, sorted_values)
         debug('CALL {} PARAMS {} KEY {}'.format(url, sorted_values, key))
         start = time.time()
         ret = Sc.cache.get(key)
         if ret is None:
+            start = time.time()
             res = Http.get(url, headers=Sc.headers(), params=sorted_values)
+            end = time.time()
             res.raise_for_status()
             ret = res.json()
-            Sc.save_cache(ret, key)
+            Sc.save_cache(ret, key, ttl)
         else:
-            info('GET from cache')
-        end = time.time()
+            debug('GET from cache'.format())
+            end = time.time()
 
         debug('GET took {0:.2f}ms'.format((end - start) * 1000))
         return ret
@@ -106,10 +108,11 @@ class Sc:
         if get_setting_as_bool('plugin.show.genre'):
             params.update({'gen': 1})
 
-        if get_setting_as_bool('stream.adv') and 'DV' not in query:
-            params.update({'DV':  0 if get_setting_as_bool('stream.adv.exclude.dolbyvision') else 1})
-        elif 'DV' not in query:
-            params.update({'DV': 0})
+        if 'HDR' not in query:
+            params.update({'HDR':  0 if get_setting_as_bool('stream.exclude.hdr') else 1})
+
+        if 'DV' not in query:
+            params.update({'DV':  0 if get_setting_as_bool('stream.exclude.dolbyvision') else 1})
 
         if get_setting_as_bool('plugin.show.old.menu'):
             params.update({'old': 1})
@@ -135,16 +138,17 @@ class Sc:
     def up_next(id, s, e):
         url = '/upNext/{}/{}/{}'.format(id, s, e)
         try:
-            data = Sc.get(url)
+            data = Sc.get(url, ttl=3600)
         except:
             data = {'error': 'error'}
         return data
 
     @staticmethod
-    def save_cache(ret, key):
-        ttl = 1800
+    def save_cache(ret, key, ttl=None):
+        ttl = 3600 if ttl is None else ttl
+
         if SC.ITEM_SYSTEM in ret and 'TTL' in ret[SC.ITEM_SYSTEM]:
             ttl = int(ret[SC.ITEM_SYSTEM]['TTL'])
 
-        info('SAVE TO CACHE {} / {}'.format(ttl, key))
+        debug('SAVE TO CACHE {} / {}'.format(ttl, key))
         Sc.cache.set(key, ret, expiration=datetime.timedelta(seconds=ttl))

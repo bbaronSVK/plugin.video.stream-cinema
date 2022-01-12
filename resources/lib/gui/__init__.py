@@ -13,7 +13,7 @@ home_win = xbmcgui.Window(10000)  # komunikacne okno
 
 
 def get_cond_visibility(text):
-    debug('get_cond_visibility: {}'.format(text))
+    # debug('get_cond_visibility: {}'.format(text))
     if 'sc://' in text:
         return translate_cond_visibility(text)
 

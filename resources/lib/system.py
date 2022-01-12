@@ -8,7 +8,7 @@ import xbmc
 from resources.lib.constants import HTTP
 from resources.lib.kodiutils import get_system_platform, get_app_name, addon
 from resources.lib.language import get_language_code
-from resources.lib.common.logger import info
+from resources.lib.common.logger import info, debug
 
 SYSTEM_BUILD_VERSION = xbmc.getInfoLabel("System.BuildVersion")
 SYSTEM_VERSION = int(SYSTEM_BUILD_VERSION.split(".")[0])
@@ -65,7 +65,7 @@ class Http:
         )
         # info('url req head: {}'.format(ret.request.headers))
         # info('url res head: {}'.format(ret.headers))
-        info('Http url: {}'.format(ret.url))
+        debug('Http url: {}'.format(ret.url))
         try:
             ret.raise_for_status()
         except requests.exceptions.HTTPError as e:

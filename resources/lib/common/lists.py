@@ -28,6 +28,9 @@ class List(object):
         # debug('List get data {}')
         return self.data
 
+    def __len__(self):
+        return len(self.data)
+
     def add(self, item, remove_only=False):
         # debug('List add {} | {}'.format(item, remove_only))
 
@@ -158,8 +161,17 @@ class SCKODIItem(Storage):
         else:
             self._watched.add(self.item, True)
 
-        if self.kodi_db:
-            self.kodi_db.set_watched_path(self.kodi_path, times)
+        if self.series:
+            key = 'series:{}'.format(self.series)
+            series = self.data.get(key, {})
+            if times:
+                series.update({self.episode: True})
+            else:
+                del series[self.episode]
+            self.data[key] = series
+
+        # if self.kodi_db:
+        #     self.kodi_db.set_watched_path(self.kodi_path, times)
 
         if from_kodi_player and self.series:
             self.set_last_ep(self.series, self.episode)

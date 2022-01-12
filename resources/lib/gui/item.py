@@ -11,6 +11,7 @@ from resources.lib.api.kraska import Kraska, ResolveException
 from resources.lib.api.sc import Sc
 from resources.lib.common.lists import List, SCKODIItem
 from resources.lib.common.logger import info, debug
+from resources.lib.common.storage import preferred_lang_list
 from resources.lib.constants import ADDON_ID, SC, GUI
 from resources.lib.debug import try_catch
 from resources.lib.gui import get_cond_visibility as gcv, home_win
@@ -122,6 +123,13 @@ class SCBaseItem:
         for k, v in enumerate(stream_info):
             self.item.addStreamInfo(v, stream_info.get(v)) if v in ['video', 'audio'] else ''
 
+        if 'fvideo' in stream_info:
+            debug('FVIDEO: {}'.format(stream_info['fvideo']))
+            self.item.setProperty('video', stream_info['fvideo'])
+
+        if 'faudio' in stream_info:
+            self.item.setProperty('audio', stream_info['faudio'])
+
     @try_catch('set_unique_ids')
     def set_unique_ids(self):
         self.item.setUniqueIDs(self.data.get('unique_ids'))
@@ -153,7 +161,6 @@ class SCBaseItem:
             if SC.ITEM_TITLE in item_info:
                 title = '{}'.format(item_info.get(SC.ITEM_TITLE))
                 self.item.setLabel(title)
-                del (item_info[SC.ITEM_TITLE])
 
             if self.data.get('play'):
                 if 'otitle' in item_info:
@@ -173,6 +180,16 @@ class SCBaseItem:
             for i, e in enumerate(item_info):
                 # debug('set info {} {}'.format(i, e))
                 self.item.setProperty(e, '{}'.format(item_info[e]))
+
+            if item_info.get('mediatype', '') == 'season' and item_info.get('episode'):
+                item = SCKODIItem(self.data.get(SC.ITEM_ID))
+                data = item.data
+                total_episodes = item_info.get('episode')
+                watched = len(data.get('series:{}'.format(item_info.get('season')), {}))
+                debug('Mame seriu {} s {}/{} epizodami'.format(item_info.get('season'), watched, total_episodes))
+                if watched >= total_episodes:
+                    item_info.update({'playcount': '1'})
+
             self.item.setInfo('video', item_info)
             self.item.setProperty('original_title', item_info.get('originaltitle'))
             self.info_set = True
@@ -230,8 +247,8 @@ class SCStreamSelect(SCBaseItem):
         if 'src' in strm_nfo:
             label2 += '   src: [B]{}[/B]'.format(strm_nfo['src'])
 
-        if 'video' in strm_nfo and 'aspect' in strm_nfo['video']:
-            label2 += '   asp: [B]{}[/B]'.format(SCStreamSelect.calculate_aspct_ratio(strm_nfo['video']['aspect']))
+        if 'video' in strm_nfo and 'aspect' in strm_nfo['video'] and 'ratio' in strm_nfo['video']:
+            label2 += '   asp: [B]{}[/B]'.format(strm_nfo['video']['ratio'])
 
         if SC.ITEM_URL in data:
             url = data.get(SC.ITEM_URL)
@@ -243,41 +260,6 @@ class SCStreamSelect(SCBaseItem):
         if SC.ITEM_ID in data:
             self.item.setProperty(SC.ITEM_ID, data.get('id'))
         self.item.setLabel2(label2)
-
-    def calculate_aspct_ratio(aspect):
-        ret = '{}:1'.format(aspect)
-        if aspect == '1.25':
-            ret = '5:4'
-        elif aspect == '1.33':
-            ret = '4:3'
-        elif aspect == '1.37' or aspect == '1.375':
-            ret = 'Academy Ratio'
-        elif aspect == '1.43':
-            ret = 'IMAX'
-        elif aspect == '1.5':
-            ret = '3:2'
-        elif aspect == '56':
-            ret = '14:9'
-        elif aspect == '1.6' or aspect == '1.60':
-            ret = '16:10'
-        elif aspect == '1.66':
-            ret = 'Super 16'
-        elif aspect == '1.78' or aspect == '1.77':
-            ret = '16:9'
-        elif aspect == '1.85':
-            ret = 'Letterbox'
-        elif aspect == '2.2':
-            ret = 'Super Panavision'
-        elif aspect == '2.33' or aspect == '2.4' or aspect == '2.40':
-            ret = '21:9'
-        elif aspect == '2.35' or aspect == '2.55' or aspect == '2.75':
-            ret = 'CinemaScope'
-        elif aspect == '2.59' or aspect == '2.39':
-            ret = 'Cinema'
-        elif aspect == '2.76':
-            ret = 'MGM 65'
-
-        return ret
 
 
 class SCDirContext:
@@ -371,6 +353,25 @@ class SCDir(SCBaseItem):
                 SC.ITEM_URL: self.data.get(SC.ITEM_URL),
                 SC.ITEM_ID: self.item.getLabel()
             }))))
+
+        if get_setting_as_bool('stream.autoselect'):
+            # debug('data: {}'.format(self.data))
+            mediatype = self.data.get(SC.ITEM_INFO, {}).get('mediatype')
+            if mediatype == 'tvshow' or mediatype == 'movie':
+                item_id = self.data.get(SC.ITEM_ID)
+                st = preferred_lang_list
+                if st.get(item_id) is not None:
+                    context_menu.append((Strings.txt(Strings.CONTEXT_DEL_PREF_LANG).format(st[item_id]),
+                                         'RunPlugin({})'.format(create_plugin_url({
+                                             SC.ITEM_ACTION: SC.ACTION_DEL_PREFERRED_LANGUAGE,
+                                             SC.ITEM_ID: self.data.get(SC.ITEM_ID)
+                                         }))))
+                else:
+                    context_menu.append(
+                        (Strings.txt(Strings.CONTEXT_ADD_PREF_LANG), 'RunPlugin({})'.format(create_plugin_url({
+                            SC.ITEM_ACTION: SC.ACTION_SET_PREFERRED_LANGUAGE,
+                            SC.ITEM_ID: self.data.get(SC.ITEM_ID)
+                        }))))
 
         if context_menu:
             self.item.addContextMenuItems(context_menu)
@@ -527,6 +528,23 @@ class SCVideo(SCBaseItem):
             SC.ITEM_URL: self.data.get(SC.ITEM_URL),
         }))])
 
+        if get_setting_as_bool('stream.autoselect'):
+            mediatype = self.data.get(SC.ITEM_INFO, {}).get('mediatype')
+            if mediatype == 'tvshow' or mediatype == 'movie':
+                item_id = self.data.get(SC.ITEM_ID)
+                st = preferred_lang_list
+                if st.get(item_id) is not None:
+                    menu.append((Strings.txt(Strings.CONTEXT_DEL_PREF_LANG).format(st[item_id]),
+                                 'RunPlugin({})'.format(create_plugin_url({
+                                     SC.ITEM_ACTION: SC.ACTION_DEL_PREFERRED_LANGUAGE,
+                                     SC.ITEM_ID: self.data.get(SC.ITEM_ID)
+                                 }))))
+                else:
+                    menu.append((Strings.txt(Strings.CONTEXT_ADD_PREF_LANG), 'RunPlugin({})'.format(create_plugin_url({
+                        SC.ITEM_ACTION: SC.ACTION_SET_PREFERRED_LANGUAGE,
+                        SC.ITEM_ID: self.data.get(SC.ITEM_ID)
+                    }))))
+
         if self.data.get(SC.ITEM_INFO, {}).get('trailer'):
             menu.append(['Trailer', 'PlayMedia({})'.format(self.data.get(SC.ITEM_INFO, {}).get('trailer'))])
 
@@ -602,14 +620,16 @@ class SCPlayItem(SCBaseItem):
         url = kr.resolve(ident)
         smin = 999999999
         smax = 0
+        durmin = 999999999
         hosts = ['b01', 's01', 'v01']
         for h in hosts:
             u = re.sub(r':\/\/([^.]+)', '://{}'.format(h), url)
             debug('speedtest URL {}'.format(u))
-            s = self.calculate_speed(u)
+            s, dur = self.calculate_speed(u)
             debug('speedtest host {} speed: {}'.format(h, convert_bitrate(s)))
             smin = min(s, smin)
             smax = max(s, smax)
+            durmin = min(dur, durmin)
             isp.update({h: s})
         debug('min/max {}/{}'.format(convert_bitrate(smin), convert_bitrate(smax)))
         debug('res: {}'.format(isp))
@@ -622,19 +642,22 @@ class SCPlayItem(SCBaseItem):
         settings.set_setting('stream.adv.speedtest', speed)
         settings.set_setting('stream.adv.speedtest.asn', isp.get('a', 'N/A'))
         settings.set_setting('stream.adv.speedtest.last', int(time.time()))
+        return (smin, smax, durmin)
 
     @try_catch('calculate_speed')
     def calculate_speed(self, url):
-        start = microtime()
         from resources.lib.system import Http
         r = Http.get(url, stream=True)
         total_length = int(r.headers.get('content-length', 0))
-        chunk = 4 * 1024
+        chunk = 4 * 1024 * 1024
+        start = microtime()
         for _ in r.iter_content(chunk):
+            debug('.')
             pass
         end = microtime()
         dur = (end - start) / 1000
-        return int(total_length / dur * 8)  # bps
+        speed = int(total_length / dur * 8)
+        return (speed, dur)  # bps
 
     @try_catch('ISP')
     def isp(self):
@@ -642,15 +665,9 @@ class SCPlayItem(SCBaseItem):
 
     @try_catch('filter')
     def filter(self):
-        # @todo autoselect / filtrovanie nechcenych streamov
-        if not get_setting_as_bool('stream.autoselect') \
-                or SC.ACTION_SELECT_STREAM in self.params or SC.ACTION_DOWNLOAD in self.params:
-            debug('nieje autoselect, alebo je vynuteny vyber streamu alebo download')
-            return
-
         speedtest_last = get_setting_as_int('stream.adv.speedtest.last')
         now = time.time()
-        force = True if speedtest_last is None or (speedtest_last + (24 * 3600 * 7)) < now else False
+        force = True if speedtest_last is None or (speedtest_last + (24 * 3600 * 2)) < now else False
 
         isp = self.isp()
         asn = settings.get_setting('stream.adv.speedtest.asn')
@@ -659,8 +676,15 @@ class SCPlayItem(SCBaseItem):
         debug('Force: {} ASN: {} / {} [{}] / SPEED: {} [{}]'.format(force, asn, isp.get('a'), asn_changed,
                                                                     settings.get_setting_as_int('stream.adv.speedtest'),
                                                                     wrong_speed))
-        if force or (get_setting_as_int('stream.max.bitrate') == 100 and (asn_changed or wrong_speed)):
-            self.speedtest(isp)
+        if force is True or (get_setting_as_int('stream.max.bitrate') == 100 and (asn_changed or wrong_speed)):
+            smin, smax, dur = self.speedtest(isp)
+            debug('smin {} / smax {} / dur {}'.format(smin, smax, dur))
+
+        # @todo autoselect / filtrovanie nechcenych streamov
+        if not get_setting_as_bool('stream.autoselect') \
+                or SC.ACTION_SELECT_STREAM in self.params or SC.ACTION_DOWNLOAD in self.params:
+            debug('nieje autoselect, alebo je vynuteny vyber streamu alebo download')
+            return
 
         if get_setting_as_bool('stream.autoselect'):
 
@@ -699,9 +723,10 @@ class SCPlayItem(SCBaseItem):
         debug('autoselect nic nevybral, tak nechame usera vybrat')
 
     def video_score(self, score, pos, s):
-        megabit = 1000000
+        megabit = 1e6
         speed = settings.get_setting_as_int('stream.adv.speedtest')
         if speed > 0:
+            debug('set max_bitrate from speedtest: {}Mbps'.format(int(speed * 0.8 / megabit)))
             max_bitrate = int(speed * 0.8)
         else:
             max_bitrate = get_setting_as_int('stream.max.bitrate') * megabit
@@ -764,10 +789,16 @@ class SCPlayItem(SCBaseItem):
 
     def audio_score(self, lang1, pos, score, stream_info, weight=3):
         if get_setting_as_bool('stream.adv') and 'streams' in stream_info:
+            force_lang = preferred_lang_list.get(self.data.get('id'))
             ascore = {apos: 0 for apos, _ in enumerate(stream_info['streams'])}
             for apos, _ in enumerate(stream_info['streams']):
                 acodec, channels, lang = _
                 lang = lang.lower()
+
+                if force_lang is not None and force_lang.lower() == lang:
+                    ascore[apos] += 1000
+                    debug('FORCE lang: {}'.format(force_lang.lower()))
+
                 debug(' - lang {}/{}'.format(lang, lang1))
                 if acodec in get_setting('stream.adv.whitelist.codec'):
                     debug(' - audio whitelist acodec {}'.format(acodec))

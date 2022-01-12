@@ -1,4 +1,4 @@
-<addon id="plugin.video.stream-cinema" name="Stream Cinema CZ a SK" provider-name="bbaron" version="2.1.14+k19">
+<addon id="plugin.video.stream-cinema" name="Stream Cinema CZ a SK" provider-name="bbaron" version="2.2.01+k19">
     <requires>
         <import addon="xbmc.python" version="3.0.0"/>
         <import addon="script.module.requests" version="2.25.1"/>
@@ -41,7 +41,22 @@
         <disclaimer lang="cs">Autor tohoto doplňku neposkytuje žádný obsah a není nijako propojený s poskytovatelemi
             obsahu. Tento doplňek pouze vyhledáva zpřístupněný obsah na kra.sk. Použití na vlastní odpovědnost!
         </disclaimer>
-        <news lang="sk">[B]Novinky[/B]
+        <news>[B]Novinky[/B]
+              [I][B]2.2.01[/B][/I]
+            * [COLOR FF50FF42]add[/COLOR] automaticke premazavanie nahladov z KODI, ktore sa nepouzivali aspon 1 mesiac
+            * [COLOR FF50FF42]add[/COLOR] moznost zvolit si preferovany jazyk pre serial/film (pri zapnutom automatickom vybere streamu)
+            * [COLOR FF50FF42]add[/COLOR] oznacovanie serii v serialoch ako videne, ak mate trakt.tv a seriu mate celu pozrenu
+            * [COLOR FF50FF42]add[/COLOR] pridana moznost do nastaveni na kompletnu synchronizaciu s trakt.tv
+            * [COLOR FF50FF42]add[/COLOR] podpora pre SKIN: Arctic: Zephyr - Reloaded SC mod
+            * [COLOR FF50FF42]add[/COLOR] po vypnuti debugu cez nastavenie sa odosiela kodi.log na web a po uspesnom odoslani sa zobrazi URL (pri podporovanej platforme sa URL nakopiruje do pamate a nasledne sa da vlozit)
+            * [COLOR FFFFAE42]fix[/COLOR] uprava/optimalizacia automatickeho vyberu audio stopy
+            * [COLOR FFFFAE42]fix[/COLOR] synchronizacie epizod z trakt - nenatahuje sa cela historia, ale len cas
+            * [COLOR FFFFAE42]fix[/COLOR] ListItem uz ma aj Title - fix pre SKIN
+
+              [I][B]2.1.15[/B][/I]
+            * [COLOR FFFFAE42]fix[/COLOR] presunute nastavenie pre Dolby Vision
+            * [COLOR FF50FF42]add[/COLOR] moznost neponukat HDR subory
+
               [I][B]2.1.14[/B][/I]
             * [COLOR FFFFAE42]fix[/COLOR] fix cache
             * [COLOR FF50FF42]add[/COLOR] v zaklade odfiltrovane Dolby Vision subory
@@ -67,58 +82,6 @@
             * [COLOR FFFFAE42]fix[/COLOR] chyba s prihlasovanim na kra.sk
             * [COLOR FFFFAE42]fix[/COLOR] chyb po vyprsani predplatneho
             * [COLOR FFFFAE42]fix[/COLOR] chyb s trakt.tv
-        </news>
-        <news lang="cs">[B]Novinky[/B]
-            * [COLOR FFFFAE42]fix[/COLOR] fix cache
-            * [COLOR FF50FF42]add[/COLOR] v zakladu odfiltrovane Dolby Vision soubory
-
-              [I][B]2.1.13[/B][/I]
-            * [COLOR FFFFAE42]fix[/COLOR] settings
-
-              [I][B]2.1.12[/B][/I]
-            * [COLOR FFFFAE42]fix[/COLOR] trakt.tv rychlost
-            * [COLOR FFFFAE42]fix[/COLOR] cache
-
-              [I][B]2.1.11[/B][/I]
-            * [COLOR FFFFAE42]fix[/COLOR] trakttv refresh token
-            * [COLOR FFFFAE42]fix[/COLOR] oneskorena synchronizace po startu
-
-              [I][B]2.1.10[/B][/I]
-            * [COLOR FF50FF42]add[/COLOR] struktura menu z KODI 18 a nizsie
-            * [COLOR FF50FF42]add[/COLOR] struktura menu z KODI 19 sa da zapnut v nastaveniach
-            * [COLOR FFFFAE42]fix[/COLOR] trakt error
-            * [COLOR FFFF5042]remove[/COLOR] oznacenie lite pluginu - uz je plna funkcionalita okrem kniznice
-
-              [I][B]2.1.9[/B][/I]
-            * [COLOR FFFFAE42]fix[/COLOR] chyb s prihlasovanim na kra.sk
-            * [COLOR FFFFAE42]fix[/COLOR] chyb po vyprseni predplatneho
-            * [COLOR FFFFAE42]fix[/COLOR] chyb s trakt.tv
-        </news>
-        <news lang="en">[B]News[/B]
-            * [COLOR FFFFAE42]fix[/COLOR] fix cache
-            * [COLOR FF50FF42]add[/COLOR] filter for excluding Dolby Vision streams (default)
-
-              [I][B]2.1.13[/B][/I]
-            * [COLOR FFFFAE42]fix[/COLOR] settings
-
-              [I][B]2.1.12[/B][/I]
-            * [COLOR FFFFAE42]fix[/COLOR] trakt.tv speedup
-            * [COLOR FFFFAE42]fix[/COLOR] cache
-
-              [I][B]2.1.11[/B][/I]
-            * [COLOR FFFFAE42]fix[/COLOR] trakttv refresh token
-            * [COLOR FFFFAE42]fix[/COLOR] delayed synchronization on startup
-
-              [I][B]2.1.10[/B][/I]
-            * [COLOR FF50FF42]add[/COLOR] menu structure from KODI 18 and below
-            * [COLOR FF50FF42]add[/COLOR] the menu structure from KODI 19 can be switched on in the settings
-            * [COLOR FFFFAE42]fix[/COLOR] trakt error
-            * [COLOR FFFF5042]remove[/COLOR] lite removev from name - full functionality is available except for the kodi library
-
-              [I][B]2.1.9[/B][/I]
-            * [COLOR FFFFAE42]fix[/COLOR] with loging on kra.sk
-            * [COLOR FFFFAE42]fix[/COLOR] atfer subscription expires
-            * [COLOR FFFFAE42]fix[/COLOR] in trakt.tv
         </news>
     </extension>
 </addon>

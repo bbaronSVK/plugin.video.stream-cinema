@@ -19,7 +19,7 @@ import xbmcvfs
 from base64 import b64encode
 
 from resources.lib.constants import ADDON_ID, PY2, SC
-from resources.lib.common.logger import debug
+from resources.lib.common.logger import debug, info
 
 addon = xbmcaddon.Addon(id=ADDON_ID)
 
@@ -511,7 +511,11 @@ def get_percentage(val, total):
 
 
 def mkdir(path):
-    xbmcvfs.mkdir(make_legal_filename(path))
+    return xbmcvfs.mkdir(make_legal_filename(path))
+
+
+def file_exists(path):
+    return xbmcvfs.exists(path)
 
 
 def make_nfo_content(item, typ='movie'):
@@ -641,3 +645,92 @@ def isp_ipgeolocationioapi():
     asn = d.get('asn', '')
     return {'c': d.get('country_code2', 'N/A'), 'a': asn.replace('AS', '')}
 
+
+def clean_textures():
+    try:
+        from resources.lib.common.storage import TexturesDb
+        t = TexturesDb()
+        t.clean()
+    except:
+        debug('player err: {}'.format(traceback.format_exc()))
+
+
+def check_set_debug(toggle=False):
+    cur_system = get_system_debug()
+    if toggle:
+        cur_system = not cur_system
+        set_system_debug(cur_system)
+        from resources.lib.gui.dialog import dok
+        from resources.lib.language import Strings
+        if cur_system:
+            dok(Strings.txt(Strings.SYSTEM_H1), Strings.txt(Strings.SYSTEM_DEBUG_ENABLED))
+        else:
+            upload_log_file()
+            dok(Strings.txt(Strings.SYSTEM_H1), Strings.txt(Strings.SYSTEM_DEBUG_DISABLED))
+
+
+def upload_log_file(name=None):
+    from resources.lib.gui.dialog import dnotify, dselect
+    from resources.lib.system import user_agent, Http
+
+    if name is None:
+        name = get_app_name().lower()
+
+    url = 'https://paste.kodi.tv/'
+    log_path = translate_path('special://logpath/')
+    log_file = os.path.join(log_path, '%s.log' % name.lower())
+    if not file_exists(log_file):
+        return dnotify(message='Log File not found, likely logging is not enabled.')
+    try:
+        f = open(log_file, 'r', encoding='utf-8', errors='ignore')
+        text = f.read()
+        f.close()
+        response = Http.post(url + 'documents', data=text.encode('utf-8', errors='ignore'),
+                             headers={'User-Agent': user_agent()})
+        if 'key' in response.json():
+            result = url + response.json()['key']
+            debug('{} log file uploaded to: {}'.format(name, result))
+            list_items = [('url:  {}'.format(str(result)), str(result))]
+            from sys import platform as sys_platform
+            supported_platform = any(value in sys_platform for value in ('win32', 'linux2', 'darwin'))
+            if supported_platform:
+                list_items += [('-- Copy url To Clipboard', ' ')]
+            dselect([i[0] for i in list_items], 'Upload')
+            if supported_platform:
+                copy2clip(str(result))
+        elif 'message' in response.json():
+            dnotify('', '{} Log upload failed: {}'.format(name, str(response.json()['message'])))
+            info('{} Log upload failed: {}'.format(name, str(response.json()['message'])))
+        else:
+            dnotify('', '{} Log upload failed'.format(name))
+            info('%s Log upload failed: %s' % (name, response.text))
+    except:
+        info('{} log upload failed'.format(name))
+        dnotify('', 'pastebin post failed: See log for more info')
+
+
+def copy2clip(txt):
+    from sys import platform as sys_platform
+    platform = sys_platform
+    if platform == "win32":
+        try:
+            from subprocess import check_call
+            # cmd = "echo " + txt.strip() + "|clip"
+            cmd = "echo " + txt.replace('&', '^&').strip() + "|clip"  # "&" is a command seperator
+            return check_call(cmd, shell=True)
+        except:
+            debug('Windows: Failure to copy to clipboard')
+    elif platform == "darwin":
+        try:
+            from subprocess import check_call
+            cmd = "echo " + txt.strip() + "|pbcopy"
+            return check_call(cmd, shell=True)
+        except:
+            debug('Mac: Failure to copy to clipboard')
+    elif platform == "linux":
+        try:
+            from subprocess import Popen, PIPE
+            p = Popen(["xsel", "-pi"], stdin=PIPE)
+            p.communicate(input=txt)
+        except:
+            debug('Linux: Failure to copy to clipboard')

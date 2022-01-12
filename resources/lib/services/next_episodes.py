@@ -11,6 +11,7 @@ from resources.lib.gui import get_cond_visibility
 from resources.lib.gui.dialog import dprogressgb
 from resources.lib.gui.item import SCUpNext
 from resources.lib.services.Monitor import monitor
+from resources.lib.services.SCPlayer import player
 from resources.lib.services.Settings import settings
 
 
@@ -19,34 +20,42 @@ class NextEp:
     def __init__(self):
         self.list = Storage('nextep')
         # dal som to sem natvrdo, aby sa oneskoril sync o 10 minut po starte
-        self.last_run = time() - 3000 #settings.get_setting_as_int('system.next_ep.last_run')
-        # if self.last_run is None:
-        #     self.last_run = time() - 3000
+        last_run = settings.get_setting_as_int('system.next_ep.last_run')
+        if last_run is None:
+            self.last_run = time()
+        else:
+            self.last_run = last_run
 
     def run(self, force=False):
         now = time()
-        if not xbmc.Player().isPlayingVideo() and (force or self.last_run + 3600 < now):
-            self.update_items()
-            self.last_run = now
-            settings.set_setting('system.next_ep.last_run', '{}'.format(int(now)))
+        if not player.isPlayback() and (force or self.last_run + (3600 * 3) < now):
+            if self.update_items():
+                self.last_run = now
+                settings.set_setting('system.next_ep.last_run', '{}'.format(int(now)))
 
     def update_items(self):
         query = 'select item_key, item_value from storage where item_key like ? and item_value like ?'
         search = '{}-%'.format(SCKODIItem.ITEM_NAME)
-        debug('search: {}'.format(search))
+        # debug('search: {}'.format(search))
         res = self.list._db.execute(query, search, '%"last_ep"%').fetchall()
         total = len(res)
+        skip_list = self.get()
+        debug('NEXTEP: {} z {} ({})'.format(len(skip_list), total, total - len(skip_list)))
         dialog = dprogressgb()
-        dialog.create('sync in progress')
+        dialog.create('Next Ep in progress')
         pos = 0
         for i in res:
-            if monitor.abortRequested() or get_cond_visibility('!System.AddonIsEnabled({})'.format(ADDON_ID)):
-                return
+            if monitor.abortRequested() or player.isPlayback():
+                dialog.close()
+                return False
             pos += 1
             _, item_id = i[0].split('-')
+            if item_id in skip_list:
+                debug('ITEM {} uz ma nextep, nepotrebujeme update'.format(item_id))
+                continue
             item = SCKODIItem(item_id)
             last_ep = item.get_last_ep()
-            debug('sync in progress: {}%'.format(int(pos / total * 100)))
+            debug('Next Ep in progress: {}%'.format(int(pos / total * 100)))
             dialog.update(int(pos / total * 100), message='{} - {}x{}'.format(item_id, last_ep[0], last_ep[1]))
             try:
                 debug('last {}x{}'.format(last_ep[0], last_ep[1]))
@@ -72,6 +81,7 @@ class NextEp:
 
         dialog.close()
         debug('LIST NEXT EP: {}'.format(self.list._data))
+        return True
 
     def get(self):
         tmp = {}
@@ -83,5 +93,4 @@ class NextEp:
 
         debug('GET NEXT EP: {}'.format(tmp))
         ret = [k[0] for k in sorted(tmp.items(), key=lambda x: x[1]['t'], reverse=True)]
-        debug('zoznam: {}'.format(len(ret)))
         return ret

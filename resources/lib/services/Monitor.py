@@ -93,16 +93,17 @@ class Monitor(KMonitor):
         self.is_DPMS = False
 
     def PlayerOnAVStart(self, data):
-        player.set_item(loads(data).get('item'))
+        debug('Monitor PlayerOnAVStart')
+        # player.set_item(loads(data).get('item'))
 
     def onNotification(self, sender, method, data):
         debug('monitor onNotification {} {} {}'.format(decode(sender), decode(method), decode(data)))
         if method in self.callback:
             debug('callback for {}'.format(method))
             self.callback[method](data)
-        if sender == 'xbmc' and method == 'Player.OnAVStart':
-            debug('monitor Player.OnAVChange, set item to: {}'.format(loads(data).get('item')))
-            player.set_item(loads(data).get('item'))
+        # if sender == 'xbmc' and method == 'Player.OnAVStart':
+            # debug('monitor Player.OnAVChange, set item to: {}'.format(loads(data).get('item')))
+            # player.set_item(loads(data).get('item'))
         if sender == 'xbmc' and method == 'System.OnSleep':
             self.is_DPMS = True
         if sender == 'xbmc' and method == 'System.OnWake':
@@ -111,16 +112,17 @@ class Monitor(KMonitor):
             from base64 import b64decode
             exec_build_in('PlayMedia({})'.format(create_plugin_url(loads(b64decode(data)))))
             pass
-        if sender == ADDON_ID and method == 'Other.List.Sort':
-            from base64 import b64decode
-            info = loads(b64decode(data))
-            debug('new List.Sort: method: {} order {} url: {}'.format(info['m'], info['o'], info['u']))
-            self.sort_method = info['m']
-            self.sort_order = info['o']
-            self.last_url = info['u']
-            self.filter = info['f']
+        # if sender == ADDON_ID and method == 'Other.List.Sort':
+        #     from base64 import b64decode
+        #     info = loads(b64decode(data))
+        #     debug('new List.Sort: method: {} order {} url: {}'.format(info['m'], info['o'], info['u']))
+        #     self.sort_method = info['m']
+        #     self.sort_order = info['o']
+        #     self.last_url = info['u']
+        #     self.filter = info['f']
 
     def periodical_check(self):
+        return
         try:
             kv = KodiViewModeDb()
             sort = kv.get_sort(self.last_url)
@@ -135,7 +137,7 @@ class Monitor(KMonitor):
             # container_refresh()
 
     def can_check(self):
-        return not self.is_screensaver and not self.is_DPMS
+        return not self.is_screensaver and not self.is_DPMS and not player.isPlayback()
 
 
 monitor = Monitor()

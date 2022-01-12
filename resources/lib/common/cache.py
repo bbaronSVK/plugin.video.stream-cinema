@@ -19,9 +19,11 @@ class SimpleCache(object):
     _win = None
     _busy_tasks = []
     _database = None
+    _enabled = True
 
-    def __init__(self):
+    def __init__(self, enabled=True):
         """Initialize our caching class"""
+        self._enabled = enabled
         self._win = xbmcgui.Window(10000)
         self._monitor = xbmc.Monitor()
         self.check_cleanup()
@@ -48,6 +50,8 @@ class SimpleCache(object):
             endpoint: the (unique) name of the cache object as reference
             checkum: optional argument to check if the checksum in the cacheobject matches the checkum provided
         """
+        if self._enabled is not True:
+            return None
         checksum = self._get_checksum(checksum)
         cur_time = self._get_timestamp(datetime.datetime.now())
         result = None

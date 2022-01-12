@@ -5,9 +5,7 @@
         <setting type="lsep" label="30011"/>
         <setting type="text" label="30012" id="kraska.user" default=""/>
         <setting type="text" label="30013" id="kraska.pass" default="" option="hidden"/>
-        <setting type="action" label="30014" action="RunPlugin(plugin://plugin.video.stream-cinema?action=6465627567)" />
-        <setting type="action" label="30056" action="RunPlugin(plugin://plugin.video.stream-cinema?action=7570646174655f6164646f6e)" />
-<!--        <setting type="action" label="xxxx" action="RunPlugin(plugin://plugin.video.stream-cinema?action=7365617263685f6e6578745f657069736f646573)" />-->
+<!--        <setting type="action" label="xxxx" action="RunPlugin(plugin://plugin.video.stream-cinema?action=696e74726f)" />-->
         <setting type="text" label="30015" id="kraska.days.left" default="" enable="false"/>
         <setting type="text" label="30016" id="kraska.token" default="" enable="false"/>
         <setting type="text" label="30017" id="system.uuid" default="" enable="false"/>
@@ -22,36 +20,38 @@
         <setting type="bool" label="30021" id="stream.dubed.titles" default="false" enable="eq(-1,false) + eq(1,false)"/>
         <setting type="bool" label="30022" id="stream.dubed" default="false" enable="eq(-1,false) + eq(-2,false)"/>
         <setting type="bool" label="30061" id="stream.autoplay.episode" default="false"/>
+        <setting type="bool" label="30067" id="stream.exclude.hdr" default="false"/>
+        <setting type="bool" label="30066" id="stream.exclude.dolbyvision" default="true"/>
         <setting type="bool" label="30023" id="stream.autoselect" default="false"/>
-        <setting type="select" label="30024" id="stream.lang1" subsetting="true" values="CZ|SK|EN|HU" visible="eq(-1,true)"
-                 default="CZ"/>
-        <setting type="select" label="30025" id="stream.lang2" subsetting="true" values="CZ|SK|EN|HU" visible="eq(-2,true)"
-                 default="SK"/>
-        <setting type="slider" label="30026" id="stream.max.bitrate" subsetting="true" default="100" range="1,1,100" option="int"
-                 visible="eq(-3,true)"/>
+        <setting type="select" label="30024" id="stream.lang1" subsetting="true" values="CZ|SK|EN|HU" visible="eq(-1,true)" default="CZ"/>
+        <setting type="select" label="30025" id="stream.lang2" subsetting="true" values="CZ|SK|EN|HU" visible="eq(-2,true)" default="SK"/>
+        <setting type="slider" label="30026" id="stream.max.bitrate" subsetting="true" default="100" range="1,1,100" option="int" visible="eq(-3,true)"/>
         <setting type="select" label="30044" id="stream.max.quality" default="4K" visible="eq(-4,true)" subsetting="true" values="-|SD|720p|1080p|4K|8K"/>
         <setting type="bool" label="30045" id="stream.adv" default="false" visible="eq(-5,true)"/>
-        <setting type="bool" label="30066" id="stream.adv.exclude.dolbyvision" visible="eq(-1,true)" default="true" subsetting="true"/>
-        <setting type="bool" label="30046" id="stream.adv.exclude.3d" default="true" visible="eq(-7,true) + eq(-2,true)" subsetting="true"/>
-        <setting type="bool" label="30047" id="stream.adv.exclude.hdr" default="false" visible="eq(-8,true) + eq(-3,true) + eq(1, false)" subsetting="true"/>
-        <setting type="bool" label="30048" id="stream.adv.prefer.hdr" default="true" visible="eq(-9,true) + eq(-4,true) + eq(-1, false)" subsetting="true"/>
-        <setting type="text" label="30049" id="stream.adv.whitelist.codec" default="hevc|h264|h265|av1|ac3|aac|mp3|dts|eac" visible="eq(-10,true) + eq(-5,true)" subsetting="true"/>
-        <setting type="text" label="30050" id="stream.adv.blacklist.codec" default="" visible="eq(-11,true) + eq(-6,true)" subsetting="true"/>
-        <setting type="text" label="30051" id="stream.adv.whitelist.group" default="" visible="eq(-12,true) + eq(-7,true)" subsetting="true"/>
-        <setting type="text" label="30052" id="stream.adv.blacklist.group" default="" visible="eq(-13,true) + eq(-8,true)" subsetting="true"/>
-        <setting type="text" label="30053" id="stream.adv.whitelist.src" default="" visible="eq(-14,true) + eq(-9,true)" subsetting="true"/>
-        <setting type="text" label="30054" id="stream.adv.blacklist.src" default="" visible="eq(-15,true) + eq(-10,true)" subsetting="true"/>
-        <setting type="bool" label="priota poctu kanalov" id="stream.adv.audio.channels" default="true" visible="eq(-16,true) + eq(-11,true)" subsetting="true"/>
+        <setting type="bool" label="30046" id="stream.adv.exclude.3d" default="true" visible="eq(-6,true) + eq(-1,true)" subsetting="true"/>
+        <setting type="bool" label="30047" id="stream.adv.exclude.hdr" default="false" visible="eq(-7,true) + eq(-2,true) + eq(1, false)" subsetting="true"/>
+        <setting type="bool" label="30048" id="stream.adv.prefer.hdr" default="true" visible="eq(-8,true) + eq(-3,true) + eq(-1, false)" subsetting="true"/>
+        <setting type="text" label="30049" id="stream.adv.whitelist.codec" default="hevc|h264|h265|av1|ac3|aac|mp3|dts|eac" visible="eq(-9,true) + eq(-4,true)" subsetting="true"/>
+        <setting type="text" label="30050" id="stream.adv.blacklist.codec" default="" visible="eq(-10,true) + eq(-5,true)" subsetting="true"/>
+        <setting type="text" label="30051" id="stream.adv.whitelist.group" default="" visible="eq(-11,true) + eq(-6,true)" subsetting="true"/>
+        <setting type="text" label="30052" id="stream.adv.blacklist.group" default="" visible="eq(-12,true) + eq(-7,true)" subsetting="true"/>
+        <setting type="text" label="30053" id="stream.adv.whitelist.src" default="" visible="eq(-13,true) + eq(-8,true)" subsetting="true"/>
+        <setting type="text" label="30054" id="stream.adv.blacklist.src" default="" visible="eq(-14,true) + eq(-9,true)" subsetting="true"/>
+        <setting type="bool" label="priota poctu kanalov" id="stream.adv.audio.channels" default="true" visible="eq(-15,true) + eq(-10,true)" subsetting="true"/>
         <setting type="number" visible="false" id="stream.adv.speedtest" default=""/>
         <setting type="text" visible="false" id="stream.adv.speedtest.asn" default=""/>
         <setting type="text" visible="false" id="stream.adv.speedtest.last" default=""/>
         <setting type="text" visible="false" id="system.next_ep.last_run" default=""/>
+        <setting type="bool" visible="false" id="stream.adv.exclude.dolbyvision" default="true"/>
 <!--        <setting type="bool" label="" id="" default="" enable="eq(-12,true)" subsetting="true"/>-->
 <!--        <setting type="bool" label="" id="" default="" enable="eq(-13,true)" subsetting="true"/>-->
     </category>
     <category label="30038">
         <setting type="folder" label="30039" id="download.path" source=""/>
         <setting type="folder" label="30041" id="androidtv.path" source=""/>
+        <setting type="text" id="library.extract.metadata" visible="false"/>
+        <setting type="text" id="movie.library.path" visible="false"/>
+        <setting type="text" id="tvshow.library.path" visible="false"/>
 <!--        <setting type="folder" label="30062" id="movie.library.path" source=""/>-->
 <!--        <setting type="folder" label="30065" id="tvshow.library.path" source=""/>-->
 <!--        <setting type="bool" label="30064" id="library.extract.metadata" source="" enable="!eq(-1,)|!eq(-2,)" subsetting="true"/>-->
@@ -74,13 +74,17 @@
 <!--                 enable="eq(-7,true)"/>-->
     </category>
     <category label="30035">
-        <setting label="30057" type="bool" id="trakt.enabled" default="false"/>
-        <setting label="30058" type="action" visible="eq(3,)" action="RunPlugin(plugin://plugin.video.stream-cinema?action=7472616b742e6c6f67696e)"/>
-        <setting label="30059" type="action" visible="!eq(2,)" action="RunPlugin(plugin://plugin.video.stream-cinema?action=7472616b742e6c6f676f7574)"/>
-        <setting label="30036" id="trakt.user" type="text" default="" enable="false"/>
-        <setting label="" id="trakt.authorization" type="text" default="" visible="false"/>
+        <setting type="bool" label="30057" id="trakt.enabled" default="false"/>
+        <setting type="action" label="30058" visible="eq(4,)" action="RunPlugin(plugin://plugin.video.stream-cinema?action=7472616b742e6c6f67696e)"/>
+        <setting type="action" label="30059" visible="!eq(3,)" action="RunPlugin(plugin://plugin.video.stream-cinema?action=7472616b742e6c6f676f7574)"/>
+        <setting type="action" label="30069" enable="eq(-3,true)" action="RunPlugin(plugin://plugin.video.stream-cinema?action=7472616b742e73796e632e73686f7773)"/>
+        <setting type="text" label="30036" id="trakt.user" default="" enable="false"/>
+        <setting type="text" label="" id="trakt.authorization" default="" visible="false"/>
     </category>
-    <category label="30043">
+    <category label="30068">
+        <setting type="action" label="30014" action="RunPlugin(plugin://plugin.video.stream-cinema?action=6465627567)" />
+        <setting type="action" label="30056" action="RunPlugin(plugin://plugin.video.stream-cinema?action=7570646174655f6164646f6e)" />
+        <setting type="action" label="30070" action="RunPlugin(plugin://plugin.video.stream-cinema?action=7570646174655f6e6578746570)"/>
         <setting type="action" label="30040" action="RunPlugin(plugin://plugin.video.stream-cinema?action=627566666572)" />
         <setting type="bool" label="30042" id="system.autoexec" default="false" />
     </category>

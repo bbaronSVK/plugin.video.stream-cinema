@@ -11,6 +11,7 @@ from json import dumps
 
 from resources.lib.common.kodivideocache import set_kodi_cache_size
 from resources.lib.debug import performance
+from resources.lib.intro import intro
 from resources.lib.kodiutils import params, container_refresh, urlencode, container_update, create_plugin_url, \
     exec_build_in, download, get_setting, update_addon, set_setting_as_bool, notify, get_setting_as_bool
 from resources.lib.common.logger import info, debug
@@ -18,9 +19,9 @@ from resources.lib.common.lists import List, SCKODIItem
 from resources.lib.constants import SORT_METHODS, SC, GUI, ADDON_ID
 from resources.lib.api.sc import Sc
 from resources.lib.gui import cur_win, home_win
-from resources.lib.gui.dialog import dok, dinput
+from resources.lib.gui.dialog import dok, dinput, dselect
 from resources.lib.gui.item import SCItem, get_history_item_name, list_hp, SCLDir, SCUpNext
-from resources.lib.common.storage import Storage, KodiViewModeDb
+from resources.lib.common.storage import Storage, KodiViewModeDb, preferred_lang_list
 from resources.lib.language import Strings
 from resources.lib.params import params
 from resources.lib.services.next_episodes import NextEp
@@ -84,6 +85,8 @@ class Scinema:
             self.succeeded = True
         elif action == SC.ACTION_CMD:
             self.action_cmd()
+        elif action == 'intro':
+            intro(2, True)
         elif action == SC.ACTION_PIN:
             self.action_pin()
         elif action == SC.ACTION_CSEARCH:
@@ -92,10 +95,13 @@ class Scinema:
             self.action_last()
         elif action == 'nextep':
             self.action_next_ep()
+        elif action == 'update_nextep':
+            self.action_update_next_ep()
+            return True
         elif action == 'search_next_episodes':
             self.action_search_next_episodes()
         elif action == SC.ACTION_DEBUG:
-            from resources.lib.services.service import check_set_debug
+            from resources.lib.kodiutils import check_set_debug
 
             check_set_debug(True)
         elif action == SC.ACTION_DOWNLOAD:
@@ -139,6 +145,20 @@ class Scinema:
             from resources.lib.services.autocomplete import Autocomplete
             Autocomplete(self.args)
             return True
+        elif action == SC.ACTION_DEL_PREFERRED_LANGUAGE:
+            del preferred_lang_list[self.args.get(SC.ITEM_ID)]
+            container_refresh()
+            return
+        elif action == SC.ACTION_SET_PREFERRED_LANGUAGE:
+            lang_list = Sc.get('/Lang/{}'.format(self.args.get(SC.ITEM_ID)))
+            debug('parametre: {} / langs: {}'.format(self.args, lang_list))
+            ret = dselect(lang_list, Strings.txt(Strings.CONTEXT_ADD_PREF_LANG))
+            if ret > -1:
+                st = preferred_lang_list
+                st[self.args.get(SC.ITEM_ID)] = lang_list[ret]
+                debug('znovelene: {} / {}'.format(ret, st[self.args.get(SC.ITEM_ID)]))
+                container_refresh()
+            return
         else:
             info('Neznama akcia: {}'.format(action))
         return False
@@ -215,6 +235,10 @@ class Scinema:
             self.call_url_and_response()
         else:
             pass
+
+    def action_update_next_ep(self):
+        st = NextEp()
+        st.update_items()
 
     def action_cmd(self):
         url = self.args.get('url')

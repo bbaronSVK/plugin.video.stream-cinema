@@ -253,6 +253,22 @@ msgctxt "#30066"
 msgid "Exclude Dolby Vision streams"
 msgstr "Vynechat soubory s Dolby Vision"
 
+msgctxt "#30067"
+msgid "Exclude HDR streams"
+msgstr "Vynechat soubory s HDR"
+
+msgctxt "#30068"
+msgid "Tools"
+msgstr "Nástroje"
+
+msgctxt "#30069"
+msgid "Sync TV Shows from trakt.tv"
+msgstr "Synchronizovat seriály z trakt.tv"
+
+msgctxt "#30070"
+msgid "Sync Next EP"
+msgstr "Synchronizovat dostupné epizody ke sledovaným seriálům"
+
 msgctxt "#30100"
 msgid "Welcome"
 msgstr "Vítejte"
@@ -380,5 +396,13 @@ msgstr "Odebrat z odběru"
 msgctxt "#30131"
 msgid "Active subscription required. For proper operation of this plugin you must have an active subscription at kra.sk."
 msgstr "Vyžaduje se předplatné. Pro správné fungování doplňku je zapotřebí aktivní předplatné na úložisku kra.sk."
+
+msgctxt "#30132"
+msgid "Cancel preferred language {}"
+msgstr "Zrušit preferovaný jazyk {}"
+
+msgctxt "#30133"
+msgid "Choose preferred language"
+msgstr "Zvolit preferovaný jazyk"
 
 

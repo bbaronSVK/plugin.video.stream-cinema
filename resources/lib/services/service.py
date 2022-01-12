@@ -5,26 +5,14 @@ import traceback
 from resources.lib.api.kraska import Kraska
 from resources.lib.common.android import AndroidTv
 from resources.lib.common.logger import debug
-from resources.lib.services import websocket
-from resources.lib.services.next_episodes import NextEp
 from resources.lib.constants import ADDON, ADDON_ID
-from resources.lib.gui.dialog import dok, dtextviewer
-from resources.lib.kodiutils import sleep, set_setting, get_uuid, get_setting, get_system_debug, set_system_debug, \
-    exec_build_in, get_setting_as_bool, update_addon
-from resources.lib.language import Strings
+from resources.lib.gui.dialog import dtextviewer
+from resources.lib.kodiutils import sleep, set_setting, get_uuid, get_setting, exec_build_in, get_setting_as_bool, \
+    update_addon, clean_textures
+from resources.lib.services import websocket
 from resources.lib.services.Monitor import monitor
 from resources.lib.services.SCPlayer import player
-
-
-def check_set_debug(toggle=False):
-    cur_system = get_system_debug()
-    if toggle:
-        cur_system = not cur_system
-        set_system_debug(cur_system)
-        if cur_system:
-            dok(Strings.txt(Strings.SYSTEM_H1), Strings.txt(Strings.SYSTEM_DEBUG_ENABLED))
-        else:
-            dok(Strings.txt(Strings.SYSTEM_H1), Strings.txt(Strings.SYSTEM_DEBUG_DISABLED))
+from resources.lib.services.next_episodes import NextEp
 
 
 class Service:
@@ -67,21 +55,26 @@ class Service:
 
         self.next_ep = NextEp()
 
+        clean_textures()
+        from threading import Thread
+        w = Thread(target=player.run)
+        w.start()
+
         while not monitor.abortRequested():
             try:
                 self.periodical_check()
             except:
                 debug('error: {}'.format(traceback.format_exc()))
                 pass
-            sleep(1000 * 1)
+            sleep(1000 * 5)
 
     def periodical_check(self):
         if monitor.can_check():
-            try:
-                player.periodical_check()
-            except:
-                debug('player err: {}'.format(traceback.format_exc()))
-                pass
+            # try:
+            #     player.periodical_check()
+            # except:
+            #     debug('player err: {}'.format(traceback.format_exc()))
+            #     pass
 
             try:
                 monitor.periodical_check()

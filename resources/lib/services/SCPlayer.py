@@ -5,13 +5,14 @@ from datetime import datetime
 from json import loads
 from time import time
 
-from xbmc import Player
+from xbmc import Player, Monitor
 
+from resources.lib.common.storage import Storage
 from resources.lib.services.Settings import settings
 from resources.lib.api.sc import Sc
 from resources.lib.common.lists import SCKODIItem
 from resources.lib.common.logger import debug
-from resources.lib.constants import ADDON_ID
+from resources.lib.constants import ADDON_ID, SC
 from resources.lib.gui import home_win, get_cond_visibility as gcv
 from resources.lib.gui.item import SCUpNext
 from resources.lib.kodiutils import upnext_signal, sleep
@@ -34,7 +35,7 @@ class SCPlayer(Player):
     def onPlayBackStarted(self):
         self.onAVStarted()
 
-    def set_item(self, item):
+    def set_item(self, item=None):
         self.up_next = False
         # self.item = item
         if not self.win.getProperty('SC.play_item'):
@@ -58,15 +59,30 @@ class SCPlayer(Player):
             self.movie = SCKODIItem(self.my_id, series=series, episode=episode, trakt=self.ids.get('trakt'))
             self.movie.scrobble(self.percent_played(), SCKODIItem.SCROBBLE_START)
             audio = self.getAvailableAudioStreams()
+            if len(audio) == 1:
+                debug('Nemame na vyber, mame len jednu audio stopu')
+                return
+
             if linfo:
                 audio = linfo
-            debug('AvailableAudioStreams {}'.format(audio))
+            debug('AvailableAudioStreams {}'.format(len(audio)))
             lang1 = settings.get_setting('stream.lang1').lower()
             lang2 = settings.get_setting('stream.lang2').lower()
             if Sc.parental_control_is_active():
                 lang1 = settings.get_setting('parental.control.lang1').lower()
                 lang2 = settings.get_setting('parental.control.lang2').lower()
-            if self.try_audio(lang1, audio) is False:
+
+            plf = Storage(SC.ITEM_PREFERRED_LANG)
+            plf.load(True)
+            debug('PREF LANGS: {} / {}'.format(self.my_id, plf.data))
+            force_lang = plf.get(self.my_id)
+            force = False
+            if force_lang is not None:
+                lang = force_lang.lower()
+                debug('mame force lang {}'.format(force_lang))
+                force = self.try_audio(lang, audio)
+
+            if force is False and self.try_audio(lang1, audio) is False:
                 self.try_audio(lang2, audio)
 
     def try_audio(self, lang, streams):
@@ -78,17 +94,26 @@ class SCPlayer(Player):
             language_list = ['eng', 'en', 'EN']
         else:
             debug("iny jazyk {}".format(lang))
-            return False
+            language_list = [lang.lower(), lang.upper()]
+
         for i in language_list:
             if i in streams:
                 debug("mame audio: {} pre jazyk {}".format(i, lang))
                 stream_number = streams.index(i)
                 self.setAudioStream(stream_number)
+                # dnotify(lang, '', time=1000, sound=False)
                 return True
         return False
 
     def onAVStarted(self):
         debug('player onAVStarted')
+        for i in range(0, 500):
+            if self.isPlayback():
+                break
+            else:
+                debug('not playing')
+                sleep(1000)
+        self.set_item()
 
     def onAVChange(self):
         debug('player onAVChange')
@@ -189,8 +214,31 @@ class SCPlayer(Player):
         except:
             debug('send_up_next ERR {}'.format(traceback.format_exc()))
 
+    def run(self):
+        debug('START player bg service')
+        m = Monitor()
+        while not m.abortRequested():
+            sleep(1000)
+            try:
+                self.periodical_check()
+            except:
+                debug('player bg service ERR {}'.format(traceback.format_exc()))
+        debug('END player bg service')
+
+    def getTime1(self):  # type: () -> float
+        try:
+            return self.getTime()
+        except:
+            return 0
+
+    def isPlayingVideo1(self):  # type: () -> bool
+        try:
+            return self.isPlayingVideo()
+        except:
+            return False
+
     def periodical_check(self):
-        if not self.isPlayingVideo() or self.is_my_plugin is False:
+        if not self.isPlayback() or self.is_my_plugin is False:
             return
 
         self.current_time = self.getTime()
@@ -210,6 +258,9 @@ class SCPlayer(Player):
             except:
                 pass
             self.up_next = True
+
+    def isPlayback(self):  # type: () -> bool
+        return self.isPlaying() and self.isPlayingVideo() and self.getTime() >= 0
 
 
 player = SCPlayer()

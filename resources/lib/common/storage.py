@@ -5,9 +5,9 @@ import os
 import sqlite3
 from json import loads, dumps
 
-from resources.lib.constants import ADDON, KodiDbMap, ADDON_ID
+from resources.lib.constants import ADDON, KodiDbMap, ADDON_ID, SC
 from resources.lib.common.logger import debug
-from resources.lib.gui.dialog import dok
+from resources.lib.gui.dialog import dok, dprogressgb
 from resources.lib.kodiutils import translate_path, get_skin_name
 from resources.lib.system import SYSTEM_VERSION
 
@@ -27,6 +27,11 @@ class Sqlite(object):
     def _get_conn(self):
         if self._connection is None:
             self._connection = sqlite3.Connection(self._path, timeout=60)
+        try:
+            self._connection.cursor()
+        except sqlite3.ProgrammingError:
+            self._connection = None
+            return self._get_conn()
         return self._connection
 
     def execute(self, query, *args):
@@ -99,6 +104,37 @@ class KodiDb:
             return None
 
 
+class TexturesDb:
+    def __init__(self):
+        path = 'special://database/Textures{}.db'.format(KodiDbMap.Textures[SYSTEM_VERSION])
+        self._db = Sqlite(path)
+
+    def clean(self):
+        zoznam = self.to_clean()
+        total = len(zoznam)
+        d = dprogressgb()
+        d.create('mazanie', 'mazem')
+        for pos, i in enumerate(zoznam):
+            p = int(pos/total*100)
+            debug('item: {}/{} {}'.format(pos, total, TexturesDb.file_name(i)))
+            self.remove_item(i)
+            d.update(p, 'mazanie', 'mazem {}'.format(i[1]))
+        d.close()
+
+    @staticmethod
+    def file_name(item):
+        return translate_path("special://masterprofile/Thumbnails/{}".format(item[1]))
+
+    def remove_item(self, item):
+        xbmcvfs.delete(TexturesDb.file_name(item))
+        self._db.execute('delete from sizes where idtexture=?', item[0])
+        self._db.execute('delete from texture where id=?', item[0])
+
+    def to_clean(self):
+        q = "SELECT s.idtexture, t.cachedurl, s.lastusetime FROM sizes AS s JOIN texture t ON (t.id=s.idtexture) WHERE lastusetime <= DATETIME('now', '-1 month') ORDER BY 3 ASC"
+        return self._db.execute(q).fetchall()
+
+
 class Storage(object):
     _sql_create = (
         'CREATE TABLE IF NOT EXISTS storage '
@@ -129,7 +165,7 @@ class Storage(object):
         if not checked:
             checked = True
             self._db.execute(self._sql_create)
-        self._load()
+        self.load()
 
     def __setitem__(self, key, value):
         if value is not None:
@@ -137,7 +173,7 @@ class Storage(object):
         else:
             if key in self._data:
                 del self._data[key]
-        self._save()
+        self.save()
 
     def __getitem__(self, item):
         return self._data.get(item)
@@ -145,7 +181,7 @@ class Storage(object):
     def __delitem__(self, key):
         if key in self._data:
             del self._data[key]
-        self._save()
+        self.save()
 
     def get(self, name):
         if name in self._data:
@@ -155,9 +191,9 @@ class Storage(object):
     def update(self, up):
         debug('updatujem {} o {}'.format(self._name, up))
         self._data.update(up)
-        self._save()
+        self.save()
 
-    def _save(self):
+    def save(self):
         # if self._data == self._last_saved:
         #     debug('stare aj nove data su rovnake, neupdatujem {}'.format(self._name))
         #     return
@@ -165,9 +201,9 @@ class Storage(object):
         self._db.execute(self._sql_set, '{}'.format(self._name), '{}'.format(dumps(self._data)))
         _storage_cache[self._name] = self._data
 
-    def _load(self):
+    def load(self, force=False):
         # debug('name {}'.format(self._name))
-        if self._name in _storage_cache:
+        if force is False and self._name in _storage_cache:
             self._data = _storage_cache.get(self._name)
             self._last_saved = self._data
             return
@@ -195,3 +231,6 @@ class KodiViewModeDb:
     def get_sort(self, url):
         query = 'select sortMethod, sortOrder from view where path=? and skin=?'
         return self._db.execute(query, url, get_skin_name()).fetchone()
+
+
+preferred_lang_list = Storage(SC.ITEM_PREFERRED_LANG)
