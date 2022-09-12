@@ -2,7 +2,7 @@ from __future__ import print_function, unicode_literals
 
 import re
 import time
-from json import dumps
+from json import dumps, loads
 
 import xbmcvfs
 from xbmcgui import ListItem
@@ -892,6 +892,7 @@ class SCPlayItem(SCBaseItem):
         self.item.setPath(url)
         self.item.setLabel(res.getProperty('original_title'))
         # home_win.setProperty('SC-lite-item', '{}'.format(res.getProperty(SC.ITEM_ID)))
+        home_win.setProperty(SC.SELECTED_ITEM, '{}'.format(dumps(self.selected)))
 
         if 'unique_ids' in self.input.get(SC.ITEM_INFO):
             unique_ids = self.input.get(SC.ITEM_INFO).get('unique_ids')
@@ -958,7 +959,16 @@ class SCUpNext:
             # play_url=item.getPath()
             play_info=play_info
         )
-        # debug('next_info: {}'.format(self.out))
+        selected_item = home_win.getProperty(SC.SELECTED_ITEM)
+        if selected_item:
+            selected_item = loads(selected_item)
+
+            debug('CURRENT: {}'.format(selected_item))
+
+            notifications = selected_item.get(SC.NOTIFICATIONS, {})
+            if SC.SKIP_END_TITLES in notifications and notifications.get(SC.SKIP_END_TITLES) is not None:
+                self.out.update({'notification_offset': notifications.get(SC.SKIP_END_TITLES, None)})
+        debug('next_info: {}'.format(self.out))
         pass
 
     def get(self):
