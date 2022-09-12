@@ -2,7 +2,7 @@
 <window>
 	<zorder>0</zorder>
 	<controls>
-		<control type="button" id="1">
+		<control type="button" id="3001">
 			<description>Skip</description>
 			<visible>Window.IsActive(FullScreenVideo)</visible>
 			<left>1700</left>

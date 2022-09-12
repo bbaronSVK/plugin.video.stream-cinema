@@ -235,7 +235,7 @@ class SCPlayer(Player):
         self.skip_button = Skip("SkipButton.xml", ADDON.getAddonInfo('path'), "default", "1080i")
 
         while not m.abortRequested():
-            sleep(1000)
+            sleep(200)
             try:
                 self.periodical_check()
             except:
@@ -289,7 +289,7 @@ class SCPlayer(Player):
         if self.skip_time_start is False or self.skip_time_end is False:
             return False
 
-        return self.current_time >= self.skip_time_start and self.current_time <= self.skip_time_end
+        return self.current_time >= self.skip_time_start and self.current_time < self.skip_time_end
 
     def skipStart(self):
         self.seekTime(self.skip_time_end)
