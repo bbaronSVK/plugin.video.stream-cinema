@@ -1,4 +1,4 @@
-<addon id="plugin.video.stream-cinema" name="Stream Cinema CZ a SK" provider-name="bbaron" version="2.2.01+k19">
+<addon id="plugin.video.stream-cinema" name="Stream Cinema CZ a SK" provider-name="bbaron" version="2.2.09+k19">
     <requires>
         <import addon="xbmc.python" version="3.0.0"/>
         <import addon="script.module.requests" version="2.25.1"/>
@@ -42,6 +42,10 @@
             obsahu. Tento doplňek pouze vyhledáva zpřístupněný obsah na kra.sk. Použití na vlastní odpovědnost!
         </disclaimer>
         <news>[B]Novinky[/B]
+              [I][B]2.2.09[/B][/I]
+            * [COLOR FF50FF42]add[/COLOR] moznost preskocit znelku serialu
+            * [COLOR FF50FF42]add[/COLOR] vylepsene casovanie upnext
+
               [I][B]2.2.01[/B][/I]
             * [COLOR FF50FF42]add[/COLOR] automaticke premazavanie nahladov z KODI, ktore sa nepouzivali aspon 1 mesiac
             * [COLOR FF50FF42]add[/COLOR] moznost zvolit si preferovany jazyk pre serial/film (pri zapnutom automatickom vybere streamu)

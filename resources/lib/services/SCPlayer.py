@@ -1,7 +1,7 @@
 from __future__ import print_function, unicode_literals
 
 import traceback
-from datetime import datetime
+from datetime import datetime, timedelta as td
 from json import loads
 from time import time
 
@@ -12,9 +12,10 @@ from resources.lib.services.Settings import settings
 from resources.lib.api.sc import Sc
 from resources.lib.common.lists import SCKODIItem
 from resources.lib.common.logger import debug
-from resources.lib.constants import ADDON_ID, SC
+from resources.lib.constants import ADDON, ADDON_ID, SC
 from resources.lib.gui import home_win, get_cond_visibility as gcv
 from resources.lib.gui.item import SCUpNext
+from resources.lib.gui.skip import Skip
 from resources.lib.kodiutils import upnext_signal, sleep
 
 
@@ -31,6 +32,10 @@ class SCPlayer(Player):
         self.ids = {}
         self.watched = False
         self.up_next = False
+        self.skip_button = None
+        self.skip_time_start = False
+        self.skip_time_end = False
+
 
     def onPlayBackStarted(self):
         self.onAVStarted()
@@ -52,6 +57,13 @@ class SCPlayer(Player):
         debug('my ids: {}'.format(self.ids))
         if self.my_id is not None:
             self.win.setProperty('{}.play'.format(ADDON_ID), '1')
+            all_item_data = loads(self.win.getProperty(SC.SELECTED_ITEM))
+            if SC.NOTIFICATIONS in all_item_data:
+                if SC.SKIP_START in all_item_data.get(SC.NOTIFICATIONS, {}):
+                    notification = all_item_data.get(SC.NOTIFICATIONS, {})
+                    self.skip_time_start = notification.get(SC.SKIP_START, False)
+                    self.skip_time_end = notification.get(SC.SKIP_END, False)
+                    debug('NOTIFICATIONS set SKIP TIME: {}s to {}s'.format(td(seconds=self.skip_time_start), td(seconds=self.skip_time_end)))
             debug('je to moj plugin')
             self.is_my_plugin = True
             series = self.item['info'].get('season')
@@ -157,6 +169,7 @@ class SCPlayer(Player):
         debug('player SCPlayer Clean')
         #
         self.win.clearProperty('{}.play'.format(ADDON_ID))
+        self.win.clearProperty(SC.SELECTED_ITEM)
         self.current_time = 0
         self.ids = {}
         self.is_my_plugin = False
@@ -166,6 +179,8 @@ class SCPlayer(Player):
         self.up_next = False
         self.total_time = 0
         self.watched = False
+        self.skip_time_start = False
+        self.skip_time_end = False
 
     def end_playback(self):
         self.set_watched()
@@ -217,6 +232,8 @@ class SCPlayer(Player):
     def run(self):
         debug('START player bg service')
         m = Monitor()
+        self.skip_button = Skip("SkipButton.xml", ADDON.getAddonInfo('path'), "default", "1080i")
+
         while not m.abortRequested():
             sleep(1000)
             try:
@@ -243,6 +260,15 @@ class SCPlayer(Player):
 
         self.current_time = self.getTime()
         self.total_time = self.getTotalTime()
+
+        if settings.get_setting_as_bool('plugin.show.skip.button') and self.isSkipTime():
+            self.skip_button.show_with_callback(self.skipStart)
+        elif settings.get_setting_as_bool('plugin.show.skip.button'):
+            if self.skip_button.is_button_visible is True:
+                debug('rusim SKIP button Notification')
+                self.skip_button.close()
+                self.skip_button.set_visibility()
+
         try:
             percent_played = self.current_time / self.total_time * 100
         except:
@@ -258,6 +284,15 @@ class SCPlayer(Player):
             except:
                 pass
             self.up_next = True
+
+    def isSkipTime(self):
+        if self.skip_time_start is False or self.skip_time_end is False:
+            return False
+
+        return self.current_time >= self.skip_time_start and self.current_time <= self.skip_time_end
+
+    def skipStart(self):
+        self.seekTime(self.skip_time_end)
 
     def isPlayback(self):  # type: () -> bool
         return self.isPlaying() and self.isPlayingVideo() and self.getTime() >= 0
