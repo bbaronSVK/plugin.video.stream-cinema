@@ -1,4 +1,4 @@
-<addon id="plugin.video.stream-cinema" name="Stream Cinema CZ a SK" provider-name="bbaron" version="2.2.09.1+k19">
+<addon id="plugin.video.stream-cinema" name="Stream Cinema CZ a SK" provider-name="bbaron" version="2.2.09.2+k19">
     <requires>
         <import addon="xbmc.python" version="3.0.0"/>
         <import addon="script.module.requests" version="2.25.1"/>
@@ -42,6 +42,9 @@
             obsahu. Tento doplňek pouze vyhledáva zpřístupněný obsah na kra.sk. Použití na vlastní odpovědnost!
         </disclaimer>
         <news>[B]Novinky[/B]
+              [I][B]2.2.09.2[/B][/I]
+            * [COLOR FF50FF42]add[/COLOR] automaticky preskoci znelku, ak uz raz bola preskocena
+
               [I][B]2.2.09.1[/B][/I]
             * [COLOR FFFFAE42]fix[/COLOR] moznost kliknut/focus na tlacitko preskocit
 
