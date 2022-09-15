@@ -32,16 +32,18 @@ class SCPlayer(Player):
         self.ids = {}
         self.watched = False
         self.up_next = False
+        self.skipped_item = None
         self.skip_button = None
         self.skip_time_start = False
         self.skip_time_end = False
-
+        self.skip_start = False
 
     def onPlayBackStarted(self):
         self.onAVStarted()
 
     def set_item(self, item=None):
         self.up_next = False
+        self.skip_start = False
         # self.item = item
         if not self.win.getProperty('SC.play_item'):
             return
@@ -56,6 +58,8 @@ class SCPlayer(Player):
         self.my_id = self.ids.get('sc') if self.ids.get('sc') else None
         debug('my ids: {}'.format(self.ids))
         if self.my_id is not None:
+            if self.skipped_item is not False and self.skipped_item != self.my_id:
+                self.skipped_item = False
             self.win.setProperty('{}.play'.format(ADDON_ID), '1')
             all_item_data = loads(self.win.getProperty(SC.SELECTED_ITEM))
             if SC.NOTIFICATIONS in all_item_data:
@@ -181,6 +185,7 @@ class SCPlayer(Player):
         self.watched = False
         self.skip_time_start = False
         self.skip_time_end = False
+        self.skip_start = False
 
     def end_playback(self):
         self.set_watched()
@@ -262,7 +267,11 @@ class SCPlayer(Player):
         self.total_time = self.getTotalTime()
 
         if settings.get_setting_as_bool('plugin.show.skip.button') and self.isSkipTime():
-            self.skip_button.show_with_callback(self.skipStart)
+            debug('skip: {} / {} / {}'.format(self.skipped_item, self.my_id, self.skip_start))
+            if self.skipped_item == self.my_id and self.skip_start is False:
+                self.skipStart()
+            else:
+                self.skip_button.show_with_callback(self.skipStart)
         elif settings.get_setting_as_bool('plugin.show.skip.button'):
             if self.skip_button.is_button_visible is True:
                 debug('rusim SKIP button Notification')
@@ -289,9 +298,11 @@ class SCPlayer(Player):
         if self.skip_time_start is False or self.skip_time_end is False:
             return False
 
-        return self.current_time >= self.skip_time_start and self.current_time < self.skip_time_end
+        return self.skip_time_start <= self.current_time < self.skip_time_end - 5
 
     def skipStart(self):
+        self.skipped_item = self.my_id
+        self.skip_start = True
         self.seekTime(self.skip_time_end)
 
     def isPlayback(self):  # type: () -> bool
