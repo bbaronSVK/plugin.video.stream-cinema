@@ -260,6 +260,11 @@ class SCPlayer(Player):
             return False
 
     def periodical_check(self):
+        if self.skip_button.is_button_visible is True:
+            debug('rusim SKIP button Notification')
+            self.skip_button.close()
+            self.skip_button.set_visibility()
+
         if not self.isPlayback() or self.is_my_plugin is False:
             return
 
