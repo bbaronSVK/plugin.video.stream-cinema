@@ -509,7 +509,11 @@ class Scinema:
         if 'addSortMethods' in data:
             for method in data['addSortMethods']:
                 # info('add sort method {}'.format(SORT_METHODS[method]))
-                xbmcplugin.addSortMethod(params.handle, SORT_METHODS[method])
+                try:
+                    if method in SORT_METHODS:
+                        xbmcplugin.addSortMethod(params.handle, SORT_METHODS[method])
+                except:
+                    pass
 
         if 'SetSortMethod' in data:
             #method = SORT_METHODS[int(data.get('SetSortMethod'))]

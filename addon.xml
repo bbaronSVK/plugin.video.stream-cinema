@@ -1,4 +1,4 @@
-<addon id="plugin.video.stream-cinema" name="Stream Cinema CZ a SK" provider-name="bbaron" version="2.2.09.3+k19">
+<addon id="plugin.video.stream-cinema" name="Stream Cinema CZ a SK" provider-name="bbaron" version="2.2.12+k19">
     <requires>
         <import addon="xbmc.python" version="3.0.0"/>
         <import addon="script.module.requests" version="2.25.1"/>
@@ -11,6 +11,9 @@
     </extension>
     <extension library="service.py" point="xbmc.service" start="startup">
         <provides>service</provides>
+    </extension>
+    <extension point="xbmc.python.script" library="script.py">
+        <provides>executable</provides>
     </extension>
     <extension point="xbmc.addon.metadata">
         <summary lang="en">stream-cinema.online - play content from kra.sk[CR]For operation it is necessary to

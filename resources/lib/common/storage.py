@@ -26,7 +26,7 @@ class Sqlite(object):
 
     def _get_conn(self):
         if self._connection is None:
-            self._connection = sqlite3.Connection(self._path, timeout=60)
+            self._connection = sqlite3.Connection(self._path, timeout=1, check_same_thread=False)
         try:
             self._connection.cursor()
         except sqlite3.ProgrammingError:

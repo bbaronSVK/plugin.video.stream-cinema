@@ -960,6 +960,7 @@ class SCUpNext:
             play_info=play_info
         )
         selected_item = home_win.getProperty(SC.SELECTED_ITEM)
+        debug('selected_item: {}'.format(selected_item))
         if selected_item:
             selected_item = loads(selected_item)
 
