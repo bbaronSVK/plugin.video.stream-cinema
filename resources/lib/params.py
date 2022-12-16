@@ -9,6 +9,7 @@ class Params:
     orig_args = sys.argv[2] if len(sys.argv) > 2 else ''
     args = decode(sys.argv[2]) if len(sys.argv) > 2 else {}
     resume = sys.argv[3][7:] != 'false' if len(sys.argv) > 3 else False
+    all = sys.argv
     url = None
 
 
