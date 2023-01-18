@@ -734,3 +734,13 @@ def copy2clip(txt):
             p.communicate(input=txt)
         except:
             debug('Linux: Failure to copy to clipboard')
+
+
+def file_put_contents(file, data):
+    with open(file, 'wb') as f:
+        f.write(data)
+
+
+def file_get_contents(file):
+    with open(file, 'rb') as f:
+        return f.read()

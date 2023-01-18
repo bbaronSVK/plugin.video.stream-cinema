@@ -13,6 +13,7 @@ from resources.lib.services import websocket
 from resources.lib.services.Monitor import monitor
 from resources.lib.services.SCPlayer import player
 from resources.lib.services.next_episodes import NextEp
+from resources.lib.api.sc import Sc
 
 
 class Service:
@@ -32,6 +33,7 @@ class Service:
         debug('START SERVICE....................................................................')
         last_changelog = get_setting('system.changelog')
 
+        Sc.download_menu_bg()
         update_addon()
 
         if last_changelog != ADDON.getAddonInfo('version'):
@@ -56,6 +58,7 @@ class Service:
         self.next_ep = NextEp()
 
         clean_textures()
+
         from threading import Thread
         w = Thread(target=player.run)
         w.start()

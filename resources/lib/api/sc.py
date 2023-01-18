@@ -3,12 +3,15 @@
 from __future__ import print_function, unicode_literals
 
 import datetime
+import json
 import time
+import traceback
 
 from resources.lib.common.cache import SimpleCache, use_cache
 from resources.lib.common.logger import debug, info
 from resources.lib.constants import BASE_URL, API_VERSION, SC, ADDON
-from resources.lib.kodiutils import get_uuid, get_skin_name, get_setting_as_bool, get_setting_as_int, get_setting
+from resources.lib.kodiutils import get_uuid, get_skin_name, get_setting_as_bool, get_setting_as_int, get_setting, \
+    file_put_contents, translate_path, file_exists, file_get_contents
 from resources.lib.system import user_agent, Http, SYSTEM_LANG_CODE
 
 try:
@@ -29,9 +32,19 @@ class Sc:
     }
 
     cache = SimpleCache()
+    static_cache = {}
+    static_cache_type = None
 
     @staticmethod
     def get(path, params=None, ttl=None):
+        Sc.load_static_cache()
+
+        if path in Sc.static_cache:
+            ret = Sc.static_cache.get(path, None)
+            if ret is not None:
+                debug("{} je zo static cache".format(path))
+                return ret
+
         sorted_values, url = Sc.prepare(params, path)
         key = '{}{}{}'.format(ADDON.getAddonInfo('version'), url, sorted_values)
         debug('CALL {} PARAMS {} KEY {}'.format(url, sorted_values, key))
@@ -109,10 +122,10 @@ class Sc:
             params.update({'gen': 1})
 
         if 'HDR' not in query:
-            params.update({'HDR':  0 if get_setting_as_bool('stream.exclude.hdr') else 1})
+            params.update({'HDR': 0 if get_setting_as_bool('stream.exclude.hdr') else 1})
 
         if 'DV' not in query:
-            params.update({'DV':  0 if get_setting_as_bool('stream.exclude.dolbyvision') else 1})
+            params.update({'DV': 0 if get_setting_as_bool('stream.exclude.dolbyvision') else 1})
 
         if get_setting_as_bool('plugin.show.old.menu'):
             params.update({'old': 1})
@@ -152,3 +165,47 @@ class Sc:
 
         debug('SAVE TO CACHE {} / {}'.format(ttl, key))
         Sc.cache.set(key, ret, expiration=datetime.timedelta(seconds=ttl))
+
+    @staticmethod
+    def static_cache_local_name():
+        dpath = ADDON.getAddonInfo('profile')
+        return translate_path("{}/{}".format(dpath, Sc.static_cache_filename()))
+
+    @staticmethod
+    def static_cache_filename():
+        old = 1 if get_setting_as_bool('plugin.show.old.menu') else 0
+
+        return 'menu.{}.json'.format(old)
+
+    @staticmethod
+    def download_menu():
+        try:
+            url = "{}/../{}".format(BASE_URL, Sc.static_cache_filename())
+            info('download menu cache {}'.format(url))
+            resp = Http.get(url)
+            dfile = Sc.static_cache_local_name()
+            file_put_contents(dfile, resp.content)
+            Sc.load_static_cache(True)
+        except Exception as e:
+            debug('error download menu: {}'.format(traceback.format_exc()))
+
+    @staticmethod
+    def download_menu_bg():
+        from threading import Thread
+        worker = Thread(target=Sc.download_menu())
+        worker.start()
+
+    @staticmethod
+    def load_static_cache():
+        try:
+            if Sc.static_cache != {}:
+                debug('Nenatahujeme static cache {} == {} || {}'.format(Sc.static_cache_type, Sc.static_cache_filename(), Sc.static_cache))
+                return
+
+            if file_exists(Sc.static_cache_local_name()):
+                debug('Natahujeme static cache zo suboru')
+                Sc.static_cache = json.loads(file_get_contents(Sc.static_cache_local_name()))
+                Sc.static_cache_type = Sc.static_cache_filename()
+        except Exception as e:
+            Sc.static_cache = {}
+            debug('error load static menu: {}'.format(traceback.format_exc()))
