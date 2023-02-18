@@ -106,7 +106,7 @@ class Kraska:
             data = self.get_data('/api/file/download', {"data": {"ident": ident}})
             if "data" in data and "link" in data.get("data", {}):
                 debug('kra resolvovala {}'.format(data.get("data").get("link")))
-                return data.get("data").get("link").replace('b01', 'b02')
+                return data.get("data").get("link")
             debug('Nepodarilo sa resolvnut subor: {}'.format(ident))
         finally:
             pass
