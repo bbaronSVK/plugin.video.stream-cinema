@@ -621,7 +621,7 @@ class SCPlayItem(SCBaseItem):
         smin = 999999999
         smax = 0
         durmin = 999999999
-        hosts = ['b01', 's01', 'v01']
+        hosts = ['b01', 's01', 'v01', 't01']
         for h in hosts:
             u = re.sub(r':\/\/([^.]+)', '://{}'.format(h), url)
             debug('speedtest URL {}'.format(u))

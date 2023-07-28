@@ -45,10 +45,11 @@ class SCPlayer(Player):
         self.up_next = False
         self.skip_start = False
         # self.item = item
-        if not self.win.getProperty('SC.play_item'):
+        json_data = self.win.getProperty('SC.play_item')
+        debug('set_item json_data: {}'.format(json_data))
+        if not json_data:
             return
-        item_data = loads(self.win.getProperty('SC.play_item'))
-        self.win.clearProperty('SC.play_item')
+        item_data = loads(json_data)
         self.item = item_data.get('info')
         debug('ITEM: {}'.format(self.item.get('info', {}).get('unique_ids')))
         linfo = item_data.get('strms').get('linfo')
@@ -173,6 +174,7 @@ class SCPlayer(Player):
         debug('player SCPlayer Clean')
         #
         self.win.clearProperty('{}.play'.format(ADDON_ID))
+        self.win.clearProperty('SC.play_item')
         self.win.clearProperty(SC.SELECTED_ITEM)
         self.current_time = 0
         self.ids = {}
