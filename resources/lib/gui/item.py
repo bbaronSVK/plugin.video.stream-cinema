@@ -235,14 +235,16 @@ class SCStreamSelect(SCBaseItem):
     def __init__(self, data):
         SCBaseItem.__init__(self, data)
         label2 = ''
+        strm_nfo = data.get('stream_info', {})
+        titulky = True if [x for x in strm_nfo.get('langs', "") if '+tit' in x] else False
+
         if 'bitrate' in data:
             label2 += 'bitrate: [B]{}[/B]'.format(convert_bitrate(int(data.get('bitrate'))))
         if 'linfo' in data:
             label2 += '   audio: [B][UPPERCASE]{}[/UPPERCASE][/B]'.format(', '.join(data['linfo']))
-            if SC.ITEM_SUBS in data:
-                label2 += ', [B]titulky[/B]'
+            if titulky:
+                label2 += ', [B]+tit[/B]'
 
-        strm_nfo = data.get('stream_info', {})
         if 'grp' in strm_nfo:
             label2 += '   grp: [B]{}[/B]'.format(strm_nfo['grp'])
 
