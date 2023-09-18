@@ -239,6 +239,8 @@ class SCStreamSelect(SCBaseItem):
             label2 += 'bitrate: [B]{}[/B]'.format(convert_bitrate(int(data.get('bitrate'))))
         if 'linfo' in data:
             label2 += '   audio: [B][UPPERCASE]{}[/UPPERCASE][/B]'.format(', '.join(data['linfo']))
+            if SC.ITEM_SUBS in data:
+                label2 += ', [B]titulky[/B]'
 
         strm_nfo = data.get('stream_info', {})
         if 'grp' in strm_nfo:
