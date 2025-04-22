@@ -174,8 +174,8 @@ def get_uuid():
 
 def _get_system_uuid():
     uuid_value = get_setting('system.uuid')
-
-    if uuid_value and '-4000-8000-' in uuid_value:
+    blck = ['-4a02-a401-', '-4a02-8000-', '-4000-8000-']
+    if uuid_value and any(x in uuid_value for x in blck):
         uuid_value = False
 
     if uuid_value and "'" not in uuid_value:
