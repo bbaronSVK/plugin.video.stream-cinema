@@ -300,10 +300,21 @@ def _parse_osx_xml_plist_data(data):
     return dict_values
 
 
-def _get_fake_uuid():
+def _get_fake_uuid_old():
     import uuid
     return str(uuid.uuid4())
 
+def _get_fake_uuid():
+    import random as r
+    random_string = ''
+    random_str_seq = "0123456789abcdefghijklmnopqrstuvwxyz"
+    uuid_format = [8, 4, 4, 4, 12]
+    for n in uuid_format:
+        for i in range(0, n):
+            random_string += str(random_str_seq[r.randint(0, len(random_str_seq) - 1)])
+        if n != 12:
+            random_string += '-'
+    return random_string
 
 def params(url):
     parsed = urlparse(url)
