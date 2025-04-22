@@ -107,6 +107,7 @@ class SC:
     TXT_PINNED = 'p-{}'
     TXT_CUSTOM_FORMAT = 'custom-{}'
     TRAKT_CACHE_WATCHET_ACTIVITY = 'SC:watched:activity'
+    BCK_FILE = 'sc.json'
 
 
 class HTTP:

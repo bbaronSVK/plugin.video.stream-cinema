@@ -273,6 +273,10 @@ msgctxt "#30071"
 msgid "Show skip button"
 msgstr "Zobrazit tlacidlo Preskocit"
 
+msgctxt "#30072"
+msgid "Auth token"
+msgstr ""
+
 msgctxt "#30100"
 msgid "Welcome"
 msgstr "Vitajte"

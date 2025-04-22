@@ -10,6 +10,7 @@
         <setting type="text" label="30016" id="kraska.token" default="" enable="false"/>
         <setting type="text" label="30017" id="system.uuid" default="" enable="false"/>
         <setting type="text" label="30018" id="system.ver" default="" enable="false"/>
+        <setting type="text" label="30072" id="system.auth_token" default="" enable="false"/>
         <setting type="text" id="system.changelog" default="" visible="false"/>
         <setting type="text" id="kraska.chsum" default="" visible="false"/>
     </category>

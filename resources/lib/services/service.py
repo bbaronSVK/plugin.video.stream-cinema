@@ -33,6 +33,7 @@ class Service:
         debug('START SERVICE....................................................................')
         last_changelog = get_setting('system.changelog')
 
+        Sc.get_auth_token()
         Sc.download_menu_bg()
         update_addon()
 

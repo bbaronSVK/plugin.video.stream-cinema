@@ -11,7 +11,7 @@ from resources.lib.services.Settings import settings
 from resources.lib.system import Http
 
 BASE = 'https://api.kra.sk'
-
+UPLOAD = 'https://upload.kra.sk'
 
 class ResolveException(Exception):
     pass
@@ -187,3 +187,73 @@ class Kraska:
                      Strings.txt(Strings.KRASKA_NOTIFY_CREDENTIAL_L1))
         if res:
             open_settings('0.0')
+
+    def list_files(self, parent=None, filter=None):
+        self.get_token()
+        data = self.get_data('/api/file/list', {'data': {'parent': parent, 'filter': filter}})
+        debug('list files: {}'.format(data))
+
+        return data
+
+    def upload(self, data, filename):
+        self.get_token()
+        import base64
+
+        item = self.get_data('/api/file/create', {'data': {'name': filename}, 'shared': False})
+        if item is not False and 'error' in item and item.get('error', None) == 1205:
+            found = self.list_files(filter=filename).get('data', [])
+            if len(found) == 1:
+                for f in found:
+                    if f.get('name', None) == filename:
+                        self.delete(f.get('ident', None))
+                        return self.upload(data, filename)
+
+            debug('list files: {}'.format(found))
+
+        if item is False or 'data' not in item:
+            debug('error upload 1: {} / {}'.format(item, item.get('error', None)))
+            raise Exception('error upload: {}'.format(item))
+
+        ident = item.get('data').get('ident', None)
+        link = item.get('data').get('link', None)
+        if ident is None or link is None:
+            debug('error upload 2: {}'.format(item))
+            raise Exception('error upload: {}'.format(item))
+
+        bident = base64.b64encode(ident.encode('utf-8')).decode("utf-8")
+
+        headers = {
+            'Tus-Resumable': '1.0.0',
+            'Upload-Metadata': 'ident {}'.format(bident),
+            'Upload-Length': str(len(data)),
+        }
+        debug('upload headers: {} - {}'.format(link, json.dumps(headers)))
+
+        upload = Http.post(link, headers=headers, allow_redirects=False)
+        debug('response headers: {}/{}'.format(upload.status_code, json.dumps(dict(upload.headers))))
+        upload_url = upload.headers.get('location', None)
+
+        if upload_url is None or upload.status_code != 201:
+            debug('error upload 3: {}'.format(item))
+            self.delete(ident)
+            raise Exception('error upload: {}'.format(item))
+
+        debug('upload url: {}{}'.format(UPLOAD, upload_url))
+
+        headers = {
+            'Tus-Resumable': '1.0.0',
+            'Upload-Offset': '0',
+            'Content-Type': 'application/offset+octet-stream',
+        }
+        ufile = Http.patch('{}{}'.format(UPLOAD, upload_url), data=data, headers=headers)
+
+        if ufile.status_code != 204:
+            debug('error upload 4: {}'.format(ufile.status_code))
+            self.delete(ident)
+
+        ufile.json()
+        debug('upload ok: {}'.format(ufile.get()))
+
+
+    def delete(self, ident):
+        return self.get_data('/api/file/delete', {'data': {'ident': ident}})

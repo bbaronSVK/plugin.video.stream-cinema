@@ -174,31 +174,17 @@ def get_uuid():
 
 def _get_system_uuid():
     uuid_value = get_setting('system.uuid')
+
+    if uuid_value and '-4000-8000-' in uuid_value:
+        uuid_value = False
+
     if uuid_value and "'" not in uuid_value:
         debug('UUID from settings: {}'.format(uuid_value))
         return uuid_value
-    else:
-        uuid_value = ''
 
-    system = get_system_platform()
-    if system in ['windows', 'uwp']:
-        uuid_value = _get_windows_uuid()
-        debug('Windows UUID Found')
-    # elif system == 'android':
-    #     uuid_value = _get_android_uuid()
-    #     debug('Android UUID Found')
-    elif system == 'linux':
-        uuid_value = _get_linux_uuid()
-        debug('Linux UUID Found')
-    elif system == 'osx':
-        uuid_value = _get_macos_uuid()
-        debug('OSX, IOS UUID Found {}'.format(uuid_value))
-    if not uuid_value or "'" in uuid_value:
-        debug('It is not possible to get a system UUID creating a new UUID')
-        if not uuid_value:
-            debug('get fake uuid')
-            uuid_value = _get_fake_uuid()
-            set_setting('system.uuid', uuid_value)
+    uuid_value = _get_fake_uuid()
+    set_setting('system.uuid', uuid_value)
+
     if sys.version_info > (3, 0):
         return str(uuid_value)
     return uuid_value.encode('ascii', 'replace')
@@ -596,11 +582,12 @@ def convert_bitrate(mbit, with_text=True):
 
 
 def get_isp():
-    for fn in [isp_ipinfo, isp_ipapi, isp_dbip, isp_ipgeolocationioapi]:
+    for fn in [isp_ipapi, isp_dbip]:
         try:
+            debug('*************************************************** ISP fn: {}'.format(fn))
             isp = fn()
             if isp.get('a') is not None:
-                debug('*************************************************** ISP: {}'.format(isp))
+                debug('*************************************************** ISP data: {}'.format(isp))
                 return isp
         except:
             debug('ERRO ISP: {}'.format(traceback.format_exc()))
@@ -620,22 +607,28 @@ def isp_ipinfo():
 def isp_call(url, ref):
     from resources.lib.api.sc import Sc
     ip = Sc.get('/IP')
-    from resources.lib.system import Http
+    debug('IP: {}'.format(ip))
     url = url.format(ip)
-    r = Http.get(url, headers={'referer': ref})
+
+    from resources.lib.system import Http
+    headers = {}
+    if ref != '':
+        headers = {'referer': ref}
+    r = Http.get(url, headers=headers)
     return r.json()
 
 
 def isp_ipapi():
-    url = 'https://ipapi.com/ip_api.php?ip={}'
-    d = isp_call(url, 'https://ipapi.com/')
-    asn = d.get('connection', {}).get('asn', 'N/A')
-    return {'c': d.get('country_code', 'N/A'), 'a': asn}
+    url = 'https://api.ipapi.is/'
+    d = isp_call(url, '')
+    asn = d.get('asn')
+    return {'c': asn.get('country', 'N/A').upper(), 'a': asn.get('asn', 'N/A')}
 
 
 def isp_dbip():
     url = 'https://db-ip.com/demo/home.php?s={}'
-    d = isp_call(url, 'https://db-ip.com/')
+    a = isp_call(url, 'https://db-ip.com/')
+    d = a.get('demoInfo', {})
     return {'c': d.get('countryCode', 'N/A'), 'a': d.get('asNumber', '')}
 
 

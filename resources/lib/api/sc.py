@@ -31,7 +31,7 @@ class Sc:
         "4": 18,
     }
 
-    cache = SimpleCache()
+    cache = SimpleCache(False)
     static_cache = {}
     static_cache_type = None
 
@@ -141,11 +141,57 @@ class Sc:
         return get_setting_as_bool('parental.control.enabled') and hour_start <= hour_now <= hour_end
 
     @staticmethod
-    def headers():
-        return {
+    def headers(token=True):
+        headers = {
             'User-Agent': user_agent(),
             'X-Uuid': get_uuid(),
         }
+        if token:
+            headers['X-AUTH-TOKEN'] = Sc.get_auth_token()
+        return headers
+
+    @staticmethod
+    def get_auth_token():
+        token = ADDON.getSetting('system.auth_token')
+        if token == '' or token is None or token == 'None' or token is False:
+            from resources.lib.api.kraska import Kraska
+
+            kr = Kraska()
+            found = kr.list_files(filter=SC.BCK_FILE)
+            if len(found.get('data', [])) == 1:
+                for f in found.get('data', []):
+                    try:
+                        url = kr.resolve(f.get('ident'))
+                        data = Http.get(url)
+                        if len(data.text) == 32:
+                            token = data.text
+                            ADDON.setSetting('system.auth_token', token)
+                            return token
+                    except Exception as e:
+                        debug('error get auth token: {}'.format(traceback.format_exc()))
+            else:
+                debug('backup file not found {}'.format(SC.BCK_FILE))
+
+            path = '/auth/token'
+            sorted_values, url = Sc.prepare(path=path, params={})
+            res = Http.post(url, params=sorted_values, headers=Sc.headers(False))
+            res.raise_for_status()
+            ret = res.json()
+            if 'error' in ret:
+                debug('error get auth token: {}'.format(ret))
+                return None
+            if 'token' not in ret:
+                debug('error get auth token: {}'.format(ret))
+                return None
+            token = ret['token']
+            ADDON.setSetting('system.auth_token', token)
+            try:
+                kr.upload(token, SC.BCK_FILE)
+            except Exception as e:
+                pass
+        else:
+            debug('auth token from settings {}'.format(token))
+        return token
 
     @staticmethod
     def up_next(id, s, e):
@@ -199,7 +245,7 @@ class Sc:
     def load_static_cache():
         try:
             if Sc.static_cache != {}:
-                debug('Nenatahujeme static cache {} == {} || {}'.format(Sc.static_cache_type, Sc.static_cache_filename(), Sc.static_cache))
+                debug('uz mame static cache {} == {}'.format(Sc.static_cache_type, Sc.static_cache_filename()))
                 return
 
             if file_exists(Sc.static_cache_local_name()):
