@@ -31,6 +31,8 @@ class Kraska:
             if "session_id" in data:
                 debug('kra login OK')
                 self.set_token(data.get('session_id'))
+                from resources.lib.api.sc import Sc
+                Sc.get_auth_token(True)
                 return True
         except:
             debug('kra err login: {}'.format(traceback.format_exc()))
@@ -125,7 +127,7 @@ class Kraska:
             debug('user nema aktivne predplatne')
             raise ResolveException("Nieje predplatne")
 
-        debug('idem vratit pocet dni {}'.format(user_info))
+        debug('idem vratit pocet dni')
         return user_info.get('days_left', 0)
 
     def get_data(self, endpoint, data=None):
@@ -156,7 +158,7 @@ class Kraska:
             days_left = data.get('data', {}).get('days_left', 0)
             days_left = 0 if days_left is None else days_left
             settings.set_setting('kraska.days.left', days_left)
-            debug('vracame info o userovi {}'.format(data.get('data', False)))
+            debug('vracame info o userovi')
             return data.get('data', False)
         except Exception as e:
             debug('kra erro: {}'.format(traceback.format_exc()))
@@ -208,7 +210,7 @@ class Kraska:
                         self.delete(f.get('ident', None))
                         return self.upload(data, filename)
 
-            debug('list files: {}'.format(found))
+            # debug('list files: {}'.format(found))
 
         if item is False or 'data' not in item:
             debug('error upload 1: {} / {}'.format(item, item.get('error', None)))
@@ -227,10 +229,10 @@ class Kraska:
             'Upload-Metadata': 'ident {}'.format(bident),
             'Upload-Length': str(len(data)),
         }
-        debug('upload headers: {} - {}'.format(link, json.dumps(headers)))
+        # debug('upload headers: {} - {}'.format(link, json.dumps(headers)))
 
         upload = Http.post(link, headers=headers, allow_redirects=False)
-        debug('response headers: {}/{}'.format(upload.status_code, json.dumps(dict(upload.headers))))
+        # debug('response headers: {}/{}'.format(upload.status_code, json.dumps(dict(upload.headers))))
         upload_url = upload.headers.get('location', None)
 
         if upload_url is None or upload.status_code != 201:
@@ -251,7 +253,6 @@ class Kraska:
             debug('error upload 4: {}'.format(ufile.status_code))
             self.delete(ident)
 
-        ufile.json()
         debug('upload ok: {}'.format(ufile.get()))
 
 

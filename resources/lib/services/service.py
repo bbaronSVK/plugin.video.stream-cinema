@@ -33,9 +33,14 @@ class Service:
         debug('START SERVICE....................................................................')
         last_changelog = get_setting('system.changelog')
 
-        Sc.get_auth_token()
-        Sc.download_menu_bg()
         update_addon()
+
+        try:
+            kr = Kraska()
+            if kr.username and kr.password:
+                kr.login()
+        except:
+            pass
 
         if last_changelog != ADDON.getAddonInfo('version'):
             debug('SYSTEM.CHANGELOG: {}'.format(ADDON.getAddonInfo('changelog')))

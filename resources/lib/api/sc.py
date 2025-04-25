@@ -151,26 +151,30 @@ class Sc:
         return headers
 
     @staticmethod
-    def get_auth_token():
-        token = ADDON.getSetting('system.auth_token')
+    def get_auth_token(force = False):
+        token = ''
+        if force is False:
+            token = ADDON.getSetting('system.auth_token')
+
         if token == '' or token is None or token == 'None' or token is False:
             from resources.lib.api.kraska import Kraska
 
             kr = Kraska()
-            found = kr.list_files(filter=SC.BCK_FILE)
-            if len(found.get('data', [])) == 1:
-                for f in found.get('data', []):
-                    try:
-                        url = kr.resolve(f.get('ident'))
-                        data = Http.get(url)
-                        if len(data.text) == 32:
-                            token = data.text
-                            ADDON.setSetting('system.auth_token', token)
-                            return token
-                    except Exception as e:
-                        debug('error get auth token: {}'.format(traceback.format_exc()))
-            else:
-                debug('backup file not found {}'.format(SC.BCK_FILE))
+            if kr.get_token():
+                found = kr.list_files(filter=SC.BCK_FILE)
+                if len(found.get('data', [])) == 1:
+                    for f in found.get('data', []):
+                        try:
+                            url = kr.resolve(f.get('ident'))
+                            data = Http.get(url)
+                            if len(data.text) == 32:
+                                token = data.text
+                                ADDON.setSetting('system.auth_token', token)
+                                return token
+                        except Exception as e:
+                            debug('error get auth token: {}'.format(traceback.format_exc()))
+                else:
+                    debug('backup file not found {}'.format(SC.BCK_FILE))
 
             path = '/auth/token'
             sorted_values, url = Sc.prepare(path=path, params={})
@@ -225,6 +229,7 @@ class Sc:
 
     @staticmethod
     def download_menu():
+        return False
         try:
             url = "{}/../{}".format(BASE_URL, Sc.static_cache_filename())
             info('download menu cache {}'.format(url))
@@ -243,6 +248,8 @@ class Sc:
 
     @staticmethod
     def load_static_cache():
+        Sc.static_cache = {}
+        return False
         try:
             if Sc.static_cache != {}:
                 debug('uz mame static cache {} == {}'.format(Sc.static_cache_type, Sc.static_cache_filename()))
