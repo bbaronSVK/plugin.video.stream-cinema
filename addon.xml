@@ -1,4 +1,4 @@
-<addon id="plugin.video.stream-cinema" name="Stream Cinema CZ a SK" provider-name="bbaron" version="2.5.04.3+k19">
+<addon id="plugin.video.stream-cinema" name="Stream Cinema CZ a SK" provider-name="bbaron" version="2.5.05+k19">
     <requires>
         <import addon="xbmc.python" version="3.0.0"/>
         <import addon="script.module.requests" version="2.25.1"/>

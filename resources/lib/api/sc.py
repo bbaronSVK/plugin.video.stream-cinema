@@ -31,7 +31,7 @@ class Sc:
         "4": 18,
     }
 
-    cache = SimpleCache(False)
+    cache = SimpleCache()
     static_cache = {}
     static_cache_type = None
 
